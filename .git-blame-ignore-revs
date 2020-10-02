@@ -1,0 +1,10 @@
+# Update to rust 2018 edition
+c9ab91b647892640c1de19adcb43be5627bceebf
+
+# Initial run through rustfmt
+531ec5d30658495a610b2ba209f62afbf01936c1
+
+# Removal of non-needed :: prefixes for paths.
+74f4b7a01f909cfbfc562e0f8e820ac9799fc2f2
+
+
