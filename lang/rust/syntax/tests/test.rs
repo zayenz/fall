@@ -1,30 +1,37 @@
 extern crate elapsed;
-extern crate file;
 extern crate fall_tree;
+extern crate file;
 extern crate lang_rust_syntax;
 
 use std::path::{Path, PathBuf};
 
-use fall_tree::test_util::{check_syntax_ws, check_syntax, check_directory, check_inline_tests};
-use fall_tree::{TextRange, tu, FileEdit};
 use fall_tree::search::ast;
+use fall_tree::test_util::{check_directory, check_inline_tests, check_syntax, check_syntax_ws};
+use fall_tree::{tu, FileEdit, TextRange};
 use lang_rust_syntax::{lang_rust, FnDef, NameOwner};
 
 #[test]
 fn inline_tests() {
-    check_inline_tests(&lang_rust(), Path::new("src/rust.fall"), Path::new("tests/inline.txt"))
+    check_inline_tests(
+        &lang_rust(),
+        Path::new("src/rust.fall"),
+        Path::new("tests/inline.txt"),
+    )
 }
 
 #[test]
 fn lexer() {
-    check_syntax_ws(&lang_rust(), r"
+    check_syntax_ws(
+        &lang_rust(),
+        r"
 /* comment
   /* nested */
 */
 
 struct S;
 /*
-", r#"
+",
+        r#"
 FILE
   WHITESPACE "\n"
   BLOCK_COMMENT "/* comment\n  /* nested */\n*/"
@@ -36,16 +43,20 @@ FILE
     SEMI ";"
   WHITESPACE "\n"
   BLOCK_COMMENT "/*\n"
-"#)
+"#,
+    )
 }
 
 #[test]
 fn double_replacement() {
-    check_syntax(&lang_rust(), r#"
+    check_syntax(
+        &lang_rust(),
+        r#"
         fn main() {
             if (Foo {}) {}
         }
-"#, r#"
+"#,
+        r#"
 FILE
   FN_DEF
     FN "fn"
@@ -70,16 +81,20 @@ FILE
             L_CURLY "{"
             R_CURLY "}"
       R_CURLY "}"
-"#)
+"#,
+    )
 }
 
 #[test]
 fn regression() {
-    check_syntax(&lang_rust(), r#"
+    check_syntax(
+        &lang_rust(),
+        r#"
         fn main() {
             &expected[..];
         }
-"#, r#"
+"#,
+        r#"
 FILE
   FN_DEF
     FN "fn"
@@ -102,12 +117,16 @@ FILE
             R_BRACK "]"
         SEMI ";"
       R_CURLY "}"
-"#)
+"#,
+    )
 }
 
 #[test]
 fn missing_token() {
-    check_syntax(&lang_rust(), "fn foo foo", r#"
+    check_syntax(
+        &lang_rust(),
+        "fn foo foo",
+        r#"
 FILE
   FN_DEF
     FN "fn"
@@ -115,12 +134,16 @@ FILE
     ERROR ""
   ERROR
     IDENT "foo"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn skipping() {
-    check_syntax(&lang_rust(), "foo fn foo(){} bar baz struct S {} quuz", r#"
+    check_syntax(
+        &lang_rust(),
+        "foo fn foo(){} bar baz struct S {} quuz",
+        r#"
 FILE
   ERROR
     IDENT "foo"
@@ -141,7 +164,8 @@ FILE
     L_CURLY "{"
     R_CURLY "}"
   ERROR
-    IDENT "quuz""#);
+    IDENT "quuz""#,
+    );
 }
 
 #[test]
@@ -149,10 +173,11 @@ fn check_by_data() {
     check_directory(&lang_rust(), &test_data())
 }
 
-
 #[test]
 fn comments_attachment() {
-    check_syntax_ws(&lang_rust(), r#"
+    check_syntax_ws(
+        &lang_rust(),
+        r#"
 /// Doc comment attached
 struct A;
 
@@ -160,7 +185,8 @@ struct A;
 
 // But only if there are no blank lines
 struct B;
-    "#, r#"
+    "#,
+        r#"
 FILE
   WHITESPACE "\n"
   STRUCT_DEF
@@ -178,9 +204,9 @@ FILE
     WHITESPACE " "
     IDENT "B"
     SEMI ";"
-  WHITESPACE "\n    ""#)
+  WHITESPACE "\n    ""#,
+    )
 }
-
 
 #[test]
 fn incremental() {
@@ -203,19 +229,18 @@ trait T {
     let node = file.root();
     let fun = ast::descendants_of_type::<FnDef>(node).pop().unwrap();
     let mut edit = FileEdit::new(&file);
-    edit.replace_with_text(
-        fun.name_ident().unwrap(),
-        "baz".to_string(),
-    );
+    edit.replace_with_text(fun.name_ident().unwrap(), "baz".to_string());
     let edit = edit.into_text_edit();
     let file = lang_rust().reparse(&file, &edit);
     let incremental_tics = file.metrics().get("parsing ticks").unwrap();
 
     assert!(800 < full_tics && full_tics < 1200);
-    assert!(incremental_tics < 800, "too many ticks: {}", incremental_tics);
+    assert!(
+        incremental_tics < 800,
+        "too many ticks: {}",
+        incremental_tics
+    );
 }
-
-
 
 #[test]
 fn performance_test() {
@@ -234,10 +259,12 @@ fn performance_test() {
                 let error_text = &file.text().to_string()[err_range];
                 let parent = err.parent().unwrap();
                 let ctx = parent.parent().unwrap_or(parent);
-                eprintln!("\nError in\n----------\n{}\n----------\n{:?}\n----------\n{}\n----------\n\n",
-                          ctx.text(),
-                          parent,
-                          error_text);
+                eprintln!(
+                    "\nError in\n----------\n{}\n----------\n{:?}\n----------\n{}\n----------\n\n",
+                    ctx.text(),
+                    parent,
+                    error_text
+                );
             }
             assert!(ast_len > 10000);
             println!("{}\ntotal: {}", file.metrics(), total);

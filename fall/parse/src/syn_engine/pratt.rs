@@ -1,6 +1,6 @@
-use crate::PrattTable;
+use super::expr::{parse_expr, parse_or};
 use crate::syn_engine::parser::{Parser, Pos};
-use super::expr::{parse_or, parse_expr};
+use crate::PrattTable;
 
 pub(super) fn parse_pratt<'g>(
     p: &mut Parser<'g>,
@@ -14,7 +14,7 @@ fn pratt_go<'g>(
     p: &mut Parser<'g>,
     table: &'g PrattTable,
     tokens: Pos,
-    min_prior: u32
+    min_prior: u32,
 ) -> Option<Pos> {
     let mut lhs = p.mark();
     let mut tokens = match pratt_prefix(p, table, tokens) {
@@ -45,17 +45,13 @@ fn pratt_go<'g>(
             }
             p.rollback(mark)
         }
-        break
+        break;
     }
 
     Some(tokens)
 }
 
-fn pratt_prefix<'p>(
-    p: &mut Parser<'p>,
-    table: &'p PrattTable,
-    tokens: Pos,
-) -> Option<Pos> {
+fn pratt_prefix<'p>(p: &mut Parser<'p>, table: &'p PrattTable, tokens: Pos) -> Option<Pos> {
     if let Some(result) = parse_or(p, &table.atoms, tokens) {
         return Some(result);
     }

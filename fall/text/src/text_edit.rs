@@ -1,4 +1,4 @@
-use crate::{TextUnit, TextRange, TextBuf, Text, tu};
+use crate::{tu, Text, TextBuf, TextRange, TextUnit};
 use std::cmp::Ordering;
 
 #[derive(Clone, Debug)]
@@ -11,7 +11,6 @@ pub enum TextEditOp {
     Copy(TextRange), // TODO: check for disjoint ranges
     Insert(TextBuf),
 }
-
 
 impl TextEdit {
     pub fn apply(&self, text: Text) -> TextBuf {
@@ -31,7 +30,6 @@ pub struct TextEditBuilder {
     segments: Vec<TextEditOp>,
     last_offset: TextUnit,
     text_len: TextUnit,
-
 }
 
 impl TextEditBuilder {
@@ -39,7 +37,7 @@ impl TextEditBuilder {
         TextEditBuilder {
             segments: Vec::new(),
             last_offset: tu(0),
-            text_len: text.len()
+            text_len: text.len(),
         }
     }
 

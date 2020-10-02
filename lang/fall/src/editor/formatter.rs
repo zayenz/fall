@@ -1,6 +1,6 @@
-use fall_tree::{Node, NodeType, File, TextEdit, FileEdit, tu};
+use crate::syntax::{L_ANGLE, PIPE, R_ANGLE, WHITESPACE};
 use fall_tree::search::{sibling, Direction};
-use crate::syntax::{PIPE, L_ANGLE, R_ANGLE, WHITESPACE};
+use fall_tree::{tu, File, FileEdit, Node, NodeType, TextEdit};
 
 pub fn reformat(file: &File) -> TextEdit {
     reformat_file(file, FALL_SPACING, WHITESPACE)
@@ -13,19 +13,17 @@ const FALL_SPACING: &[Rule] = &[
     Rule::Before(R_ANGLE, Spaces::None),
 ];
 
-
 #[derive(Clone, Copy)]
 enum Rule {
     After(NodeType, Spaces),
-    Before(NodeType, Spaces)
+    Before(NodeType, Spaces),
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Spaces {
     None,
-    Single
+    Single,
 }
-
 
 fn reformat_file(file: &File, rules: &[Rule], ws_type: NodeType) -> TextEdit {
     let spacer = Spacer { rules, ws_type };
@@ -33,7 +31,6 @@ fn reformat_file(file: &File, rules: &[Rule], ws_type: NodeType) -> TextEdit {
     reformat_node(file.root(), &mut edit, &spacer);
     edit.into_text_edit()
 }
-
 
 struct Spacer<'r> {
     rules: &'r [Rule],
@@ -43,19 +40,22 @@ struct Spacer<'r> {
 impl<'r> Spacer<'r> {
     fn apply<'f>(&self, node: Node<'f>, edit: &mut FileEdit<'f>) {
         for &rule in self.rules {
-            let (spaces, ws_node, before_ws_node) =
-                match (rule, sibling(node, Direction::Right), sibling(node, Direction::Left)) {
-                    (Rule::After(rty, spaces), Some(next), _) if rty == node.ty() => {
-                        (spaces, next, node)
-                    }
-                    (Rule::Before(rty, spaces), _, Some(prev)) if rty == node.ty() => {
-                        (spaces, prev, prev)
-                    }
-                    _ => continue
-                };
+            let (spaces, ws_node, before_ws_node) = match (
+                rule,
+                sibling(node, Direction::Right),
+                sibling(node, Direction::Left),
+            ) {
+                (Rule::After(rty, spaces), Some(next), _) if rty == node.ty() => {
+                    (spaces, next, node)
+                }
+                (Rule::Before(rty, spaces), _, Some(prev)) if rty == node.ty() => {
+                    (spaces, prev, prev)
+                }
+                _ => continue,
+            };
 
             if ws_node.text().contains("\n") {
-                continue
+                continue;
             }
 
             match (spaces, ws_node.ty() == self.ws_type) {
@@ -64,12 +64,11 @@ impl<'r> Spacer<'r> {
                 (Spaces::Single, true) if ws_node.text().len() != tu(1) => {
                     edit.replace_with_text(ws_node, " ".to_owned())
                 }
-                _ => continue
+                _ => continue,
             }
         }
     }
 }
-
 
 fn reformat_node<'f>(node: Node<'f>, edit: &mut FileEdit<'f>, spacer: &Spacer) {
     spacer.apply(node, edit);
@@ -77,7 +76,6 @@ fn reformat_node<'f>(node: Node<'f>, edit: &mut FileEdit<'f>, spacer: &Spacer) {
         reformat_node(child, edit, spacer);
     }
 }
-
 
 #[cfg(test)]
 fn test_reformat(before: &str, after: &str) {
@@ -89,24 +87,30 @@ fn test_reformat(before: &str, after: &str) {
 
 #[test]
 fn test_adds_spaces_after_pipe() {
-    test_reformat(r"
+    test_reformat(
+        r"
            rule foo { x|y }
-       ", r"
+       ",
+        r"
            rule foo { x | y }
-       ")
+       ",
+    )
 }
 
 #[test]
 fn test_dont_mess_newlines() {
-    test_reformat(r"
+    test_reformat(
+        r"
            rule foo {
              x
            | y
            }
-       ", r"
+       ",
+        r"
            rule foo {
              x
            | y
            }
-       ")
+       ",
+    )
 }

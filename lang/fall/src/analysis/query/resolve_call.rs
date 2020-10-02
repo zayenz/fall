@@ -5,13 +5,12 @@ use itertools::Itertools;
 use fall_tree::search::child_of_type_exn;
 use fall_tree::AstNode;
 
-use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::db::{self, DB};
+use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::query;
-use crate::analysis::{RefKind, CallKind};
+use crate::analysis::{CallKind, RefKind};
 
 use crate::syntax::{CallExpr, Expr, IDENT};
-
 
 impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
     fn execute(self, db: &DB<'f>, d: &mut DiagnosticSink) -> Option<CallKind<'f>> {
@@ -21,7 +20,10 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
             if n_expected != n_args {
                 d.error(
                     call.node(),
-                    format!("Wrong number of arguments, expected {}, got {}", n_expected, n_args),
+                    format!(
+                        "Wrong number of arguments, expected {}, got {}",
+                        n_expected, n_args
+                    ),
                 )
             }
         };
@@ -39,34 +41,49 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
             call.args().next().and_then(|arg| kind(d, arg))
         };
         let mut not = |d: &mut DiagnosticSink| one(d, &mut |_, arg| Some(CallKind::Not(arg)));
-        let mut is_in = |d: &mut DiagnosticSink| one(d, &mut |d, _| resolve_context(db, d, call).map(CallKind::IsIn));
-
-        let two = |d: &mut DiagnosticSink, kind: &mut dyn FnMut(&mut DiagnosticSink, Expr<'f>, Expr<'f>) -> Option<CallKind<'f>>| {
-            expect_args(d, 2);
-            call.args().next_tuple().and_then(|(arg1, arg2)| kind(d, arg1, arg2))
+        let mut is_in = |d: &mut DiagnosticSink| {
+            one(d, &mut |d, _| {
+                resolve_context(db, d, call).map(CallKind::IsIn)
+            })
         };
-        let mut layer = |d: &mut DiagnosticSink| two(d, &mut |_, arg1, arg2| {
-            Some(CallKind::Layer(arg1, arg2))
-        });
-        let mut with_skip = |d: &mut DiagnosticSink| two(d, &mut |_, arg1, arg2| {
-            Some(CallKind::WithSkip(arg1, arg2))
-        });
-        let mut inject = |d: &mut DiagnosticSink| two(d, &mut |_, arg1, arg2| {
-            Some(CallKind::Inject(arg1, arg2))
-        });
-        let mut enter = |d: &mut DiagnosticSink| two(d, &mut |d, _, arg2| {
-            resolve_context(db, d, call).map(|ctx| CallKind::Enter(ctx, arg2))
-        });
-        let mut exit = |d: &mut DiagnosticSink| two(d, &mut |d, _, arg2| {
-            resolve_context(db, d, call).map(|ctx| CallKind::Exit(ctx, arg2))
-        });
+
+        let two = |d: &mut DiagnosticSink,
+                   kind: &mut dyn FnMut(
+            &mut DiagnosticSink,
+            Expr<'f>,
+            Expr<'f>,
+        ) -> Option<CallKind<'f>>| {
+            expect_args(d, 2);
+            call.args()
+                .next_tuple()
+                .and_then(|(arg1, arg2)| kind(d, arg1, arg2))
+        };
+        let mut layer =
+            |d: &mut DiagnosticSink| two(d, &mut |_, arg1, arg2| Some(CallKind::Layer(arg1, arg2)));
+        let mut with_skip = |d: &mut DiagnosticSink| {
+            two(d, &mut |_, arg1, arg2| Some(CallKind::WithSkip(arg1, arg2)))
+        };
+        let mut inject = |d: &mut DiagnosticSink| {
+            two(d, &mut |_, arg1, arg2| Some(CallKind::Inject(arg1, arg2)))
+        };
+        let mut enter = |d: &mut DiagnosticSink| {
+            two(d, &mut |d, _, arg2| {
+                resolve_context(db, d, call).map(|ctx| CallKind::Enter(ctx, arg2))
+            })
+        };
+        let mut exit = |d: &mut DiagnosticSink| {
+            two(d, &mut |d, _, arg2| {
+                resolve_context(db, d, call).map(|ctx| CallKind::Exit(ctx, arg2))
+            })
+        };
 
         let mut prev_is = |d: &mut DiagnosticSink| {
             let mut args = Vec::new();
             for arg in call.args() {
                 let mut ok = false;
                 if let Expr::RefExpr(expr) = arg {
-                    if let Some(RefKind::RuleReference(rule)) = db.get(query::ResolveRefExpr(expr)) {
+                    if let Some(RefKind::RuleReference(rule)) = db.get(query::ResolveRefExpr(expr))
+                    {
                         if rule.ty_name().is_some() {
                             args.push(rule);
                             ok = true;
@@ -80,7 +97,10 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
             Some(CallKind::PrevIs(Arc::new(args)))
         };
 
-        let build_in: Vec<(&str, &mut dyn FnMut(&mut DiagnosticSink) -> Option<CallKind<'f>>)> = vec![
+        let build_in: Vec<(
+            &str,
+            &mut dyn FnMut(&mut DiagnosticSink) -> Option<CallKind<'f>>,
+        )> = vec![
             ("any", &mut any),
             ("commit", &mut commit),
             ("eof", &mut eof),
@@ -91,7 +111,7 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
             ("inject", &mut inject),
             ("enter", &mut enter),
             ("exit", &mut exit),
-            ("prev_is", &mut prev_is)
+            ("prev_is", &mut prev_is),
         ];
 
         for (name, kind) in build_in.into_iter() {
@@ -110,9 +130,7 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
                     )
                 }
 
-                let params = parameters.parameters()
-                    .zip(call.args())
-                    .collect();
+                let params = parameters.parameters().zip(call.args()).collect();
                 return Some(CallKind::RuleCall(rule, Arc::new(params)));
             }
         }
@@ -132,18 +150,20 @@ fn resolve_context(db: &DB, d: &mut DiagnosticSink, call: CallExpr) -> Option<u3
             .position(|&c| c == name)
             .map(|usize_| usize_ as u32)
     } else {
-        d.error(call.args().next().unwrap().node(), "Context should be a single quoted string");
+        d.error(
+            call.args().next().unwrap().node(),
+            "Context should be a single quoted string",
+        );
         None
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use fall_tree::search::find_leaf_at_offset;
-    use fall_tree::search::ast;
     use crate::analysis::*;
     use crate::test_util::parse_with_caret;
+    use fall_tree::search::ast;
+    use fall_tree::search::find_leaf_at_offset;
 
     #[test]
     fn test_resolve_no_args() {
@@ -155,17 +175,32 @@ mod tests {
     #[test]
     fn test_resolve_simple_args() {
         check_resolved("rule foo { <^not a> }", "Not(RefExpr@[16; 17))");
-        check_resolved("rule foo { <^with_skip a b> }", "WithSkip(RefExpr@[22; 23), RefExpr@[24; 25))");
-        check_resolved("rule foo { <^layer a b> }", "Layer(RefExpr@[18; 19), RefExpr@[20; 21))");
+        check_resolved(
+            "rule foo { <^with_skip a b> }",
+            "WithSkip(RefExpr@[22; 23), RefExpr@[24; 25))",
+        );
+        check_resolved(
+            "rule foo { <^layer a b> }",
+            "Layer(RefExpr@[18; 19), RefExpr@[20; 21))",
+        );
     }
 
     #[test]
     fn test_resolve_layer() {
-        check_resolved("rule foo { <^enter 'ctx' a> }", "Enter(0, RefExpr@[24; 25))");
+        check_resolved(
+            "rule foo { <^enter 'ctx' a> }",
+            "Enter(0, RefExpr@[24; 25))",
+        );
         check_resolved("rule foo { <^exit  'ctx' a> }", "Exit(0, RefExpr@[24; 25))");
 
-        check_resolved("rule foo { <is_in 'ctx1'> <^enter 'ctx2' a>  }", "Enter(1, RefExpr@[40; 41))");
-        check_resolved("rule foo { <is_in 'ctx1'> <^exit  'ctx2' a>  }", "Exit(1, RefExpr@[40; 41))");
+        check_resolved(
+            "rule foo { <is_in 'ctx1'> <^enter 'ctx2' a>  }",
+            "Enter(1, RefExpr@[40; 41))",
+        );
+        check_resolved(
+            "rule foo { <is_in 'ctx1'> <^exit  'ctx2' a>  }",
+            "Exit(1, RefExpr@[40; 41))",
+        );
 
         check_resolved(
             "rule foo { <enter 'ctx1' a> <enter 'ctx2' b> <^is_in 'ctx2'> }",
@@ -245,7 +280,8 @@ mod tests {
         let (file, caret) = parse_with_caret(&text);
         let call = {
             let leaf = find_leaf_at_offset(file.root(), caret)
-                .left_biased().unwrap();
+                .left_biased()
+                .unwrap();
             ast::ancestor_exn(leaf)
         };
         let a = Analysis::new(crate::ast(&file));

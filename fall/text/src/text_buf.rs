@@ -1,9 +1,9 @@
-use crate::{Text, TextRange, tu};
+use crate::{tu, Text, TextRange};
 use std::fmt;
 
 #[derive(Clone)]
 pub struct TextBuf {
-    data: String
+    data: String,
 }
 
 impl From<String> for TextBuf {
@@ -20,7 +20,9 @@ impl<'s> From<&'s str> for TextBuf {
 
 impl<'s> From<Text<'s>> for TextBuf {
     fn from(s: Text<'s>) -> Self {
-        TextBuf { data: s.to_string() }
+        TextBuf {
+            data: s.to_string(),
+        }
     }
 }
 

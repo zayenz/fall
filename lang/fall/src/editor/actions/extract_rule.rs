@@ -1,22 +1,21 @@
-use fall_tree::{AstNode, File, Node, TextRange, FileEdit};
-use fall_tree::search::{find_covering_node, ancestors};
-use fall_tree::search::ast;
+use crate::syntax::{Expr, RefExpr, SeqExpr, SynRule};
 use fall_editor::actions::ActionResult;
-use crate::syntax::{Expr, SynRule, SeqExpr, RefExpr};
+use fall_tree::search::ast;
+use fall_tree::search::{ancestors, find_covering_node};
+use fall_tree::{AstNode, File, FileEdit, Node, TextRange};
 
 pub fn extract_rule(file: &File, range: TextRange, apply: bool) -> Option<ActionResult> {
     if range.is_empty() {
         return None;
     }
-    let expr = ancestors(find_covering_node(file.root(), range))
-        .find(|&n| is_expression(n))?;
+    let expr = ancestors(find_covering_node(file.root(), range)).find(|&n| is_expression(n))?;
 
     if RefExpr::wrap(expr).is_some() {
         return None;
     }
 
     if !apply {
-        return Some(ActionResult::Available)
+        return Some(ActionResult::Available);
     }
 
     let rule = ast::ancestor_exn::<SynRule>(expr).node();
@@ -30,15 +29,13 @@ pub fn extract_rule(file: &File, range: TextRange, apply: bool) -> Option<Action
     Some(ActionResult::Applied(edit.into_text_edit()))
 }
 
-
 fn is_expression(node: Node) -> bool {
     Expr::wrap(node).is_some()
 }
 
 fn range_to_extract(parent: Node, range: TextRange) -> TextRange {
     if SeqExpr::wrap(parent).is_some() {
-        let mut children =
-            parent.children().filter(|n| n.range().intersects(range));
+        let mut children = parent.children().filter(|n| n.range().intersects(range));
         let first = children.next();
         let last = children.last();
         if let (Some(first), Some(last)) = (first, last) {
@@ -57,32 +54,39 @@ mod tests {
 
     #[test]
     fn test_extract_whole_seq() {
-        check_context_action::<crate::FileWithAnalysis>("Extract rule", r##"
+        check_context_action::<crate::FileWithAnalysis>(
+            "Extract rule",
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { ^bar baz^ }
-"##, r##"
+"##,
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { new_rule }
 
 rule new_rule {
   bar baz
 }
-"##);
+"##,
+        );
     }
 
     #[test]
     fn test_extract_sub_seq() {
-        check_context_action::<crate::FileWithAnalysis>("Extract rule", r##"
+        check_context_action::<crate::FileWithAnalysis>(
+            "Extract rule",
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { foo ^bar baz^ quux }
-"##, r##"
+"##,
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { foo new_rule quux }
 
 rule new_rule {
   bar baz
 }
-"##);
+"##,
+        );
     }
 }
-

@@ -1,11 +1,10 @@
-use proptest::prelude::*;
 use itertools::Itertools;
+use proptest::prelude::*;
 
-use crate::{TextUnit, TextRange, TextEdit, TextEditOp, Text, tu};
+use crate::{tu, Text, TextEdit, TextEditOp, TextRange, TextUnit};
 
 pub fn arb_text_unit() -> BoxedStrategy<TextUnit> {
-    prop::num::u32::ANY.prop_map(TextUnit)
-        .boxed()
+    prop::num::u32::ANY.prop_map(TextUnit).boxed()
 }
 
 pub fn arb_text_range() -> BoxedStrategy<TextRange> {
@@ -21,13 +20,16 @@ pub fn arb_text_edit() -> BoxedStrategy<ArbTextEdit> {
     )
         .prop_map(|(mut cuts, inserts)| {
             cuts.sort();
-            let copies = cuts.into_iter().tuples::<(_, _)>()
+            let copies = cuts
+                .into_iter()
+                .tuples::<(_, _)>()
                 .map(|(s, e)| (true, range(s, e)))
                 .map(Some);
-            let inserts = inserts.into_iter()
+            let inserts = inserts
+                .into_iter()
                 .map(|opt_insert| opt_insert.map(|r| (false, r)));
             ArbTextEdit {
-                ops: inserts.interleave(copies).filter_map(|x| x).collect()
+                ops: inserts.interleave(copies).filter_map(|x| x).collect(),
             }
         })
         .boxed()
@@ -43,14 +45,18 @@ impl ArbTextEdit {
         let len: TextUnit = text.len();
         let scale_range = |r: TextRange| scale_range(r, len);
         TextEdit {
-            ops: self.ops.iter().map(|&(is_insert, range)| {
-                let range = scale_range(range);
-                if is_insert {
-                    TextEditOp::Copy(range)
-                } else {
-                    TextEditOp::Insert(text.slice(range).to_text_buf())
-                }
-            }).collect()
+            ops: self
+                .ops
+                .iter()
+                .map(|&(is_insert, range)| {
+                    let range = scale_range(range);
+                    if is_insert {
+                        TextEditOp::Copy(range)
+                    } else {
+                        TextEditOp::Insert(text.slice(range).to_text_buf())
+                    }
+                })
+                .collect(),
         }
     }
 }

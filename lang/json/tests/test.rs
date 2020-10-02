@@ -6,17 +6,24 @@ use lang_json::lang_json;
 
 #[test]
 fn leading_trailing_space() {
-    check_syntax(&lang_json(), r##" {} "##, r#"
+    check_syntax(
+        &lang_json(),
+        r##" {} "##,
+        r#"
 FILE
   OBJECT
     LBRACE "{"
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn obj() {
-    check_syntax(&lang_json(), r##"{ "foo": [1, 2, 3] }"##, r#"
+    check_syntax(
+        &lang_json(),
+        r##"{ "foo": [1, 2, 3] }"##,
+        r#"
 FILE
   OBJECT
     LBRACE "{"
@@ -35,12 +42,16 @@ FILE
           NUMBER "3"
         RBRACK "]"
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn comma1() {
-    check_syntax(&lang_json(), r##"{ "a": 1 "b": 2 }"##, r#"
+    check_syntax(
+        &lang_json(),
+        r##"{ "a": 1 "b": 2 }"##,
+        r#"
 FILE
   OBJECT
     LBRACE "{"
@@ -56,12 +67,16 @@ FILE
       PRIMITIVE
         NUMBER "2"
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn comma2() {
-    check_syntax(&lang_json(), r##"{ "a": 1, "b": 2, }"##, r#"
+    check_syntax(
+        &lang_json(),
+        r##"{ "a": 1, "b": 2, }"##,
+        r#"
 FILE
   OBJECT
     LBRACE "{"
@@ -80,12 +95,17 @@ FILE
     ERROR
       COMMA ","
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
-fn comma3() { //FIXME
-    check_syntax(&lang_json(), r##"[1 2 3,]"##, r#"
+fn comma3() {
+    //FIXME
+    check_syntax(
+        &lang_json(),
+        r##"[1 2 3,]"##,
+        r#"
 FILE
   ARRAY
     LBRACK "["
@@ -101,12 +121,16 @@ FILE
     ERROR
       COMMA ","
     RBRACK "]"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn obj_recovery0() {
-    check_syntax(&lang_json(), r##"{92,}"##, r##"
+    check_syntax(
+        &lang_json(),
+        r##"{92,}"##,
+        r##"
 FILE
   OBJECT
     LBRACE "{"
@@ -114,12 +138,16 @@ FILE
       NUMBER "92"
       COMMA ","
     RBRACE "}"
-"##);
+"##,
+    );
 }
 
 #[test]
 fn obj_recovery00() {
-    check_syntax(&lang_json(), r##"{92, "x": 0}"##, r##"
+    check_syntax(
+        &lang_json(),
+        r##"{92, "x": 0}"##,
+        r##"
 FILE
   OBJECT
     LBRACE "{"
@@ -132,12 +160,16 @@ FILE
       PRIMITIVE
         NUMBER "0"
     RBRACE "}"
-"##);
+"##,
+    );
 }
 
 #[test]
 fn obj_recovery1() {
-    check_syntax(&lang_json(), r##"{"foo": 1, 92, "bar": 3}"##, r##"
+    check_syntax(
+        &lang_json(),
+        r##"{"foo": 1, 92, "bar": 3}"##,
+        r##"
 FILE
   OBJECT
     LBRACE "{"
@@ -156,12 +188,16 @@ FILE
       PRIMITIVE
         NUMBER "3"
     RBRACE "}"
-"##);
+"##,
+    );
 }
 
 #[test]
 fn obj_recovery2() {
-    check_syntax(&lang_json(), r##"{"foo": 1, "baz":: 92, "bar": 3}"##, r##"
+    check_syntax(
+        &lang_json(),
+        r##"{"foo": 1, "baz":: 92, "bar": 3}"##,
+        r##"
 FILE
   OBJECT
     LBRACE "{"
@@ -186,12 +222,16 @@ FILE
       PRIMITIVE
         NUMBER "3"
     RBRACE "}"
-"##);
+"##,
+    );
 }
 
 #[test]
 fn array_recovery2() {
-    check_syntax(&lang_json(), r##"[1, 2, } 2 3, "foo", null 92]"##, r##"
+    check_syntax(
+        &lang_json(),
+        r##"[1, 2, } 2 3, "foo", null 92]"##,
+        r##"
 FILE
   ARRAY
     LBRACK "["
@@ -218,7 +258,8 @@ FILE
     PRIMITIVE
       NUMBER "92"
     RBRACK "]"
-"##);
+"##,
+    );
 }
 
 #[test]
@@ -232,7 +273,9 @@ fn accidentally_quadratic() {
 
 #[test]
 fn example() {
-    check_syntax(&lang_json(), r#"
+    check_syntax(
+        &lang_json(),
+        r#"
 {"widget": {
     "debug": "on",
     "window": {
@@ -258,7 +301,8 @@ fn example() {
         "alignment": "center",
         "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
     }
-}}"#, r#"
+}}"#,
+        r#"
 FILE
   OBJECT
     LBRACE "{"
@@ -394,5 +438,6 @@ FILE
             RBRACE "}"
         RBRACE "}"
     RBRACE "}"
-"#)
+"#,
+    )
 }

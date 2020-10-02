@@ -1,4 +1,4 @@
-use crate::{File, Node, Language};
+use crate::{File, Language, Node};
 use std::fmt::Write;
 
 pub fn dump_file(f: &File) -> String {
@@ -20,15 +20,21 @@ pub fn walk_tree<F: FnMut(Node)>(node: Node, mut f: F) {
     }
 }
 
-
 fn dump(lang: &Language, root: Node, text: &str, include_whitespace: bool) -> String {
     let mut buf = String::new();
     go(lang, 0, root, text, &mut buf, include_whitespace);
     return buf;
 
-    fn go(lang: &Language, level: usize, n: Node, text: &str, buf: &mut String, include_whitespace: bool) {
+    fn go(
+        lang: &Language,
+        level: usize,
+        n: Node,
+        text: &str,
+        buf: &mut String,
+        include_whitespace: bool,
+    ) {
         if lang.node_type_info(n.ty()).whitespace_like && !include_whitespace {
-            return
+            return;
         }
 
         for _ in 0..level {
@@ -37,11 +43,9 @@ fn dump(lang: &Language, root: Node, text: &str, include_whitespace: bool) -> St
 
         let ty_name = lang.node_type_info(n.ty()).name;
         if n.children().next().is_none() {
-            write!(buf, "{} {:?}\n", ty_name, &text[n.range()])
-                .unwrap();
+            write!(buf, "{} {:?}\n", ty_name, &text[n.range()]).unwrap();
         } else {
-            write!(buf, "{}\n", ty_name)
-                .unwrap();
+            write!(buf, "{}\n", ty_name).unwrap();
             for child in n.children() {
                 go(lang, level + 1, child, text, buf, include_whitespace);
             }

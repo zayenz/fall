@@ -1,5 +1,5 @@
-use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
+use fall_parse::runtime as rt;
 pub const WHITESPACE: rt::NodeType = rt::NodeType(100);
 pub const LINE_COMMENT: rt::NodeType = rt::NodeType(101);
 pub const BLOCK_COMMENT: rt::NodeType = rt::NodeType(102);
@@ -285,7 +285,11 @@ pub fn language() -> &'static rt::Language {
             rt::LexRule::new(QUESTION, "\\?", None),
             rt::LexRule::new(CARET, "\\^", None),
             rt::LexRule::new(CARET_EQ, "\\^=", None),
-            rt::LexRule::new(CHAR, "\'\\\\\'\'|\'[^\']\'|\'(\\\\|\\p{XID_Continue}|\\{|\\})*\'", None),
+            rt::LexRule::new(
+                CHAR,
+                "\'\\\\\'\'|\'[^\']\'|\'(\\\\|\\p{XID_Continue}|\\{|\\})*\'",
+                None,
+            ),
             rt::LexRule::new(LIFETIME, "\'\\p{XID_Continue}*", None),
             rt::LexRule::new(BOOL, "true|false", None),
             rt::LexRule::new(NUMBER, "\\d+", None),
@@ -299,17 +303,223 @@ pub fn language() -> &'static rt::Language {
         ::fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
-                WHITESPACE, LINE_COMMENT, BLOCK_COMMENT, UNION, AS, CRATE, EXTERN, FN, LET, PUB, STRUCT, USE, MOD, IF, ELSE, ENUM, IMPL, SELF, SUPER, TYPE, CONST, STATIC, FOR, LOOP, WHILE, MOVE, MUT, REF, TRAIT, MATCH, RETURN, CONTINUE, BREAK, IN, UNSAFE, WHERE, L_PAREN, R_PAREN, L_CURLY, R_CURLY, L_ANGLE, R_ANGLE, L_BRACK, R_BRACK, SHL, SHL_EQ, SHR, SHR_EQ, AND, OR, THIN_ARROW, FAT_ARROW, EQ, EQEQ, BANGEQ, GTET, LTEQ, SEMI, COLON, COLONCOLON, COMMA, DOT, DOTDOT, DOTDOTDOT, HASH, DOLLAR, STAR, STAR_EQ, SLASH, SLASH_EQ, PERCENT, PERCENT_EQ, PLUS, PLUS_EQ, MINUS, MINUS_EQ, AMPERSAND, AMPERSAND_EQ, PIPE, PIPE_EQ, UNDERSCORE, BANG, QUESTION, CARET, CARET_EQ, CHAR, LIFETIME, BOOL, NUMBER, STRING, RAW_STRING, IDENT, FILE, USE_DECL, USE_SPEC, USE_SPEC_ENTRY, EXTERN_CRATE_DECL, FN_DEF, LINKAGE, VALUE_PARAM, LAMBDA_VALUE_PARAM, SELF_PARAMETER, STRUCT_DEF, STRUCT_FIELD, TUPLE_FIELD, ENUM_DEF, ENUM_VARIANT, MOD_DEF, IMPL_DEF, TRAIT_DEF, MEMBERS, TYPE_DEF, CONST_DEF, MACRO_ITEM, EXTERN_BLOCK, TYPE_PARAMETERS, TYPE_PARAMETER, TYPE_BOUND, LIFETIME_PARAMETER, VISIBILITY, WHERE_CLAUSE, PATH, TRAIT_PROJECTION_PATH, PATH_SEGMENT, TYPE_ARGUMENTS, FN_TRAIT_SUGAR, ALIAS, TYPE_REFERENCE, PATH_TYPE, REFERENCE_TYPE, POINTER_TYPE, PLACEHOLDER_TYPE, UNIT_TYPE, PAREN_TYPE, TUPLE_TYPE, NEVER_TYPE, ARRAY_TYPE, FN_POINTER_TYPE, FOR_TYPE, WILDCARD_PATTERN, PATH_PATTERN, TUPE_STRUCT_PATTERN, STRUCT_PATTERN, STRUCT_PATTERN_FIELD, BINDING_PATTERN, LITERAL_PATTERN, UNIT_PATTERN, PAREN_PATTERN, TUPLE_PATTERN, REFERENCE_PATTERN, EXPR, LITERAL, PATH_EXPR, STRUCT_LITERAL, STRUCT_LITERAL_FIELD, UNIT_EXPR, PAREN_EXPR, TUPLE_EXPR, ARRAY_LITERAL, LAMBDA_EXPR, RETURN_EXPR, LOOP_CF_EXPR, BLOCK_EXPR, LET_STMT, TYPE_ASCRIPTION, EMPTY_STMT, EXPR_STMT, IF_EXPR, WHILE_EXPR, LOOP_EXPR, FOR_EXPR, MATCH_EXPR, MATCH_ARM, GUARD, BLOCK_MACRO_EXPR, LINE_MACRO_EXPR, METHOD_CALL_EXPR, CALL_EXPR, VALUE_ARGUMENT, FIELD_EXPR, INDEX_EXPR, TRY_EXPR, CAST_EXPR, REFERENCE_EXPR, DEREFERENCE_EXPR, NEGATION_EXPR, NOT_EXPR, PRODUCT_EXPR, SUM_EXPR, BIT_SHIFT, BIT_AND, BIT_XOR, BIT_OR, COMPARISON, LOGICAL_AND, LOGICAL_OR, RANGE_EXPR, ASSIGNMENT_EXPR, ATTRIBUTE, INNER_ATTRIBUTE, ATTR_VALUE, BLOCK_MACRO, LINE_MACRO, TT,
+                WHITESPACE,
+                LINE_COMMENT,
+                BLOCK_COMMENT,
+                UNION,
+                AS,
+                CRATE,
+                EXTERN,
+                FN,
+                LET,
+                PUB,
+                STRUCT,
+                USE,
+                MOD,
+                IF,
+                ELSE,
+                ENUM,
+                IMPL,
+                SELF,
+                SUPER,
+                TYPE,
+                CONST,
+                STATIC,
+                FOR,
+                LOOP,
+                WHILE,
+                MOVE,
+                MUT,
+                REF,
+                TRAIT,
+                MATCH,
+                RETURN,
+                CONTINUE,
+                BREAK,
+                IN,
+                UNSAFE,
+                WHERE,
+                L_PAREN,
+                R_PAREN,
+                L_CURLY,
+                R_CURLY,
+                L_ANGLE,
+                R_ANGLE,
+                L_BRACK,
+                R_BRACK,
+                SHL,
+                SHL_EQ,
+                SHR,
+                SHR_EQ,
+                AND,
+                OR,
+                THIN_ARROW,
+                FAT_ARROW,
+                EQ,
+                EQEQ,
+                BANGEQ,
+                GTET,
+                LTEQ,
+                SEMI,
+                COLON,
+                COLONCOLON,
+                COMMA,
+                DOT,
+                DOTDOT,
+                DOTDOTDOT,
+                HASH,
+                DOLLAR,
+                STAR,
+                STAR_EQ,
+                SLASH,
+                SLASH_EQ,
+                PERCENT,
+                PERCENT_EQ,
+                PLUS,
+                PLUS_EQ,
+                MINUS,
+                MINUS_EQ,
+                AMPERSAND,
+                AMPERSAND_EQ,
+                PIPE,
+                PIPE_EQ,
+                UNDERSCORE,
+                BANG,
+                QUESTION,
+                CARET,
+                CARET_EQ,
+                CHAR,
+                LIFETIME,
+                BOOL,
+                NUMBER,
+                STRING,
+                RAW_STRING,
+                IDENT,
+                FILE,
+                USE_DECL,
+                USE_SPEC,
+                USE_SPEC_ENTRY,
+                EXTERN_CRATE_DECL,
+                FN_DEF,
+                LINKAGE,
+                VALUE_PARAM,
+                LAMBDA_VALUE_PARAM,
+                SELF_PARAMETER,
+                STRUCT_DEF,
+                STRUCT_FIELD,
+                TUPLE_FIELD,
+                ENUM_DEF,
+                ENUM_VARIANT,
+                MOD_DEF,
+                IMPL_DEF,
+                TRAIT_DEF,
+                MEMBERS,
+                TYPE_DEF,
+                CONST_DEF,
+                MACRO_ITEM,
+                EXTERN_BLOCK,
+                TYPE_PARAMETERS,
+                TYPE_PARAMETER,
+                TYPE_BOUND,
+                LIFETIME_PARAMETER,
+                VISIBILITY,
+                WHERE_CLAUSE,
+                PATH,
+                TRAIT_PROJECTION_PATH,
+                PATH_SEGMENT,
+                TYPE_ARGUMENTS,
+                FN_TRAIT_SUGAR,
+                ALIAS,
+                TYPE_REFERENCE,
+                PATH_TYPE,
+                REFERENCE_TYPE,
+                POINTER_TYPE,
+                PLACEHOLDER_TYPE,
+                UNIT_TYPE,
+                PAREN_TYPE,
+                TUPLE_TYPE,
+                NEVER_TYPE,
+                ARRAY_TYPE,
+                FN_POINTER_TYPE,
+                FOR_TYPE,
+                WILDCARD_PATTERN,
+                PATH_PATTERN,
+                TUPE_STRUCT_PATTERN,
+                STRUCT_PATTERN,
+                STRUCT_PATTERN_FIELD,
+                BINDING_PATTERN,
+                LITERAL_PATTERN,
+                UNIT_PATTERN,
+                PAREN_PATTERN,
+                TUPLE_PATTERN,
+                REFERENCE_PATTERN,
+                EXPR,
+                LITERAL,
+                PATH_EXPR,
+                STRUCT_LITERAL,
+                STRUCT_LITERAL_FIELD,
+                UNIT_EXPR,
+                PAREN_EXPR,
+                TUPLE_EXPR,
+                ARRAY_LITERAL,
+                LAMBDA_EXPR,
+                RETURN_EXPR,
+                LOOP_CF_EXPR,
+                BLOCK_EXPR,
+                LET_STMT,
+                TYPE_ASCRIPTION,
+                EMPTY_STMT,
+                EXPR_STMT,
+                IF_EXPR,
+                WHILE_EXPR,
+                LOOP_EXPR,
+                FOR_EXPR,
+                MATCH_EXPR,
+                MATCH_ARM,
+                GUARD,
+                BLOCK_MACRO_EXPR,
+                LINE_MACRO_EXPR,
+                METHOD_CALL_EXPR,
+                CALL_EXPR,
+                VALUE_ARGUMENT,
+                FIELD_EXPR,
+                INDEX_EXPR,
+                TRY_EXPR,
+                CAST_EXPR,
+                REFERENCE_EXPR,
+                DEREFERENCE_EXPR,
+                NEGATION_EXPR,
+                NOT_EXPR,
+                PRODUCT_EXPR,
+                SUM_EXPR,
+                BIT_SHIFT,
+                BIT_AND,
+                BIT_XOR,
+                BIT_OR,
+                COMPARISON,
+                LOGICAL_AND,
+                LOGICAL_OR,
+                RANGE_EXPR,
+                ASSIGNMENT_EXPR,
+                ATTRIBUTE,
+                INNER_ATTRIBUTE,
+                ATTR_VALUE,
+                BLOCK_MACRO,
+                LINE_MACRO,
+                TT,
             ],
             syntactical_rules: rt::parser_from_str(parser_json),
-                whitespace_binder,
-            .. Default::default()
+            whitespace_binder,
+            ..Default::default()
         }
     }
     use self::rt::*;
     lazy_static! {
         static ref LANG: rt::Language = {
-            struct Impl { parser_definition: rt::ParserDefinition, lexer: rt::RegexLexer };
+            struct Impl {
+                parser_definition: rt::ParserDefinition,
+                lexer: rt::RegexLexer,
+            };
             impl rt::LanguageImpl for Impl {
                 fn parse(
                     &self,
@@ -317,7 +527,14 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::parse(&LANG, &self.lexer, &self.parser_definition, text, metrics, builder)
+                    rt::parse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn reparse(
                     &self,
@@ -327,235 +544,865 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::reparse(&LANG, &self.lexer, &self.parser_definition, incremental_data, edit, new_text, metrics, builder)
+                    rt::reparse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        incremental_data,
+                        edit,
+                        new_text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn node_type_info(&self, ty: rt::NodeType) -> rt::NodeTypeInfo {
                     match ty {
-                        ERROR => rt::NodeTypeInfo { name: "ERROR", whitespace_like: false },
-                        WHITESPACE => rt::NodeTypeInfo { name: "WHITESPACE", whitespace_like: true },
-                        LINE_COMMENT => rt::NodeTypeInfo { name: "LINE_COMMENT", whitespace_like: true },
-                        BLOCK_COMMENT => rt::NodeTypeInfo { name: "BLOCK_COMMENT", whitespace_like: true },
-                        UNION => rt::NodeTypeInfo { name: "UNION", whitespace_like: false },
-                        AS => rt::NodeTypeInfo { name: "AS", whitespace_like: false },
-                        CRATE => rt::NodeTypeInfo { name: "CRATE", whitespace_like: false },
-                        EXTERN => rt::NodeTypeInfo { name: "EXTERN", whitespace_like: false },
-                        FN => rt::NodeTypeInfo { name: "FN", whitespace_like: false },
-                        LET => rt::NodeTypeInfo { name: "LET", whitespace_like: false },
-                        PUB => rt::NodeTypeInfo { name: "PUB", whitespace_like: false },
-                        STRUCT => rt::NodeTypeInfo { name: "STRUCT", whitespace_like: false },
-                        USE => rt::NodeTypeInfo { name: "USE", whitespace_like: false },
-                        MOD => rt::NodeTypeInfo { name: "MOD", whitespace_like: false },
-                        IF => rt::NodeTypeInfo { name: "IF", whitespace_like: false },
-                        ELSE => rt::NodeTypeInfo { name: "ELSE", whitespace_like: false },
-                        ENUM => rt::NodeTypeInfo { name: "ENUM", whitespace_like: false },
-                        IMPL => rt::NodeTypeInfo { name: "IMPL", whitespace_like: false },
-                        SELF => rt::NodeTypeInfo { name: "SELF", whitespace_like: false },
-                        SUPER => rt::NodeTypeInfo { name: "SUPER", whitespace_like: false },
-                        TYPE => rt::NodeTypeInfo { name: "TYPE", whitespace_like: false },
-                        CONST => rt::NodeTypeInfo { name: "CONST", whitespace_like: false },
-                        STATIC => rt::NodeTypeInfo { name: "STATIC", whitespace_like: false },
-                        FOR => rt::NodeTypeInfo { name: "FOR", whitespace_like: false },
-                        LOOP => rt::NodeTypeInfo { name: "LOOP", whitespace_like: false },
-                        WHILE => rt::NodeTypeInfo { name: "WHILE", whitespace_like: false },
-                        MOVE => rt::NodeTypeInfo { name: "MOVE", whitespace_like: false },
-                        MUT => rt::NodeTypeInfo { name: "MUT", whitespace_like: false },
-                        REF => rt::NodeTypeInfo { name: "REF", whitespace_like: false },
-                        TRAIT => rt::NodeTypeInfo { name: "TRAIT", whitespace_like: false },
-                        MATCH => rt::NodeTypeInfo { name: "MATCH", whitespace_like: false },
-                        RETURN => rt::NodeTypeInfo { name: "RETURN", whitespace_like: false },
-                        CONTINUE => rt::NodeTypeInfo { name: "CONTINUE", whitespace_like: false },
-                        BREAK => rt::NodeTypeInfo { name: "BREAK", whitespace_like: false },
-                        IN => rt::NodeTypeInfo { name: "IN", whitespace_like: false },
-                        UNSAFE => rt::NodeTypeInfo { name: "UNSAFE", whitespace_like: false },
-                        WHERE => rt::NodeTypeInfo { name: "WHERE", whitespace_like: false },
-                        L_PAREN => rt::NodeTypeInfo { name: "L_PAREN", whitespace_like: false },
-                        R_PAREN => rt::NodeTypeInfo { name: "R_PAREN", whitespace_like: false },
-                        L_CURLY => rt::NodeTypeInfo { name: "L_CURLY", whitespace_like: false },
-                        R_CURLY => rt::NodeTypeInfo { name: "R_CURLY", whitespace_like: false },
-                        L_ANGLE => rt::NodeTypeInfo { name: "L_ANGLE", whitespace_like: false },
-                        R_ANGLE => rt::NodeTypeInfo { name: "R_ANGLE", whitespace_like: false },
-                        L_BRACK => rt::NodeTypeInfo { name: "L_BRACK", whitespace_like: false },
-                        R_BRACK => rt::NodeTypeInfo { name: "R_BRACK", whitespace_like: false },
-                        SHL => rt::NodeTypeInfo { name: "SHL", whitespace_like: false },
-                        SHL_EQ => rt::NodeTypeInfo { name: "SHL_EQ", whitespace_like: false },
-                        SHR => rt::NodeTypeInfo { name: "SHR", whitespace_like: false },
-                        SHR_EQ => rt::NodeTypeInfo { name: "SHR_EQ", whitespace_like: false },
-                        AND => rt::NodeTypeInfo { name: "AND", whitespace_like: false },
-                        OR => rt::NodeTypeInfo { name: "OR", whitespace_like: false },
-                        THIN_ARROW => rt::NodeTypeInfo { name: "THIN_ARROW", whitespace_like: false },
-                        FAT_ARROW => rt::NodeTypeInfo { name: "FAT_ARROW", whitespace_like: false },
-                        EQ => rt::NodeTypeInfo { name: "EQ", whitespace_like: false },
-                        EQEQ => rt::NodeTypeInfo { name: "EQEQ", whitespace_like: false },
-                        BANGEQ => rt::NodeTypeInfo { name: "BANGEQ", whitespace_like: false },
-                        GTET => rt::NodeTypeInfo { name: "GTET", whitespace_like: false },
-                        LTEQ => rt::NodeTypeInfo { name: "LTEQ", whitespace_like: false },
-                        SEMI => rt::NodeTypeInfo { name: "SEMI", whitespace_like: false },
-                        COLON => rt::NodeTypeInfo { name: "COLON", whitespace_like: false },
-                        COLONCOLON => rt::NodeTypeInfo { name: "COLONCOLON", whitespace_like: false },
-                        COMMA => rt::NodeTypeInfo { name: "COMMA", whitespace_like: false },
-                        DOT => rt::NodeTypeInfo { name: "DOT", whitespace_like: false },
-                        DOTDOT => rt::NodeTypeInfo { name: "DOTDOT", whitespace_like: false },
-                        DOTDOTDOT => rt::NodeTypeInfo { name: "DOTDOTDOT", whitespace_like: false },
-                        HASH => rt::NodeTypeInfo { name: "HASH", whitespace_like: false },
-                        DOLLAR => rt::NodeTypeInfo { name: "DOLLAR", whitespace_like: false },
-                        STAR => rt::NodeTypeInfo { name: "STAR", whitespace_like: false },
-                        STAR_EQ => rt::NodeTypeInfo { name: "STAR_EQ", whitespace_like: false },
-                        SLASH => rt::NodeTypeInfo { name: "SLASH", whitespace_like: false },
-                        SLASH_EQ => rt::NodeTypeInfo { name: "SLASH_EQ", whitespace_like: false },
-                        PERCENT => rt::NodeTypeInfo { name: "PERCENT", whitespace_like: false },
-                        PERCENT_EQ => rt::NodeTypeInfo { name: "PERCENT_EQ", whitespace_like: false },
-                        PLUS => rt::NodeTypeInfo { name: "PLUS", whitespace_like: false },
-                        PLUS_EQ => rt::NodeTypeInfo { name: "PLUS_EQ", whitespace_like: false },
-                        MINUS => rt::NodeTypeInfo { name: "MINUS", whitespace_like: false },
-                        MINUS_EQ => rt::NodeTypeInfo { name: "MINUS_EQ", whitespace_like: false },
-                        AMPERSAND => rt::NodeTypeInfo { name: "AMPERSAND", whitespace_like: false },
-                        AMPERSAND_EQ => rt::NodeTypeInfo { name: "AMPERSAND_EQ", whitespace_like: false },
-                        PIPE => rt::NodeTypeInfo { name: "PIPE", whitespace_like: false },
-                        PIPE_EQ => rt::NodeTypeInfo { name: "PIPE_EQ", whitespace_like: false },
-                        UNDERSCORE => rt::NodeTypeInfo { name: "UNDERSCORE", whitespace_like: false },
-                        BANG => rt::NodeTypeInfo { name: "BANG", whitespace_like: false },
-                        QUESTION => rt::NodeTypeInfo { name: "QUESTION", whitespace_like: false },
-                        CARET => rt::NodeTypeInfo { name: "CARET", whitespace_like: false },
-                        CARET_EQ => rt::NodeTypeInfo { name: "CARET_EQ", whitespace_like: false },
-                        CHAR => rt::NodeTypeInfo { name: "CHAR", whitespace_like: false },
-                        LIFETIME => rt::NodeTypeInfo { name: "LIFETIME", whitespace_like: false },
-                        BOOL => rt::NodeTypeInfo { name: "BOOL", whitespace_like: false },
-                        NUMBER => rt::NodeTypeInfo { name: "NUMBER", whitespace_like: false },
-                        STRING => rt::NodeTypeInfo { name: "STRING", whitespace_like: false },
-                        RAW_STRING => rt::NodeTypeInfo { name: "RAW_STRING", whitespace_like: false },
-                        IDENT => rt::NodeTypeInfo { name: "IDENT", whitespace_like: false },
-                        FILE => rt::NodeTypeInfo { name: "FILE", whitespace_like: false },
-                        USE_DECL => rt::NodeTypeInfo { name: "USE_DECL", whitespace_like: false },
-                        USE_SPEC => rt::NodeTypeInfo { name: "USE_SPEC", whitespace_like: false },
-                        USE_SPEC_ENTRY => rt::NodeTypeInfo { name: "USE_SPEC_ENTRY", whitespace_like: false },
-                        EXTERN_CRATE_DECL => rt::NodeTypeInfo { name: "EXTERN_CRATE_DECL", whitespace_like: false },
-                        FN_DEF => rt::NodeTypeInfo { name: "FN_DEF", whitespace_like: false },
-                        LINKAGE => rt::NodeTypeInfo { name: "LINKAGE", whitespace_like: false },
-                        VALUE_PARAM => rt::NodeTypeInfo { name: "VALUE_PARAM", whitespace_like: false },
-                        LAMBDA_VALUE_PARAM => rt::NodeTypeInfo { name: "LAMBDA_VALUE_PARAM", whitespace_like: false },
-                        SELF_PARAMETER => rt::NodeTypeInfo { name: "SELF_PARAMETER", whitespace_like: false },
-                        STRUCT_DEF => rt::NodeTypeInfo { name: "STRUCT_DEF", whitespace_like: false },
-                        STRUCT_FIELD => rt::NodeTypeInfo { name: "STRUCT_FIELD", whitespace_like: false },
-                        TUPLE_FIELD => rt::NodeTypeInfo { name: "TUPLE_FIELD", whitespace_like: false },
-                        ENUM_DEF => rt::NodeTypeInfo { name: "ENUM_DEF", whitespace_like: false },
-                        ENUM_VARIANT => rt::NodeTypeInfo { name: "ENUM_VARIANT", whitespace_like: false },
-                        MOD_DEF => rt::NodeTypeInfo { name: "MOD_DEF", whitespace_like: false },
-                        IMPL_DEF => rt::NodeTypeInfo { name: "IMPL_DEF", whitespace_like: false },
-                        TRAIT_DEF => rt::NodeTypeInfo { name: "TRAIT_DEF", whitespace_like: false },
-                        MEMBERS => rt::NodeTypeInfo { name: "MEMBERS", whitespace_like: false },
-                        TYPE_DEF => rt::NodeTypeInfo { name: "TYPE_DEF", whitespace_like: false },
-                        CONST_DEF => rt::NodeTypeInfo { name: "CONST_DEF", whitespace_like: false },
-                        MACRO_ITEM => rt::NodeTypeInfo { name: "MACRO_ITEM", whitespace_like: false },
-                        EXTERN_BLOCK => rt::NodeTypeInfo { name: "EXTERN_BLOCK", whitespace_like: false },
-                        TYPE_PARAMETERS => rt::NodeTypeInfo { name: "TYPE_PARAMETERS", whitespace_like: false },
-                        TYPE_PARAMETER => rt::NodeTypeInfo { name: "TYPE_PARAMETER", whitespace_like: false },
-                        TYPE_BOUND => rt::NodeTypeInfo { name: "TYPE_BOUND", whitespace_like: false },
-                        LIFETIME_PARAMETER => rt::NodeTypeInfo { name: "LIFETIME_PARAMETER", whitespace_like: false },
-                        VISIBILITY => rt::NodeTypeInfo { name: "VISIBILITY", whitespace_like: false },
-                        WHERE_CLAUSE => rt::NodeTypeInfo { name: "WHERE_CLAUSE", whitespace_like: false },
-                        PATH => rt::NodeTypeInfo { name: "PATH", whitespace_like: false },
-                        TRAIT_PROJECTION_PATH => rt::NodeTypeInfo { name: "TRAIT_PROJECTION_PATH", whitespace_like: false },
-                        PATH_SEGMENT => rt::NodeTypeInfo { name: "PATH_SEGMENT", whitespace_like: false },
-                        TYPE_ARGUMENTS => rt::NodeTypeInfo { name: "TYPE_ARGUMENTS", whitespace_like: false },
-                        FN_TRAIT_SUGAR => rt::NodeTypeInfo { name: "FN_TRAIT_SUGAR", whitespace_like: false },
-                        ALIAS => rt::NodeTypeInfo { name: "ALIAS", whitespace_like: false },
-                        TYPE_REFERENCE => rt::NodeTypeInfo { name: "TYPE_REFERENCE", whitespace_like: false },
-                        PATH_TYPE => rt::NodeTypeInfo { name: "PATH_TYPE", whitespace_like: false },
-                        REFERENCE_TYPE => rt::NodeTypeInfo { name: "REFERENCE_TYPE", whitespace_like: false },
-                        POINTER_TYPE => rt::NodeTypeInfo { name: "POINTER_TYPE", whitespace_like: false },
-                        PLACEHOLDER_TYPE => rt::NodeTypeInfo { name: "PLACEHOLDER_TYPE", whitespace_like: false },
-                        UNIT_TYPE => rt::NodeTypeInfo { name: "UNIT_TYPE", whitespace_like: false },
-                        PAREN_TYPE => rt::NodeTypeInfo { name: "PAREN_TYPE", whitespace_like: false },
-                        TUPLE_TYPE => rt::NodeTypeInfo { name: "TUPLE_TYPE", whitespace_like: false },
-                        NEVER_TYPE => rt::NodeTypeInfo { name: "NEVER_TYPE", whitespace_like: false },
-                        ARRAY_TYPE => rt::NodeTypeInfo { name: "ARRAY_TYPE", whitespace_like: false },
-                        FN_POINTER_TYPE => rt::NodeTypeInfo { name: "FN_POINTER_TYPE", whitespace_like: false },
-                        FOR_TYPE => rt::NodeTypeInfo { name: "FOR_TYPE", whitespace_like: false },
-                        WILDCARD_PATTERN => rt::NodeTypeInfo { name: "WILDCARD_PATTERN", whitespace_like: false },
-                        PATH_PATTERN => rt::NodeTypeInfo { name: "PATH_PATTERN", whitespace_like: false },
-                        TUPE_STRUCT_PATTERN => rt::NodeTypeInfo { name: "TUPE_STRUCT_PATTERN", whitespace_like: false },
-                        STRUCT_PATTERN => rt::NodeTypeInfo { name: "STRUCT_PATTERN", whitespace_like: false },
-                        STRUCT_PATTERN_FIELD => rt::NodeTypeInfo { name: "STRUCT_PATTERN_FIELD", whitespace_like: false },
-                        BINDING_PATTERN => rt::NodeTypeInfo { name: "BINDING_PATTERN", whitespace_like: false },
-                        LITERAL_PATTERN => rt::NodeTypeInfo { name: "LITERAL_PATTERN", whitespace_like: false },
-                        UNIT_PATTERN => rt::NodeTypeInfo { name: "UNIT_PATTERN", whitespace_like: false },
-                        PAREN_PATTERN => rt::NodeTypeInfo { name: "PAREN_PATTERN", whitespace_like: false },
-                        TUPLE_PATTERN => rt::NodeTypeInfo { name: "TUPLE_PATTERN", whitespace_like: false },
-                        REFERENCE_PATTERN => rt::NodeTypeInfo { name: "REFERENCE_PATTERN", whitespace_like: false },
-                        EXPR => rt::NodeTypeInfo { name: "EXPR", whitespace_like: false },
-                        LITERAL => rt::NodeTypeInfo { name: "LITERAL", whitespace_like: false },
-                        PATH_EXPR => rt::NodeTypeInfo { name: "PATH_EXPR", whitespace_like: false },
-                        STRUCT_LITERAL => rt::NodeTypeInfo { name: "STRUCT_LITERAL", whitespace_like: false },
-                        STRUCT_LITERAL_FIELD => rt::NodeTypeInfo { name: "STRUCT_LITERAL_FIELD", whitespace_like: false },
-                        UNIT_EXPR => rt::NodeTypeInfo { name: "UNIT_EXPR", whitespace_like: false },
-                        PAREN_EXPR => rt::NodeTypeInfo { name: "PAREN_EXPR", whitespace_like: false },
-                        TUPLE_EXPR => rt::NodeTypeInfo { name: "TUPLE_EXPR", whitespace_like: false },
-                        ARRAY_LITERAL => rt::NodeTypeInfo { name: "ARRAY_LITERAL", whitespace_like: false },
-                        LAMBDA_EXPR => rt::NodeTypeInfo { name: "LAMBDA_EXPR", whitespace_like: false },
-                        RETURN_EXPR => rt::NodeTypeInfo { name: "RETURN_EXPR", whitespace_like: false },
-                        LOOP_CF_EXPR => rt::NodeTypeInfo { name: "LOOP_CF_EXPR", whitespace_like: false },
-                        BLOCK_EXPR => rt::NodeTypeInfo { name: "BLOCK_EXPR", whitespace_like: false },
-                        LET_STMT => rt::NodeTypeInfo { name: "LET_STMT", whitespace_like: false },
-                        TYPE_ASCRIPTION => rt::NodeTypeInfo { name: "TYPE_ASCRIPTION", whitespace_like: false },
-                        EMPTY_STMT => rt::NodeTypeInfo { name: "EMPTY_STMT", whitespace_like: false },
-                        EXPR_STMT => rt::NodeTypeInfo { name: "EXPR_STMT", whitespace_like: false },
-                        IF_EXPR => rt::NodeTypeInfo { name: "IF_EXPR", whitespace_like: false },
-                        WHILE_EXPR => rt::NodeTypeInfo { name: "WHILE_EXPR", whitespace_like: false },
-                        LOOP_EXPR => rt::NodeTypeInfo { name: "LOOP_EXPR", whitespace_like: false },
-                        FOR_EXPR => rt::NodeTypeInfo { name: "FOR_EXPR", whitespace_like: false },
-                        MATCH_EXPR => rt::NodeTypeInfo { name: "MATCH_EXPR", whitespace_like: false },
-                        MATCH_ARM => rt::NodeTypeInfo { name: "MATCH_ARM", whitespace_like: false },
-                        GUARD => rt::NodeTypeInfo { name: "GUARD", whitespace_like: false },
-                        BLOCK_MACRO_EXPR => rt::NodeTypeInfo { name: "BLOCK_MACRO_EXPR", whitespace_like: false },
-                        LINE_MACRO_EXPR => rt::NodeTypeInfo { name: "LINE_MACRO_EXPR", whitespace_like: false },
-                        METHOD_CALL_EXPR => rt::NodeTypeInfo { name: "METHOD_CALL_EXPR", whitespace_like: false },
-                        CALL_EXPR => rt::NodeTypeInfo { name: "CALL_EXPR", whitespace_like: false },
-                        VALUE_ARGUMENT => rt::NodeTypeInfo { name: "VALUE_ARGUMENT", whitespace_like: false },
-                        FIELD_EXPR => rt::NodeTypeInfo { name: "FIELD_EXPR", whitespace_like: false },
-                        INDEX_EXPR => rt::NodeTypeInfo { name: "INDEX_EXPR", whitespace_like: false },
-                        TRY_EXPR => rt::NodeTypeInfo { name: "TRY_EXPR", whitespace_like: false },
-                        CAST_EXPR => rt::NodeTypeInfo { name: "CAST_EXPR", whitespace_like: false },
-                        REFERENCE_EXPR => rt::NodeTypeInfo { name: "REFERENCE_EXPR", whitespace_like: false },
-                        DEREFERENCE_EXPR => rt::NodeTypeInfo { name: "DEREFERENCE_EXPR", whitespace_like: false },
-                        NEGATION_EXPR => rt::NodeTypeInfo { name: "NEGATION_EXPR", whitespace_like: false },
-                        NOT_EXPR => rt::NodeTypeInfo { name: "NOT_EXPR", whitespace_like: false },
-                        PRODUCT_EXPR => rt::NodeTypeInfo { name: "PRODUCT_EXPR", whitespace_like: false },
-                        SUM_EXPR => rt::NodeTypeInfo { name: "SUM_EXPR", whitespace_like: false },
-                        BIT_SHIFT => rt::NodeTypeInfo { name: "BIT_SHIFT", whitespace_like: false },
-                        BIT_AND => rt::NodeTypeInfo { name: "BIT_AND", whitespace_like: false },
-                        BIT_XOR => rt::NodeTypeInfo { name: "BIT_XOR", whitespace_like: false },
-                        BIT_OR => rt::NodeTypeInfo { name: "BIT_OR", whitespace_like: false },
-                        COMPARISON => rt::NodeTypeInfo { name: "COMPARISON", whitespace_like: false },
-                        LOGICAL_AND => rt::NodeTypeInfo { name: "LOGICAL_AND", whitespace_like: false },
-                        LOGICAL_OR => rt::NodeTypeInfo { name: "LOGICAL_OR", whitespace_like: false },
-                        RANGE_EXPR => rt::NodeTypeInfo { name: "RANGE_EXPR", whitespace_like: false },
-                        ASSIGNMENT_EXPR => rt::NodeTypeInfo { name: "ASSIGNMENT_EXPR", whitespace_like: false },
-                        ATTRIBUTE => rt::NodeTypeInfo { name: "ATTRIBUTE", whitespace_like: false },
-                        INNER_ATTRIBUTE => rt::NodeTypeInfo { name: "INNER_ATTRIBUTE", whitespace_like: false },
-                        ATTR_VALUE => rt::NodeTypeInfo { name: "ATTR_VALUE", whitespace_like: false },
-                        BLOCK_MACRO => rt::NodeTypeInfo { name: "BLOCK_MACRO", whitespace_like: false },
-                        LINE_MACRO => rt::NodeTypeInfo { name: "LINE_MACRO", whitespace_like: false },
-                        TT => rt::NodeTypeInfo { name: "TT", whitespace_like: false },
-                        _ => panic!("Unknown rt::NodeType: {:?}", ty)
+                        ERROR => rt::NodeTypeInfo {
+                            name: "ERROR",
+                            whitespace_like: false,
+                        },
+                        WHITESPACE => rt::NodeTypeInfo {
+                            name: "WHITESPACE",
+                            whitespace_like: true,
+                        },
+                        LINE_COMMENT => rt::NodeTypeInfo {
+                            name: "LINE_COMMENT",
+                            whitespace_like: true,
+                        },
+                        BLOCK_COMMENT => rt::NodeTypeInfo {
+                            name: "BLOCK_COMMENT",
+                            whitespace_like: true,
+                        },
+                        UNION => rt::NodeTypeInfo {
+                            name: "UNION",
+                            whitespace_like: false,
+                        },
+                        AS => rt::NodeTypeInfo {
+                            name: "AS",
+                            whitespace_like: false,
+                        },
+                        CRATE => rt::NodeTypeInfo {
+                            name: "CRATE",
+                            whitespace_like: false,
+                        },
+                        EXTERN => rt::NodeTypeInfo {
+                            name: "EXTERN",
+                            whitespace_like: false,
+                        },
+                        FN => rt::NodeTypeInfo {
+                            name: "FN",
+                            whitespace_like: false,
+                        },
+                        LET => rt::NodeTypeInfo {
+                            name: "LET",
+                            whitespace_like: false,
+                        },
+                        PUB => rt::NodeTypeInfo {
+                            name: "PUB",
+                            whitespace_like: false,
+                        },
+                        STRUCT => rt::NodeTypeInfo {
+                            name: "STRUCT",
+                            whitespace_like: false,
+                        },
+                        USE => rt::NodeTypeInfo {
+                            name: "USE",
+                            whitespace_like: false,
+                        },
+                        MOD => rt::NodeTypeInfo {
+                            name: "MOD",
+                            whitespace_like: false,
+                        },
+                        IF => rt::NodeTypeInfo {
+                            name: "IF",
+                            whitespace_like: false,
+                        },
+                        ELSE => rt::NodeTypeInfo {
+                            name: "ELSE",
+                            whitespace_like: false,
+                        },
+                        ENUM => rt::NodeTypeInfo {
+                            name: "ENUM",
+                            whitespace_like: false,
+                        },
+                        IMPL => rt::NodeTypeInfo {
+                            name: "IMPL",
+                            whitespace_like: false,
+                        },
+                        SELF => rt::NodeTypeInfo {
+                            name: "SELF",
+                            whitespace_like: false,
+                        },
+                        SUPER => rt::NodeTypeInfo {
+                            name: "SUPER",
+                            whitespace_like: false,
+                        },
+                        TYPE => rt::NodeTypeInfo {
+                            name: "TYPE",
+                            whitespace_like: false,
+                        },
+                        CONST => rt::NodeTypeInfo {
+                            name: "CONST",
+                            whitespace_like: false,
+                        },
+                        STATIC => rt::NodeTypeInfo {
+                            name: "STATIC",
+                            whitespace_like: false,
+                        },
+                        FOR => rt::NodeTypeInfo {
+                            name: "FOR",
+                            whitespace_like: false,
+                        },
+                        LOOP => rt::NodeTypeInfo {
+                            name: "LOOP",
+                            whitespace_like: false,
+                        },
+                        WHILE => rt::NodeTypeInfo {
+                            name: "WHILE",
+                            whitespace_like: false,
+                        },
+                        MOVE => rt::NodeTypeInfo {
+                            name: "MOVE",
+                            whitespace_like: false,
+                        },
+                        MUT => rt::NodeTypeInfo {
+                            name: "MUT",
+                            whitespace_like: false,
+                        },
+                        REF => rt::NodeTypeInfo {
+                            name: "REF",
+                            whitespace_like: false,
+                        },
+                        TRAIT => rt::NodeTypeInfo {
+                            name: "TRAIT",
+                            whitespace_like: false,
+                        },
+                        MATCH => rt::NodeTypeInfo {
+                            name: "MATCH",
+                            whitespace_like: false,
+                        },
+                        RETURN => rt::NodeTypeInfo {
+                            name: "RETURN",
+                            whitespace_like: false,
+                        },
+                        CONTINUE => rt::NodeTypeInfo {
+                            name: "CONTINUE",
+                            whitespace_like: false,
+                        },
+                        BREAK => rt::NodeTypeInfo {
+                            name: "BREAK",
+                            whitespace_like: false,
+                        },
+                        IN => rt::NodeTypeInfo {
+                            name: "IN",
+                            whitespace_like: false,
+                        },
+                        UNSAFE => rt::NodeTypeInfo {
+                            name: "UNSAFE",
+                            whitespace_like: false,
+                        },
+                        WHERE => rt::NodeTypeInfo {
+                            name: "WHERE",
+                            whitespace_like: false,
+                        },
+                        L_PAREN => rt::NodeTypeInfo {
+                            name: "L_PAREN",
+                            whitespace_like: false,
+                        },
+                        R_PAREN => rt::NodeTypeInfo {
+                            name: "R_PAREN",
+                            whitespace_like: false,
+                        },
+                        L_CURLY => rt::NodeTypeInfo {
+                            name: "L_CURLY",
+                            whitespace_like: false,
+                        },
+                        R_CURLY => rt::NodeTypeInfo {
+                            name: "R_CURLY",
+                            whitespace_like: false,
+                        },
+                        L_ANGLE => rt::NodeTypeInfo {
+                            name: "L_ANGLE",
+                            whitespace_like: false,
+                        },
+                        R_ANGLE => rt::NodeTypeInfo {
+                            name: "R_ANGLE",
+                            whitespace_like: false,
+                        },
+                        L_BRACK => rt::NodeTypeInfo {
+                            name: "L_BRACK",
+                            whitespace_like: false,
+                        },
+                        R_BRACK => rt::NodeTypeInfo {
+                            name: "R_BRACK",
+                            whitespace_like: false,
+                        },
+                        SHL => rt::NodeTypeInfo {
+                            name: "SHL",
+                            whitespace_like: false,
+                        },
+                        SHL_EQ => rt::NodeTypeInfo {
+                            name: "SHL_EQ",
+                            whitespace_like: false,
+                        },
+                        SHR => rt::NodeTypeInfo {
+                            name: "SHR",
+                            whitespace_like: false,
+                        },
+                        SHR_EQ => rt::NodeTypeInfo {
+                            name: "SHR_EQ",
+                            whitespace_like: false,
+                        },
+                        AND => rt::NodeTypeInfo {
+                            name: "AND",
+                            whitespace_like: false,
+                        },
+                        OR => rt::NodeTypeInfo {
+                            name: "OR",
+                            whitespace_like: false,
+                        },
+                        THIN_ARROW => rt::NodeTypeInfo {
+                            name: "THIN_ARROW",
+                            whitespace_like: false,
+                        },
+                        FAT_ARROW => rt::NodeTypeInfo {
+                            name: "FAT_ARROW",
+                            whitespace_like: false,
+                        },
+                        EQ => rt::NodeTypeInfo {
+                            name: "EQ",
+                            whitespace_like: false,
+                        },
+                        EQEQ => rt::NodeTypeInfo {
+                            name: "EQEQ",
+                            whitespace_like: false,
+                        },
+                        BANGEQ => rt::NodeTypeInfo {
+                            name: "BANGEQ",
+                            whitespace_like: false,
+                        },
+                        GTET => rt::NodeTypeInfo {
+                            name: "GTET",
+                            whitespace_like: false,
+                        },
+                        LTEQ => rt::NodeTypeInfo {
+                            name: "LTEQ",
+                            whitespace_like: false,
+                        },
+                        SEMI => rt::NodeTypeInfo {
+                            name: "SEMI",
+                            whitespace_like: false,
+                        },
+                        COLON => rt::NodeTypeInfo {
+                            name: "COLON",
+                            whitespace_like: false,
+                        },
+                        COLONCOLON => rt::NodeTypeInfo {
+                            name: "COLONCOLON",
+                            whitespace_like: false,
+                        },
+                        COMMA => rt::NodeTypeInfo {
+                            name: "COMMA",
+                            whitespace_like: false,
+                        },
+                        DOT => rt::NodeTypeInfo {
+                            name: "DOT",
+                            whitespace_like: false,
+                        },
+                        DOTDOT => rt::NodeTypeInfo {
+                            name: "DOTDOT",
+                            whitespace_like: false,
+                        },
+                        DOTDOTDOT => rt::NodeTypeInfo {
+                            name: "DOTDOTDOT",
+                            whitespace_like: false,
+                        },
+                        HASH => rt::NodeTypeInfo {
+                            name: "HASH",
+                            whitespace_like: false,
+                        },
+                        DOLLAR => rt::NodeTypeInfo {
+                            name: "DOLLAR",
+                            whitespace_like: false,
+                        },
+                        STAR => rt::NodeTypeInfo {
+                            name: "STAR",
+                            whitespace_like: false,
+                        },
+                        STAR_EQ => rt::NodeTypeInfo {
+                            name: "STAR_EQ",
+                            whitespace_like: false,
+                        },
+                        SLASH => rt::NodeTypeInfo {
+                            name: "SLASH",
+                            whitespace_like: false,
+                        },
+                        SLASH_EQ => rt::NodeTypeInfo {
+                            name: "SLASH_EQ",
+                            whitespace_like: false,
+                        },
+                        PERCENT => rt::NodeTypeInfo {
+                            name: "PERCENT",
+                            whitespace_like: false,
+                        },
+                        PERCENT_EQ => rt::NodeTypeInfo {
+                            name: "PERCENT_EQ",
+                            whitespace_like: false,
+                        },
+                        PLUS => rt::NodeTypeInfo {
+                            name: "PLUS",
+                            whitespace_like: false,
+                        },
+                        PLUS_EQ => rt::NodeTypeInfo {
+                            name: "PLUS_EQ",
+                            whitespace_like: false,
+                        },
+                        MINUS => rt::NodeTypeInfo {
+                            name: "MINUS",
+                            whitespace_like: false,
+                        },
+                        MINUS_EQ => rt::NodeTypeInfo {
+                            name: "MINUS_EQ",
+                            whitespace_like: false,
+                        },
+                        AMPERSAND => rt::NodeTypeInfo {
+                            name: "AMPERSAND",
+                            whitespace_like: false,
+                        },
+                        AMPERSAND_EQ => rt::NodeTypeInfo {
+                            name: "AMPERSAND_EQ",
+                            whitespace_like: false,
+                        },
+                        PIPE => rt::NodeTypeInfo {
+                            name: "PIPE",
+                            whitespace_like: false,
+                        },
+                        PIPE_EQ => rt::NodeTypeInfo {
+                            name: "PIPE_EQ",
+                            whitespace_like: false,
+                        },
+                        UNDERSCORE => rt::NodeTypeInfo {
+                            name: "UNDERSCORE",
+                            whitespace_like: false,
+                        },
+                        BANG => rt::NodeTypeInfo {
+                            name: "BANG",
+                            whitespace_like: false,
+                        },
+                        QUESTION => rt::NodeTypeInfo {
+                            name: "QUESTION",
+                            whitespace_like: false,
+                        },
+                        CARET => rt::NodeTypeInfo {
+                            name: "CARET",
+                            whitespace_like: false,
+                        },
+                        CARET_EQ => rt::NodeTypeInfo {
+                            name: "CARET_EQ",
+                            whitespace_like: false,
+                        },
+                        CHAR => rt::NodeTypeInfo {
+                            name: "CHAR",
+                            whitespace_like: false,
+                        },
+                        LIFETIME => rt::NodeTypeInfo {
+                            name: "LIFETIME",
+                            whitespace_like: false,
+                        },
+                        BOOL => rt::NodeTypeInfo {
+                            name: "BOOL",
+                            whitespace_like: false,
+                        },
+                        NUMBER => rt::NodeTypeInfo {
+                            name: "NUMBER",
+                            whitespace_like: false,
+                        },
+                        STRING => rt::NodeTypeInfo {
+                            name: "STRING",
+                            whitespace_like: false,
+                        },
+                        RAW_STRING => rt::NodeTypeInfo {
+                            name: "RAW_STRING",
+                            whitespace_like: false,
+                        },
+                        IDENT => rt::NodeTypeInfo {
+                            name: "IDENT",
+                            whitespace_like: false,
+                        },
+                        FILE => rt::NodeTypeInfo {
+                            name: "FILE",
+                            whitespace_like: false,
+                        },
+                        USE_DECL => rt::NodeTypeInfo {
+                            name: "USE_DECL",
+                            whitespace_like: false,
+                        },
+                        USE_SPEC => rt::NodeTypeInfo {
+                            name: "USE_SPEC",
+                            whitespace_like: false,
+                        },
+                        USE_SPEC_ENTRY => rt::NodeTypeInfo {
+                            name: "USE_SPEC_ENTRY",
+                            whitespace_like: false,
+                        },
+                        EXTERN_CRATE_DECL => rt::NodeTypeInfo {
+                            name: "EXTERN_CRATE_DECL",
+                            whitespace_like: false,
+                        },
+                        FN_DEF => rt::NodeTypeInfo {
+                            name: "FN_DEF",
+                            whitespace_like: false,
+                        },
+                        LINKAGE => rt::NodeTypeInfo {
+                            name: "LINKAGE",
+                            whitespace_like: false,
+                        },
+                        VALUE_PARAM => rt::NodeTypeInfo {
+                            name: "VALUE_PARAM",
+                            whitespace_like: false,
+                        },
+                        LAMBDA_VALUE_PARAM => rt::NodeTypeInfo {
+                            name: "LAMBDA_VALUE_PARAM",
+                            whitespace_like: false,
+                        },
+                        SELF_PARAMETER => rt::NodeTypeInfo {
+                            name: "SELF_PARAMETER",
+                            whitespace_like: false,
+                        },
+                        STRUCT_DEF => rt::NodeTypeInfo {
+                            name: "STRUCT_DEF",
+                            whitespace_like: false,
+                        },
+                        STRUCT_FIELD => rt::NodeTypeInfo {
+                            name: "STRUCT_FIELD",
+                            whitespace_like: false,
+                        },
+                        TUPLE_FIELD => rt::NodeTypeInfo {
+                            name: "TUPLE_FIELD",
+                            whitespace_like: false,
+                        },
+                        ENUM_DEF => rt::NodeTypeInfo {
+                            name: "ENUM_DEF",
+                            whitespace_like: false,
+                        },
+                        ENUM_VARIANT => rt::NodeTypeInfo {
+                            name: "ENUM_VARIANT",
+                            whitespace_like: false,
+                        },
+                        MOD_DEF => rt::NodeTypeInfo {
+                            name: "MOD_DEF",
+                            whitespace_like: false,
+                        },
+                        IMPL_DEF => rt::NodeTypeInfo {
+                            name: "IMPL_DEF",
+                            whitespace_like: false,
+                        },
+                        TRAIT_DEF => rt::NodeTypeInfo {
+                            name: "TRAIT_DEF",
+                            whitespace_like: false,
+                        },
+                        MEMBERS => rt::NodeTypeInfo {
+                            name: "MEMBERS",
+                            whitespace_like: false,
+                        },
+                        TYPE_DEF => rt::NodeTypeInfo {
+                            name: "TYPE_DEF",
+                            whitespace_like: false,
+                        },
+                        CONST_DEF => rt::NodeTypeInfo {
+                            name: "CONST_DEF",
+                            whitespace_like: false,
+                        },
+                        MACRO_ITEM => rt::NodeTypeInfo {
+                            name: "MACRO_ITEM",
+                            whitespace_like: false,
+                        },
+                        EXTERN_BLOCK => rt::NodeTypeInfo {
+                            name: "EXTERN_BLOCK",
+                            whitespace_like: false,
+                        },
+                        TYPE_PARAMETERS => rt::NodeTypeInfo {
+                            name: "TYPE_PARAMETERS",
+                            whitespace_like: false,
+                        },
+                        TYPE_PARAMETER => rt::NodeTypeInfo {
+                            name: "TYPE_PARAMETER",
+                            whitespace_like: false,
+                        },
+                        TYPE_BOUND => rt::NodeTypeInfo {
+                            name: "TYPE_BOUND",
+                            whitespace_like: false,
+                        },
+                        LIFETIME_PARAMETER => rt::NodeTypeInfo {
+                            name: "LIFETIME_PARAMETER",
+                            whitespace_like: false,
+                        },
+                        VISIBILITY => rt::NodeTypeInfo {
+                            name: "VISIBILITY",
+                            whitespace_like: false,
+                        },
+                        WHERE_CLAUSE => rt::NodeTypeInfo {
+                            name: "WHERE_CLAUSE",
+                            whitespace_like: false,
+                        },
+                        PATH => rt::NodeTypeInfo {
+                            name: "PATH",
+                            whitespace_like: false,
+                        },
+                        TRAIT_PROJECTION_PATH => rt::NodeTypeInfo {
+                            name: "TRAIT_PROJECTION_PATH",
+                            whitespace_like: false,
+                        },
+                        PATH_SEGMENT => rt::NodeTypeInfo {
+                            name: "PATH_SEGMENT",
+                            whitespace_like: false,
+                        },
+                        TYPE_ARGUMENTS => rt::NodeTypeInfo {
+                            name: "TYPE_ARGUMENTS",
+                            whitespace_like: false,
+                        },
+                        FN_TRAIT_SUGAR => rt::NodeTypeInfo {
+                            name: "FN_TRAIT_SUGAR",
+                            whitespace_like: false,
+                        },
+                        ALIAS => rt::NodeTypeInfo {
+                            name: "ALIAS",
+                            whitespace_like: false,
+                        },
+                        TYPE_REFERENCE => rt::NodeTypeInfo {
+                            name: "TYPE_REFERENCE",
+                            whitespace_like: false,
+                        },
+                        PATH_TYPE => rt::NodeTypeInfo {
+                            name: "PATH_TYPE",
+                            whitespace_like: false,
+                        },
+                        REFERENCE_TYPE => rt::NodeTypeInfo {
+                            name: "REFERENCE_TYPE",
+                            whitespace_like: false,
+                        },
+                        POINTER_TYPE => rt::NodeTypeInfo {
+                            name: "POINTER_TYPE",
+                            whitespace_like: false,
+                        },
+                        PLACEHOLDER_TYPE => rt::NodeTypeInfo {
+                            name: "PLACEHOLDER_TYPE",
+                            whitespace_like: false,
+                        },
+                        UNIT_TYPE => rt::NodeTypeInfo {
+                            name: "UNIT_TYPE",
+                            whitespace_like: false,
+                        },
+                        PAREN_TYPE => rt::NodeTypeInfo {
+                            name: "PAREN_TYPE",
+                            whitespace_like: false,
+                        },
+                        TUPLE_TYPE => rt::NodeTypeInfo {
+                            name: "TUPLE_TYPE",
+                            whitespace_like: false,
+                        },
+                        NEVER_TYPE => rt::NodeTypeInfo {
+                            name: "NEVER_TYPE",
+                            whitespace_like: false,
+                        },
+                        ARRAY_TYPE => rt::NodeTypeInfo {
+                            name: "ARRAY_TYPE",
+                            whitespace_like: false,
+                        },
+                        FN_POINTER_TYPE => rt::NodeTypeInfo {
+                            name: "FN_POINTER_TYPE",
+                            whitespace_like: false,
+                        },
+                        FOR_TYPE => rt::NodeTypeInfo {
+                            name: "FOR_TYPE",
+                            whitespace_like: false,
+                        },
+                        WILDCARD_PATTERN => rt::NodeTypeInfo {
+                            name: "WILDCARD_PATTERN",
+                            whitespace_like: false,
+                        },
+                        PATH_PATTERN => rt::NodeTypeInfo {
+                            name: "PATH_PATTERN",
+                            whitespace_like: false,
+                        },
+                        TUPE_STRUCT_PATTERN => rt::NodeTypeInfo {
+                            name: "TUPE_STRUCT_PATTERN",
+                            whitespace_like: false,
+                        },
+                        STRUCT_PATTERN => rt::NodeTypeInfo {
+                            name: "STRUCT_PATTERN",
+                            whitespace_like: false,
+                        },
+                        STRUCT_PATTERN_FIELD => rt::NodeTypeInfo {
+                            name: "STRUCT_PATTERN_FIELD",
+                            whitespace_like: false,
+                        },
+                        BINDING_PATTERN => rt::NodeTypeInfo {
+                            name: "BINDING_PATTERN",
+                            whitespace_like: false,
+                        },
+                        LITERAL_PATTERN => rt::NodeTypeInfo {
+                            name: "LITERAL_PATTERN",
+                            whitespace_like: false,
+                        },
+                        UNIT_PATTERN => rt::NodeTypeInfo {
+                            name: "UNIT_PATTERN",
+                            whitespace_like: false,
+                        },
+                        PAREN_PATTERN => rt::NodeTypeInfo {
+                            name: "PAREN_PATTERN",
+                            whitespace_like: false,
+                        },
+                        TUPLE_PATTERN => rt::NodeTypeInfo {
+                            name: "TUPLE_PATTERN",
+                            whitespace_like: false,
+                        },
+                        REFERENCE_PATTERN => rt::NodeTypeInfo {
+                            name: "REFERENCE_PATTERN",
+                            whitespace_like: false,
+                        },
+                        EXPR => rt::NodeTypeInfo {
+                            name: "EXPR",
+                            whitespace_like: false,
+                        },
+                        LITERAL => rt::NodeTypeInfo {
+                            name: "LITERAL",
+                            whitespace_like: false,
+                        },
+                        PATH_EXPR => rt::NodeTypeInfo {
+                            name: "PATH_EXPR",
+                            whitespace_like: false,
+                        },
+                        STRUCT_LITERAL => rt::NodeTypeInfo {
+                            name: "STRUCT_LITERAL",
+                            whitespace_like: false,
+                        },
+                        STRUCT_LITERAL_FIELD => rt::NodeTypeInfo {
+                            name: "STRUCT_LITERAL_FIELD",
+                            whitespace_like: false,
+                        },
+                        UNIT_EXPR => rt::NodeTypeInfo {
+                            name: "UNIT_EXPR",
+                            whitespace_like: false,
+                        },
+                        PAREN_EXPR => rt::NodeTypeInfo {
+                            name: "PAREN_EXPR",
+                            whitespace_like: false,
+                        },
+                        TUPLE_EXPR => rt::NodeTypeInfo {
+                            name: "TUPLE_EXPR",
+                            whitespace_like: false,
+                        },
+                        ARRAY_LITERAL => rt::NodeTypeInfo {
+                            name: "ARRAY_LITERAL",
+                            whitespace_like: false,
+                        },
+                        LAMBDA_EXPR => rt::NodeTypeInfo {
+                            name: "LAMBDA_EXPR",
+                            whitespace_like: false,
+                        },
+                        RETURN_EXPR => rt::NodeTypeInfo {
+                            name: "RETURN_EXPR",
+                            whitespace_like: false,
+                        },
+                        LOOP_CF_EXPR => rt::NodeTypeInfo {
+                            name: "LOOP_CF_EXPR",
+                            whitespace_like: false,
+                        },
+                        BLOCK_EXPR => rt::NodeTypeInfo {
+                            name: "BLOCK_EXPR",
+                            whitespace_like: false,
+                        },
+                        LET_STMT => rt::NodeTypeInfo {
+                            name: "LET_STMT",
+                            whitespace_like: false,
+                        },
+                        TYPE_ASCRIPTION => rt::NodeTypeInfo {
+                            name: "TYPE_ASCRIPTION",
+                            whitespace_like: false,
+                        },
+                        EMPTY_STMT => rt::NodeTypeInfo {
+                            name: "EMPTY_STMT",
+                            whitespace_like: false,
+                        },
+                        EXPR_STMT => rt::NodeTypeInfo {
+                            name: "EXPR_STMT",
+                            whitespace_like: false,
+                        },
+                        IF_EXPR => rt::NodeTypeInfo {
+                            name: "IF_EXPR",
+                            whitespace_like: false,
+                        },
+                        WHILE_EXPR => rt::NodeTypeInfo {
+                            name: "WHILE_EXPR",
+                            whitespace_like: false,
+                        },
+                        LOOP_EXPR => rt::NodeTypeInfo {
+                            name: "LOOP_EXPR",
+                            whitespace_like: false,
+                        },
+                        FOR_EXPR => rt::NodeTypeInfo {
+                            name: "FOR_EXPR",
+                            whitespace_like: false,
+                        },
+                        MATCH_EXPR => rt::NodeTypeInfo {
+                            name: "MATCH_EXPR",
+                            whitespace_like: false,
+                        },
+                        MATCH_ARM => rt::NodeTypeInfo {
+                            name: "MATCH_ARM",
+                            whitespace_like: false,
+                        },
+                        GUARD => rt::NodeTypeInfo {
+                            name: "GUARD",
+                            whitespace_like: false,
+                        },
+                        BLOCK_MACRO_EXPR => rt::NodeTypeInfo {
+                            name: "BLOCK_MACRO_EXPR",
+                            whitespace_like: false,
+                        },
+                        LINE_MACRO_EXPR => rt::NodeTypeInfo {
+                            name: "LINE_MACRO_EXPR",
+                            whitespace_like: false,
+                        },
+                        METHOD_CALL_EXPR => rt::NodeTypeInfo {
+                            name: "METHOD_CALL_EXPR",
+                            whitespace_like: false,
+                        },
+                        CALL_EXPR => rt::NodeTypeInfo {
+                            name: "CALL_EXPR",
+                            whitespace_like: false,
+                        },
+                        VALUE_ARGUMENT => rt::NodeTypeInfo {
+                            name: "VALUE_ARGUMENT",
+                            whitespace_like: false,
+                        },
+                        FIELD_EXPR => rt::NodeTypeInfo {
+                            name: "FIELD_EXPR",
+                            whitespace_like: false,
+                        },
+                        INDEX_EXPR => rt::NodeTypeInfo {
+                            name: "INDEX_EXPR",
+                            whitespace_like: false,
+                        },
+                        TRY_EXPR => rt::NodeTypeInfo {
+                            name: "TRY_EXPR",
+                            whitespace_like: false,
+                        },
+                        CAST_EXPR => rt::NodeTypeInfo {
+                            name: "CAST_EXPR",
+                            whitespace_like: false,
+                        },
+                        REFERENCE_EXPR => rt::NodeTypeInfo {
+                            name: "REFERENCE_EXPR",
+                            whitespace_like: false,
+                        },
+                        DEREFERENCE_EXPR => rt::NodeTypeInfo {
+                            name: "DEREFERENCE_EXPR",
+                            whitespace_like: false,
+                        },
+                        NEGATION_EXPR => rt::NodeTypeInfo {
+                            name: "NEGATION_EXPR",
+                            whitespace_like: false,
+                        },
+                        NOT_EXPR => rt::NodeTypeInfo {
+                            name: "NOT_EXPR",
+                            whitespace_like: false,
+                        },
+                        PRODUCT_EXPR => rt::NodeTypeInfo {
+                            name: "PRODUCT_EXPR",
+                            whitespace_like: false,
+                        },
+                        SUM_EXPR => rt::NodeTypeInfo {
+                            name: "SUM_EXPR",
+                            whitespace_like: false,
+                        },
+                        BIT_SHIFT => rt::NodeTypeInfo {
+                            name: "BIT_SHIFT",
+                            whitespace_like: false,
+                        },
+                        BIT_AND => rt::NodeTypeInfo {
+                            name: "BIT_AND",
+                            whitespace_like: false,
+                        },
+                        BIT_XOR => rt::NodeTypeInfo {
+                            name: "BIT_XOR",
+                            whitespace_like: false,
+                        },
+                        BIT_OR => rt::NodeTypeInfo {
+                            name: "BIT_OR",
+                            whitespace_like: false,
+                        },
+                        COMPARISON => rt::NodeTypeInfo {
+                            name: "COMPARISON",
+                            whitespace_like: false,
+                        },
+                        LOGICAL_AND => rt::NodeTypeInfo {
+                            name: "LOGICAL_AND",
+                            whitespace_like: false,
+                        },
+                        LOGICAL_OR => rt::NodeTypeInfo {
+                            name: "LOGICAL_OR",
+                            whitespace_like: false,
+                        },
+                        RANGE_EXPR => rt::NodeTypeInfo {
+                            name: "RANGE_EXPR",
+                            whitespace_like: false,
+                        },
+                        ASSIGNMENT_EXPR => rt::NodeTypeInfo {
+                            name: "ASSIGNMENT_EXPR",
+                            whitespace_like: false,
+                        },
+                        ATTRIBUTE => rt::NodeTypeInfo {
+                            name: "ATTRIBUTE",
+                            whitespace_like: false,
+                        },
+                        INNER_ATTRIBUTE => rt::NodeTypeInfo {
+                            name: "INNER_ATTRIBUTE",
+                            whitespace_like: false,
+                        },
+                        ATTR_VALUE => rt::NodeTypeInfo {
+                            name: "ATTR_VALUE",
+                            whitespace_like: false,
+                        },
+                        BLOCK_MACRO => rt::NodeTypeInfo {
+                            name: "BLOCK_MACRO",
+                            whitespace_like: false,
+                        },
+                        LINE_MACRO => rt::NodeTypeInfo {
+                            name: "LINE_MACRO",
+                            whitespace_like: false,
+                        },
+                        TT => rt::NodeTypeInfo {
+                            name: "TT",
+                            whitespace_like: false,
+                        },
+                        _ => panic!("Unknown rt::NodeType: {:?}", ty),
                     }
                 }
             }
             rt::Language::new(Impl {
                 parser_definition: create_parser_definition(),
-                lexer: create_lexer()
+                lexer: create_lexer(),
             })
         };
     }
     &*LANG
 }
-fn whitespace_binder(ty: rt::NodeType, adjacent_tokens: Vec<(rt::NodeType, &str)>, is_leading: bool) -> usize {
+fn whitespace_binder(
+    ty: rt::NodeType,
+    adjacent_tokens: Vec<(rt::NodeType, &str)>,
+    is_leading: bool,
+) -> usize {
     if !is_leading {
         return 0;
     }
     match ty {
         STRUCT_DEF => {
             let mut has_comment = false;
-            adjacent_tokens.iter().rev()
+            adjacent_tokens
+                .iter()
+                .rev()
                 .take_while(|&&(ty, text)| {
                     if ty == LINE_COMMENT {
                         has_comment = true;
@@ -574,7 +1421,9 @@ fn parse_raw_string(s: &str) -> Option<usize> {
     // Who needs more than 25 hashes anyway? :)
     let q_hashes = concat!('"', "######", "######", "######", "######", "######");
     let closing = &q_hashes[..quote_start];
-    s[quote_start + 1..].find(closing).map(|i| i + quote_start + 1 + closing.len())
+    s[quote_start + 1..]
+        .find(closing)
+        .map(|i| i + quote_start + 1 + closing.len())
 }
 fn parse_block_comment(s: &str) -> Option<usize> {
     let mut s = &s[2..];
@@ -603,7 +1452,9 @@ fn parse_block_comment(s: &str) -> Option<usize> {
 #[allow(unused)]
 use self::rt::AstNode;
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct FnDef<'f> { node: rt::Node<'f> }
+pub struct FnDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for FnDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == FN_DEF {
@@ -612,10 +1463,11 @@ impl<'f> rt::AstNode<'f> for FnDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> FnDef<'f> {
-}
+impl<'f> FnDef<'f> {}
 impl<'f> ::std::fmt::Debug for FnDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("FnDef@")?;
@@ -624,7 +1476,9 @@ impl<'f> ::std::fmt::Debug for FnDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct StructDef<'f> { node: rt::Node<'f> }
+pub struct StructDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for StructDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == STRUCT_DEF {
@@ -633,10 +1487,11 @@ impl<'f> rt::AstNode<'f> for StructDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> StructDef<'f> {
-}
+impl<'f> StructDef<'f> {}
 impl<'f> ::std::fmt::Debug for StructDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("StructDef@")?;
@@ -645,7 +1500,9 @@ impl<'f> ::std::fmt::Debug for StructDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct EnumDef<'f> { node: rt::Node<'f> }
+pub struct EnumDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for EnumDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == ENUM_DEF {
@@ -654,10 +1511,11 @@ impl<'f> rt::AstNode<'f> for EnumDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> EnumDef<'f> {
-}
+impl<'f> EnumDef<'f> {}
 impl<'f> ::std::fmt::Debug for EnumDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("EnumDef@")?;
@@ -666,7 +1524,9 @@ impl<'f> ::std::fmt::Debug for EnumDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TraitDef<'f> { node: rt::Node<'f> }
+pub struct TraitDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TraitDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TRAIT_DEF {
@@ -675,10 +1535,11 @@ impl<'f> rt::AstNode<'f> for TraitDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> TraitDef<'f> {
-}
+impl<'f> TraitDef<'f> {}
 impl<'f> ::std::fmt::Debug for TraitDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("TraitDef@")?;
@@ -687,7 +1548,9 @@ impl<'f> ::std::fmt::Debug for TraitDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TypeDef<'f> { node: rt::Node<'f> }
+pub struct TypeDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TypeDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TYPE_DEF {
@@ -696,10 +1559,11 @@ impl<'f> rt::AstNode<'f> for TypeDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> TypeDef<'f> {
-}
+impl<'f> TypeDef<'f> {}
 impl<'f> ::std::fmt::Debug for TypeDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("TypeDef@")?;
@@ -708,7 +1572,9 @@ impl<'f> ::std::fmt::Debug for TypeDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ModDef<'f> { node: rt::Node<'f> }
+pub struct ModDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for ModDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == MOD_DEF {
@@ -717,10 +1583,11 @@ impl<'f> rt::AstNode<'f> for ModDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> ModDef<'f> {
-}
+impl<'f> ModDef<'f> {}
 impl<'f> ::std::fmt::Debug for ModDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("ModDef@")?;
@@ -729,7 +1596,9 @@ impl<'f> ::std::fmt::Debug for ModDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ImplDef<'f> { node: rt::Node<'f> }
+pub struct ImplDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for ImplDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == IMPL_DEF {
@@ -738,10 +1607,11 @@ impl<'f> rt::AstNode<'f> for ImplDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> ImplDef<'f> {
-}
+impl<'f> ImplDef<'f> {}
 impl<'f> ::std::fmt::Debug for ImplDef<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("ImplDef@")?;
@@ -750,7 +1620,9 @@ impl<'f> ::std::fmt::Debug for ImplDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TypeParameters<'f> { node: rt::Node<'f> }
+pub struct TypeParameters<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TypeParameters<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TYPE_PARAMETERS {
@@ -759,7 +1631,9 @@ impl<'f> rt::AstNode<'f> for TypeParameters<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> TypeParameters<'f> {
     pub fn lifetime_parameters(&self) -> rt::AstChildren<'f, LifetimeParameter<'f>> {
@@ -777,7 +1651,9 @@ impl<'f> ::std::fmt::Debug for TypeParameters<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TypeParameter<'f> { node: rt::Node<'f> }
+pub struct TypeParameter<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TypeParameter<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TYPE_PARAMETER {
@@ -786,10 +1662,11 @@ impl<'f> rt::AstNode<'f> for TypeParameter<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> TypeParameter<'f> {
-}
+impl<'f> TypeParameter<'f> {}
 impl<'f> ::std::fmt::Debug for TypeParameter<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("TypeParameter@")?;
@@ -798,7 +1675,9 @@ impl<'f> ::std::fmt::Debug for TypeParameter<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct LifetimeParameter<'f> { node: rt::Node<'f> }
+pub struct LifetimeParameter<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for LifetimeParameter<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == LIFETIME_PARAMETER {
@@ -807,7 +1686,9 @@ impl<'f> rt::AstNode<'f> for LifetimeParameter<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> LifetimeParameter<'f> {
     pub fn lifetime(&self) -> rt::Text<'f> {
@@ -822,7 +1703,9 @@ impl<'f> ::std::fmt::Debug for LifetimeParameter<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Path<'f> { node: rt::Node<'f> }
+pub struct Path<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Path<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == PATH {
@@ -831,7 +1714,9 @@ impl<'f> rt::AstNode<'f> for Path<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Path<'f> {
     pub fn qualifier(&self) -> Option<Path<'f>> {
@@ -849,7 +1734,9 @@ impl<'f> ::std::fmt::Debug for Path<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct PathSegment<'f> { node: rt::Node<'f> }
+pub struct PathSegment<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for PathSegment<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == PATH_SEGMENT {
@@ -858,10 +1745,11 @@ impl<'f> rt::AstNode<'f> for PathSegment<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> PathSegment<'f> {
-}
+impl<'f> PathSegment<'f> {}
 impl<'f> ::std::fmt::Debug for PathSegment<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("PathSegment@")?;
@@ -870,7 +1758,9 @@ impl<'f> ::std::fmt::Debug for PathSegment<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct UseDecl<'f> { node: rt::Node<'f> }
+pub struct UseDecl<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for UseDecl<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == USE_DECL {
@@ -879,7 +1769,9 @@ impl<'f> rt::AstNode<'f> for UseDecl<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> UseDecl<'f> {
     pub fn path(&self) -> Option<Path<'f>> {
@@ -897,7 +1789,9 @@ impl<'f> ::std::fmt::Debug for UseDecl<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct UseSpec<'f> { node: rt::Node<'f> }
+pub struct UseSpec<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for UseSpec<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == USE_SPEC {
@@ -906,10 +1800,11 @@ impl<'f> rt::AstNode<'f> for UseSpec<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> UseSpec<'f> {
-}
+impl<'f> UseSpec<'f> {}
 impl<'f> ::std::fmt::Debug for UseSpec<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("UseSpec@")?;
@@ -918,7 +1813,9 @@ impl<'f> ::std::fmt::Debug for UseSpec<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct LetStmt<'f> { node: rt::Node<'f> }
+pub struct LetStmt<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for LetStmt<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == LET_STMT {
@@ -927,10 +1824,11 @@ impl<'f> rt::AstNode<'f> for LetStmt<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> LetStmt<'f> {
-}
+impl<'f> LetStmt<'f> {}
 impl<'f> ::std::fmt::Debug for LetStmt<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("LetStmt@")?;
@@ -939,7 +1837,9 @@ impl<'f> ::std::fmt::Debug for LetStmt<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ExprStmt<'f> { node: rt::Node<'f> }
+pub struct ExprStmt<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for ExprStmt<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == EXPR_STMT {
@@ -948,10 +1848,11 @@ impl<'f> rt::AstNode<'f> for ExprStmt<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> ExprStmt<'f> {
-}
+impl<'f> ExprStmt<'f> {}
 impl<'f> ::std::fmt::Debug for ExprStmt<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("ExprStmt@")?;
@@ -960,7 +1861,9 @@ impl<'f> ::std::fmt::Debug for ExprStmt<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TypeReference<'f> { node: rt::Node<'f> }
+pub struct TypeReference<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TypeReference<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TYPE_REFERENCE {
@@ -969,10 +1872,11 @@ impl<'f> rt::AstNode<'f> for TypeReference<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> TypeReference<'f> {
-}
+impl<'f> TypeReference<'f> {}
 impl<'f> ::std::fmt::Debug for TypeReference<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("TypeReference@")?;

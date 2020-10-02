@@ -1,8 +1,7 @@
 extern crate lang_rust;
 
-use std::path::PathBuf;
 use lang_rust::editor::SymbolIndex;
-
+use std::path::PathBuf;
 
 fn main() {
     let paths = vec![PathBuf::from("/home/matklad/projects/fall")];

@@ -1,11 +1,11 @@
 extern crate elapsed;
-extern crate file;
 extern crate fall_tree;
+extern crate file;
 extern crate lang_rust;
 
 use std::path::PathBuf;
 
-use fall_tree::{TextRange, tu};
+use fall_tree::{tu, TextRange};
 use lang_rust::syntax::lang_rust;
 
 fn main() {
@@ -18,10 +18,12 @@ fn main() {
         let error_text = &file.text().to_string()[err_range];
         let parent = err.parent().unwrap();
         let ctx = parent.parent().unwrap_or(parent);
-        eprintln!("\nError in\n----------\n{}\n----------\n{:?}\n----------\n{}\n----------\n\n",
-                  ctx.text(),
-                  parent,
-                  error_text);
+        eprintln!(
+            "\nError in\n----------\n{}\n----------\n{:?}\n----------\n{}\n----------\n\n",
+            ctx.text(),
+            parent,
+            error_text
+        );
     }
     assert!(ast_len > 10000);
     println!("{}\ntotal: {}", file.metrics(), total);

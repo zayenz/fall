@@ -12,11 +12,11 @@ pub extern crate serde_json;
 use std::any::Any;
 use std::collections::HashMap;
 
-use fall_tree::{Text, Language, NodeType, Metrics, TextEdit, TextUnit, TreeBuilder, ERROR, tu};
+use fall_tree::{tu, Language, Metrics, NodeType, Text, TextEdit, TextUnit, TreeBuilder, ERROR};
 
 mod lex_engine;
 
-use crate::lex_engine::{Token, Lexer};
+use crate::lex_engine::{Lexer, Token};
 
 mod syn_engine;
 
@@ -31,8 +31,7 @@ impl RegexLexer {
     pub fn new(rules: Vec<LexRule>) -> RegexLexer {
         let mut tys = Vec::new();
         tys.push(ERROR);
-        let mut builder = m_lexer::LexerBuilder::new()
-            .error_token(m_lexer::TokenKind(0));
+        let mut builder = m_lexer::LexerBuilder::new().error_token(m_lexer::TokenKind(0));
 
         for rule in rules {
             builder = builder.rule(
@@ -44,9 +43,11 @@ impl RegexLexer {
                 }),
             );
             tys.push(rule.ty);
-
         }
-        RegexLexer { tys, lexer: builder.build() }
+        RegexLexer {
+            tys,
+            lexer: builder.build(),
+        }
     }
 }
 
@@ -72,10 +73,13 @@ pub type CustomLexRule = fn(&str) -> Option<usize>;
 
 impl LexRule {
     pub fn new(ty: NodeType, re: &str, f: Option<CustomLexRule>) -> LexRule {
-        LexRule { ty, re: re.to_owned(), f }
+        LexRule {
+            ty,
+            re: re.to_owned(),
+            f,
+        }
     }
 }
-
 
 /// Describes both lexical and syntactical grammar
 /// of a language.
@@ -85,7 +89,8 @@ impl LexRule {
 pub struct ParserDefinition {
     pub node_types: Vec<NodeType>,
     pub syntactical_rules: Vec<Expr>,
-    pub whitespace_binder: fn(ty: NodeType, adjacent_spaces: Vec<(NodeType, &str)>, leading: bool) -> usize,
+    pub whitespace_binder:
+        fn(ty: NodeType, adjacent_spaces: Vec<(NodeType, &str)>, leading: bool) -> usize,
 }
 
 impl Default for ParserDefinition {
@@ -101,7 +106,6 @@ impl Default for ParserDefinition {
         }
     }
 }
-
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, TypedIndex)]
 #[typed_index(NodeType)]
@@ -158,10 +162,11 @@ pub struct PrattTable {
 }
 
 impl PrattTable {
-    fn infixes<'p>(&'p self, min_prior: u32) -> Box<dyn Iterator<Item=&'p Infix> + 'p> {
+    fn infixes<'p>(&'p self, min_prior: u32) -> Box<dyn Iterator<Item = &'p Infix> + 'p> {
         Box::new(
-            self.infixes.iter()
-                .filter(move |ix| ix.priority >= min_prior)
+            self.infixes
+                .iter()
+                .filter(move |ix| ix.priority >= min_prior),
         )
     }
 }
@@ -181,7 +186,6 @@ pub struct Infix {
     pub has_rhs: bool,
 }
 
-
 struct IncrementalData {
     tokens: Vec<Token>,
     events: Vec<Event>,
@@ -195,9 +199,7 @@ pub fn parse(
     metrics: &Metrics,
     builder: &mut TreeBuilder,
 ) -> Option<Box<dyn Any + Sync + Send>> {
-    let tokens: Vec<Token> = metrics.measure_time("lexing", || {
-        lex_engine::lex(lexer_def, text)
-    });
+    let tokens: Vec<Token> = metrics.measure_time("lexing", || lex_engine::lex(lexer_def, text));
     metrics.record("relexed region", text.len().utf8_len() as u64, "");
 
     let events = parser_def.parse(None, text, &tokens, lang, metrics, builder);
@@ -233,7 +235,6 @@ pub fn reparse(
     Some(Box::new(incremental_data))
 }
 
-
 impl ParserDefinition {
     fn parse(
         &self,
@@ -251,7 +252,7 @@ impl ParserDefinition {
         };
         let file_ty = match self.syntactical_rules[0] {
             Expr::Pub { ty, .. } => self.node_types[ty.0 as usize],
-            _ => unreachable!()
+            _ => unreachable!(),
         };
 
         let (events, ticks) = metrics.measure_time("parsing", || {
@@ -269,8 +270,12 @@ impl ParserDefinition {
                     if ty == file_ty {
                         return spaces.len();
                     }
-                    let owned: Vec<_> = spaces.iter().map(|&(t, text)| (t, text.to_cow())).collect();
-                    let spaces = owned.iter().map(|&(t, ref text)| (t, text.as_ref())).collect();
+                    let owned: Vec<_> =
+                        spaces.iter().map(|&(t, text)| (t, text.to_cow())).collect();
+                    let spaces = owned
+                        .iter()
+                        .map(|&(t, ref text)| (t, text.as_ref()))
+                        .collect();
                     (self.whitespace_binder)(ty, spaces, leading)
                 },
                 builder,
@@ -285,10 +290,13 @@ pub mod runtime {
         ::serde_json::from_str(json).unwrap()
     }
 
-    pub use crate::{ParserDefinition, RegexLexer, LexRule, parse, reparse};
-    pub use serde_json;
+    pub use crate::{parse, reparse, LexRule, ParserDefinition, RegexLexer};
     pub use fall_tree;
-    pub use fall_tree::{AstNode, AstChildren, Node, NodeType, NodeTypeInfo, Language, LanguageImpl, ERROR, Text, TextEdit, TreeBuilder, Metrics};
     pub use fall_tree::search::{child_of_type, child_of_type_exn};
+    pub use fall_tree::{
+        AstChildren, AstNode, Language, LanguageImpl, Metrics, Node, NodeType, NodeTypeInfo, Text,
+        TextEdit, TreeBuilder, ERROR,
+    };
     pub use lazy_static::*;
+    pub use serde_json;
 }

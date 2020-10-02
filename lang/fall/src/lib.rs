@@ -4,18 +4,19 @@ extern crate serde;
 #[macro_use]
 extern crate rental;
 
-extern crate fall_tree;
-extern crate fall_parse;
 extern crate fall_editor;
+extern crate fall_parse;
+extern crate fall_tree;
 pub extern crate lang_fall_syntax as syntax;
 
 use fall_tree::{AstNode, File};
 
 mod analysis;
 
-
-pub use self::analysis::{Analysis, FileWithAnalysis, CallKind, RefKind, PratVariant, PrattOp,
-                         MethodKind, Arity, ChildKind};
+pub use self::analysis::{
+    Analysis, Arity, CallKind, ChildKind, FileWithAnalysis, MethodKind, PratVariant, PrattOp,
+    RefKind,
+};
 
 pub fn parse<S: Into<String>>(text: S) -> File {
     syntax::lang_fall().parse(text.into())
@@ -30,7 +31,6 @@ pub fn ast(file: &File) -> syntax::FallFile {
 }
 
 pub mod editor;
-
 
 #[cfg(test)]
 mod test_util {

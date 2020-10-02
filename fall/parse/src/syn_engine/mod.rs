@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use fall_tree::{NodeType, TextEdit, TextUnit, TextEditOp, tu, TextRange, ERROR};
 use crate::lex_engine::Token;
 use crate::{Expr, ExprRef};
+use fall_tree::{tu, NodeType, TextEdit, TextEditOp, TextRange, TextUnit, ERROR};
 
 pub struct Grammar<'g> {
     pub node_types: &'g [NodeType],
@@ -18,8 +18,8 @@ impl<'g> ::std::ops::Index<ExprRef> for Grammar<'g> {
     }
 }
 
-mod parser;
 mod expr;
+mod parser;
 mod pratt;
 
 pub(crate) use self::expr::parse;
@@ -28,13 +28,21 @@ mod convert;
 
 pub(crate) use self::convert::convert;
 
-
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum Event {
-    Start { ty: NodeType, forward_parent: Option<u32> },
-    Token { ty: NodeType, n_raw_tokens: u16 },
+    Start {
+        ty: NodeType,
+        forward_parent: Option<u32>,
+    },
+    Token {
+        ty: NodeType,
+        n_raw_tokens: u16,
+    },
     End,
-    Cached { key: u32, n_events: u32 },
+    Cached {
+        key: u32,
+        n_events: u32,
+    },
 }
 
 pub(crate) fn salvage_segments(
@@ -76,8 +84,9 @@ pub(crate) fn salvage_segments(
         match *event {
             Event::Start { .. } => (),
             Event::End => (),
-            Event::Token { n_raw_tokens, .. } =>
-                eat_tokens(&mut raw_token_pos, &mut text_pos, n_raw_tokens),
+            Event::Token { n_raw_tokens, .. } => {
+                eat_tokens(&mut raw_token_pos, &mut text_pos, n_raw_tokens)
+            }
 
             Event::Cached { key, n_events } => {
                 let start = text_pos;
@@ -95,7 +104,7 @@ pub(crate) fn salvage_segments(
                 }
                 if has_error {
                     start_event += n_events;
-                    continue
+                    continue;
                 }
 
                 let end = text_pos;
@@ -104,11 +113,16 @@ pub(crate) fn salvage_segments(
                 let mut inserted = tu(0);
                 for op in edit.ops.iter() {
                     match *op {
-                        TextEditOp::Copy(copy) => if range.is_subrange_of(copy) {
-                            let fixed_start = inserted + (start - copy.start());
-                            result.insert((fixed_start, ExprRef(key)), (start_event, n_events, n_tokens));
-                        } else {
-                            inserted += copy.len()
+                        TextEditOp::Copy(copy) => {
+                            if range.is_subrange_of(copy) {
+                                let fixed_start = inserted + (start - copy.start());
+                                result.insert(
+                                    (fixed_start, ExprRef(key)),
+                                    (start_event, n_events, n_tokens),
+                                );
+                            } else {
+                                inserted += copy.len()
+                            }
                         }
                         TextEditOp::Insert(ref text) => inserted += text.as_text().len(),
                     }
@@ -120,6 +134,3 @@ pub(crate) fn salvage_segments(
 
     result
 }
-
-
-

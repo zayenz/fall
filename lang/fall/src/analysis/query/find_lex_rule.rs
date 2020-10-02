@@ -1,7 +1,6 @@
 use crate::analysis::db::{self, DB};
 use crate::analysis::query;
-use crate::syntax::{LexRule};
-
+use crate::syntax::LexRule;
 
 impl<'f> db::QExecutor<'f> for super::FindLexRule<'f> {
     fn execute(self, db: &DB<'f>) -> Option<LexRule<'f>> {

@@ -1,13 +1,12 @@
 use std::any::Any;
 
-use crate::{TextEdit, TextBuf, Text, TextRange, NodeType, Language, Metrics};
+use crate::{Language, Metrics, NodeType, Text, TextBuf, TextEdit, TextRange};
 
 mod imp;
 mod tree_builder;
 
 pub use self::imp::NodeChildren;
 pub use self::tree_builder::TreeBuilder;
-
 
 pub struct File {
     imp: imp::FileImpl,
@@ -75,7 +74,9 @@ impl<'f> Node<'f> {
         self.0.text()
     }
 
-    pub fn file(&self) -> &'f File { self.0.file() }
+    pub fn file(&self) -> &'f File {
+        self.0.file()
+    }
 
     pub fn parent(&self) -> Option<Node<'f>> {
         self.0.parent()

@@ -1,20 +1,17 @@
-use fall_tree::{Node, TextUnit, TextRange, AstNode};
-use fall_tree::visitor::{visitor, process_node};
+use crate::analysis::{Analysis, CallKind, ChildKind, MethodKind, RefKind};
+use crate::syntax::{
+    AstClassDef, AstNodeDef, CallExpr, LexRule, MethodDef, Parameter, RefExpr, SynRule, IDENT,
+};
 use fall_tree::search::ast;
-use crate::analysis::{Analysis, RefKind, CallKind, MethodKind, ChildKind};
-use crate::syntax::{RefExpr, CallExpr, MethodDef, SynRule, LexRule, Parameter, AstNodeDef, AstClassDef,
-             IDENT};
+use fall_tree::visitor::{process_node, visitor};
+use fall_tree::{AstNode, Node, TextRange, TextUnit};
 
 mod refdec;
 
-use self::refdec::{Reference, Declaration};
+use self::refdec::{Declaration, Reference};
 
 pub fn resolve_reference(analysis: &Analysis, offset: TextUnit) -> Option<TextRange> {
-    return refdec::resolve_reference(
-        analysis,
-        offset,
-        &|node| ref_provider(analysis, node)
-    );
+    return refdec::resolve_reference(analysis, offset, &|node| ref_provider(analysis, node));
 }
 
 pub fn find_usages(analysis: &Analysis, offset: TextUnit) -> Vec<TextRange> {
@@ -22,7 +19,7 @@ pub fn find_usages(analysis: &Analysis, offset: TextUnit) -> Vec<TextRange> {
         analysis,
         offset,
         &|node| ref_provider(analysis, node),
-        def_provider
+        def_provider,
     );
 }
 
@@ -35,7 +32,7 @@ fn ref_provider<'f>(analysis: &Analysis<'f>, node: Node<'f>) -> Option<Reference
                     let ref_ = RefExpr::wrap(node).unwrap();
                     let target = match analysis.resolve_reference(ref_) {
                         None => return None,
-                        Some(t) => t
+                        Some(t) => t,
                     };
 
                     Some(match target {
@@ -46,18 +43,21 @@ fn ref_provider<'f>(analysis: &Analysis<'f>, node: Node<'f>) -> Option<Reference
                 }))
             })
             .visit::<MethodDef, _>(|method, result| {
-                *result = Some(Reference::new(method.selector().node(), |analysis, node| {
-                    let method = ast::ancestor_exn::<MethodDef>(node);
-                    let target = analysis.resolve_method(method)?;
-                    Some(match target {
-                        MethodKind::NodeAccessor(child_kind, _) => match child_kind {
-                            ChildKind::AstNode(node) => node.into(),
-                            ChildKind::AstClass(cls) => cls.into(),
-                            ChildKind::Token(token) => token.into()
-                        }
-                        _ => return None
-                    })
-                }))
+                *result = Some(Reference::new(
+                    method.selector().node(),
+                    |analysis, node| {
+                        let method = ast::ancestor_exn::<MethodDef>(node);
+                        let target = analysis.resolve_method(method)?;
+                        Some(match target {
+                            MethodKind::NodeAccessor(child_kind, _) => match child_kind {
+                                ChildKind::AstNode(node) => node.into(),
+                                ChildKind::AstClass(cls) => cls.into(),
+                                ChildKind::Token(token) => token.into(),
+                            },
+                            _ => return None,
+                        })
+                    },
+                ))
             })
             .visit_nodes(&[IDENT], |ident, result| {
                 match ident.parent().and_then(CallExpr::wrap) {
@@ -67,14 +67,14 @@ fn ref_provider<'f>(analysis: &Analysis<'f>, node: Node<'f>) -> Option<Reference
                                 let call = CallExpr::wrap(node.parent().unwrap()).unwrap();
                                 match analysis.resolve_call(call).unwrap() {
                                     CallKind::RuleCall(rule, ..) => Some(rule.into()),
-                                    _ => unimplemented!()
+                                    _ => unimplemented!(),
                                 }
                             }))
                         }
                     }
                     _ => {}
                 }
-            })
+            }),
     )
 }
 
@@ -86,7 +86,7 @@ fn def_provider<'f>(node: Node<'f>) -> Option<Declaration<'f>> {
             .visit::<LexRule, _>(|node, result| *result = Some(node.into()))
             .visit::<Parameter, _>(|node, result| *result = Some(node.into()))
             .visit::<AstNodeDef, _>(|node, result| *result = Some(node.into()))
-            .visit::<AstClassDef, _>(|node, result| *result = Some(node.into()))
+            .visit::<AstClassDef, _>(|node, result| *result = Some(node.into())),
     )
 }
 
@@ -124,7 +124,8 @@ impl<'f> From<AstClassDef<'f>> for Declaration<'f> {
 fn test_find_refs() {
     use fall_tree::tu;
 
-    let file = crate::analyse(r#####"
+    let file = crate::analyse(
+        r#####"
 tokenizer {
   #[skip] whitespace r"\s+"
 
@@ -169,7 +170,9 @@ pub rule negate_expr { '-' expr }
 test r"
   1 + --1! - -2!
 "
-"#####.to_string());
+"#####
+            .to_string(),
+    );
     file.analyse(|analysis| {
         let usages = find_usages(analysis, tu(309));
 

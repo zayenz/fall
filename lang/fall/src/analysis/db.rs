@@ -1,11 +1,10 @@
-use std::hash::Hash;
 use std::collections::hash_map::{self, HashMap};
+use std::hash::Hash;
 use std::sync::Mutex;
 
-use super::{DiagnosticSink, Diagnostic};
-use crate::syntax::FallFile;
 use super::query;
-
+use super::{Diagnostic, DiagnosticSink};
+use crate::syntax::FallFile;
 
 type QMap<'f, Q> = Mutex<HashMap<Q, <Q as Query<'f>>::Result>>;
 
@@ -14,7 +13,6 @@ pub(crate) struct DB<'f> {
     pub(super) diagnostics: Mutex<Vec<Diagnostic>>,
 
     //query_stack: Mutex<Vec<String>>,
-
     all_lex_rules: QMap<'f, query::AllLexRules>,
     all_syn_rules: QMap<'f, query::AllSynRules>,
     all_contexts: QMap<'f, query::AllContexts>,
@@ -33,7 +31,6 @@ impl<'f> DB<'f> {
             diagnostics: Default::default(),
 
             //query_stack: Default::default(),
-
             all_lex_rules: Default::default(),
             all_syn_rules: Default::default(),
             all_contexts: Default::default(),
@@ -78,29 +75,31 @@ pub(crate) trait Query<'f>: ::std::fmt::Debug {
     type Result;
 }
 
-
 pub(crate) trait QExecutor<'f>: Query<'f> {
     fn execute(self, db: &DB<'f>) -> Self::Result;
 }
 
-
 pub(crate) trait OnceQExecutor<'f>: Query<'f> + Eq + Hash
-    where Self: Clone, Self::Result: Clone
+where
+    Self: Clone,
+    Self::Result: Clone,
 {
     fn execute(self, db: &DB<'f>, d: &mut DiagnosticSink) -> Self::Result;
 }
 
 pub(crate) trait QueryCache<'f, Q>
-    where
-        Q: Query<'f> + Eq + Hash
+where
+    Q: Query<'f> + Eq + Hash,
 {
     fn get_cache(&self) -> &QMap<'f, Q>;
 }
 
 impl<'f, Q> QExecutor<'f> for Q
-    where
-        Q: OnceQExecutor<'f>, Q: Clone, Q::Result: Clone,
-        DB<'f>: QueryCache<'f, Q>
+where
+    Q: OnceQExecutor<'f>,
+    Q: Clone,
+    Q::Result: Clone,
+    DB<'f>: QueryCache<'f, Q>,
 {
     fn execute(self, db: &DB<'f>) -> Self::Result {
         if let Some(result) = db.get_cache().lock().unwrap().get(&self) {
@@ -121,7 +120,7 @@ impl<'f, Q> QExecutor<'f> for Q
                 db.diagnostics.lock().unwrap().extend(diagnostics);
                 vacant.insert(value).clone()
             }
-            hash_map::Entry::Occupied(occupied) => occupied.get().clone()
+            hash_map::Entry::Occupied(occupied) => occupied.get().clone(),
         }
     }
 }

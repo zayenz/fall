@@ -1,7 +1,10 @@
 use fall_tree::Text;
 
 pub fn scream(word: Text) -> String {
-    word.to_cow().chars().map(|c| c.to_ascii_uppercase()).collect()
+    word.to_cow()
+        .chars()
+        .map(|c| c.to_ascii_uppercase())
+        .collect()
 }
 
 pub fn camel(word: Text) -> String {

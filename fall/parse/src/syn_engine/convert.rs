@@ -1,6 +1,6 @@
-use fall_tree::{NodeType, Text, TextRange, TreeBuilder, tu};
 use crate::lex_engine::Token;
 use crate::syn_engine::Event;
+use fall_tree::{tu, NodeType, Text, TextRange, TreeBuilder};
 
 pub(crate) fn convert(
     text: Text,
@@ -14,18 +14,27 @@ pub(crate) fn convert(
     let (first, rest) = (events[0], &events[1..]);
 
     let mut len = tu(0);
-    let tokens = tokens.iter().map(|&t| {
-        let token_text = text.slice(TextRange::from_len(len, t.len));
-        len += t.len;
-        (t, token_text)
-    }).collect::<Vec<_>>();
+    let tokens = tokens
+        .iter()
+        .map(|&t| {
+            let token_text = text.slice(TextRange::from_len(len, t.len));
+            len += t.len;
+            (t, token_text)
+        })
+        .collect::<Vec<_>>();
 
-    let conv = Convertor { is_whitespace, whitespace_binder };
+    let conv = Convertor {
+        is_whitespace,
+        whitespace_binder,
+    };
     match first {
-        Event::Start { ty, forward_parent: _ } => {
+        Event::Start {
+            ty,
+            forward_parent: _,
+        } => {
             conv.go(ty, &tokens, rest, builder);
         }
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
 
@@ -37,10 +46,13 @@ fn reshuffle_events(events: &[Event]) -> Vec<Event> {
     for (i, &e) in events.iter().enumerate() {
         if holes.last() == Some(&i) {
             holes.pop();
-            continue
+            continue;
         }
         match e {
-            Event::Start { forward_parent: Some(_), .. } => {
+            Event::Start {
+                forward_parent: Some(_),
+                ..
+            } => {
                 forward_parents.clear();
                 let mut idx = i;
                 loop {
@@ -56,17 +68,19 @@ fn reshuffle_events(events: &[Event]) -> Vec<Event> {
                     }
                 }
                 for &(idx, ty) in forward_parents.iter().into_iter().rev() {
-                    result.push(Event::Start { ty, forward_parent: None });
+                    result.push(Event::Start {
+                        ty,
+                        forward_parent: None,
+                    });
                     holes.push(idx);
                 }
                 holes.pop();
             }
-            _ => result.push(e)
+            _ => result.push(e),
         }
     }
     result
 }
-
 
 struct Convertor<'a> {
     is_whitespace: &'a dyn Fn(NodeType) -> bool,
@@ -105,8 +119,12 @@ impl<'a> Convertor<'a> {
         };
     }
 
-    fn collect_tokens_for_binder<'t>(&self, tokens: &[(Token, Text<'t>)]) -> Vec<(NodeType, Text<'t>)> {
-        tokens.iter()
+    fn collect_tokens_for_binder<'t>(
+        &self,
+        tokens: &[(Token, Text<'t>)],
+    ) -> Vec<(NodeType, Text<'t>)> {
+        tokens
+            .iter()
             .take_while(|&&(t, _)| (self.is_whitespace)(t.ty))
             .map(|&(t, text)| (t.ty, text))
             .collect()
@@ -127,9 +145,13 @@ impl<'a> Convertor<'a> {
             n_events += 1;
             events = rest;
             match first {
-                Event::Start { ty, forward_parent: _ } => {
+                Event::Start {
+                    ty,
+                    forward_parent: _,
+                } => {
                     let leading_ws = self.collect_tokens_for_binder(tokens);
-                    let left_wd = leading_ws.len() - (self.whitespace_binder)(ty, &leading_ws, true);
+                    let left_wd =
+                        leading_ws.len() - (self.whitespace_binder)(ty, &leading_ws, true);
                     for i in 0..left_wd {
                         let t = tokens[i].0;
                         builder.leaf(t.ty, t.len);
@@ -137,8 +159,10 @@ impl<'a> Convertor<'a> {
                     tokens = &tokens[left_wd..];
                     n_tokens += left_wd;
 
-                    let Conversion { right_edge, n_events: child_events } =
-                        self.go(ty, tokens, events, builder);
+                    let Conversion {
+                        right_edge,
+                        n_events: child_events,
+                    } = self.go(ty, tokens, events, builder);
                     tokens = &tokens[right_edge..];
                     n_tokens += right_edge;
                     events = &events[child_events..];
@@ -148,7 +172,10 @@ impl<'a> Convertor<'a> {
                 Event::End => return (n_tokens, n_events),
 
                 Event::Token { ty, n_raw_tokens } => {
-                    let non_white = tokens.iter().take_while(|&&(t, _)| (self.is_whitespace)(t.ty)).count();
+                    let non_white = tokens
+                        .iter()
+                        .take_while(|&&(t, _)| (self.is_whitespace)(t.ty))
+                        .count();
                     for i in 0..non_white {
                         let t = tokens[i].0;
                         builder.leaf(t.ty, t.len);

@@ -6,23 +6,22 @@ extern crate tera;
 #[macro_use]
 extern crate failure;
 
-extern crate fall_tree;
 extern crate fall_parse;
+extern crate fall_tree;
 extern crate lang_fall;
 
 use std::{
-    io::Write,
-    path::{PathBuf, Path},
     fs,
+    io::Write,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
 };
 
 use failure::{Error, ResultExt};
-use fall_tree::{File, AstNode};
+use fall_tree::{AstNode, File};
 
-
-mod util;
 mod generate;
+mod util;
 
 pub type Result<T> = ::std::result::Result<T, Error>;
 
@@ -32,9 +31,7 @@ pub enum Task {
 }
 
 fn read_file(path: &Path) -> Result<String> {
-    let text = fs::read_to_string(path).with_context(|_| {
-        format!("path: {}", path.display())
-    })?;
+    let text = fs::read_to_string(path).with_context(|_| format!("path: {}", path.display()))?;
     Ok(text)
 }
 
@@ -55,7 +52,6 @@ pub fn process(command: Task) -> Result<()> {
     Ok(())
 }
 
-
 pub fn generate(analysis: &lang_fall::Analysis) -> Result<String> {
     generate::generate(analysis)
 }
@@ -67,7 +63,7 @@ impl TestRenderer {
         let file = lang_fall::syntax::FallFile::wrap(file.root()).unwrap();
         let text = match file.tests().nth(test).and_then(|t| t.contents()) {
             None => return String::new(),
-            Some(text) => text.to_string()
+            Some(text) => text.to_string(),
         };
 
         match self.render_all(file.node().text().to_string(), Some(text)) {
@@ -80,7 +76,7 @@ impl TestRenderer {
         let file = lang_fall::analyse(grammar);
         let parser = match file.analyse(generate) {
             Ok(parser) => parser,
-            Err(e) => return Ok(format!("error:\n{}", e))
+            Err(e) => return Ok(format!("error:\n{}", e)),
         };
         let base_dir = base_directory()?;
 
@@ -88,7 +84,10 @@ impl TestRenderer {
         put_text_if_changed(&syntax, &parser)?;
 
         let toml = base_dir.join("Cargo.toml");
-        put_text_if_changed(&toml, &format!(r##"
+        put_text_if_changed(
+            &toml,
+            &format!(
+                r##"
             [package]
             name = "fall_tests_rendering"
             version = "0.1.0"
@@ -99,9 +98,14 @@ impl TestRenderer {
             [dependencies]
             fall_tree = {{ path = "{fall_dir}/tree" }}
             fall_parse = {{ path = "{fall_dir}/parse" }}
-        "##, fall_dir = fall_dir().display()))?;
+        "##,
+                fall_dir = fall_dir().display()
+            ),
+        )?;
 
-        put_text_if_changed(&base_dir.join("src").join("main.rs"), r##"
+        put_text_if_changed(
+            &base_dir.join("src").join("main.rs"),
+            r##"
             #![allow(warnings)]
             extern crate fall_tree;
             extern crate fall_parse;
@@ -117,7 +121,8 @@ impl TestRenderer {
                     println!("{}\n", fall_tree::dump_file(&file));
                 }
             }
-        "##)?;
+        "##,
+        )?;
 
         let build = Command::new("cargo")
             .arg("build")
@@ -144,12 +149,14 @@ impl TestRenderer {
         let tests: String = match test {
             Some(test) => test,
 
-            None => file.analyse(|a| a.ast().tests()
-                .filter_map(|t| t.contents())
-                .map(|t| t.to_string())
-                .collect::<Vec<_>>()
-                .join("\n***###***\n")
-            )
+            None => file.analyse(|a| {
+                a.ast()
+                    .tests()
+                    .filter_map(|t| t.contents())
+                    .map(|t| t.to_string())
+                    .collect::<Vec<_>>()
+                    .join("\n***###***\n")
+            }),
         };
 
         {

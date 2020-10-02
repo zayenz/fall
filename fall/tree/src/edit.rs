@@ -1,5 +1,5 @@
-use crate::{TextEdit, TextEditBuilder, Node, File, TextRange, TextEditOp, tu};
 use crate::search::find_covering_node;
+use crate::{tu, File, Node, TextEdit, TextEditBuilder, TextEditOp, TextRange};
 
 pub struct FileEdit<'f> {
     file: &'f File,
@@ -33,9 +33,7 @@ impl<'f> FileEdit<'f> {
         let file_text = self.file.text();
         let prefix = file_text.slice(TextRange::from_to(node.range().start(), range.start()));
         let suffix = file_text.slice(TextRange::from_to(range.end(), node.range().end()));
-        let new_text = prefix.to_string()
-            + &replacement
-            + &suffix.to_cow();
+        let new_text = prefix.to_string() + &replacement + &suffix.to_cow();
         self.replace_with_text(node, new_text);
     }
 

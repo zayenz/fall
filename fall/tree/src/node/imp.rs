@@ -1,8 +1,8 @@
 use std::ops::Index;
 
-use crate::{TextBuf, Text, TextRange, NodeType, Language, Metrics};
 use super::Node;
-use crate::node::tree_builder::{TreeBuilder, NodeData, NodeId};
+use crate::node::tree_builder::{NodeData, NodeId, TreeBuilder};
+use crate::{Language, Metrics, NodeType, Text, TextBuf, TextRange};
 
 pub struct FileImpl {
     pub lang: Language,
@@ -14,7 +14,10 @@ pub struct FileImpl {
 
 impl FileImpl {
     pub fn root<'i, 'f: 'i>(&'i self, file: &'f super::File) -> Node<'f> {
-        Node(NodeImpl { id: self.root, file })
+        Node(NodeImpl {
+            id: self.root,
+            file,
+        })
     }
 
     pub fn text(&self) -> Text {
@@ -59,18 +62,32 @@ impl<'f> NodeImpl<'f> {
         self.file.text().slice(self.range())
     }
 
-    pub fn file(&self) -> &'f super::File { self.file }
+    pub fn file(&self) -> &'f super::File {
+        self.file
+    }
 
     pub fn parent(&self) -> Option<Node<'f>> {
-        self.data().parent.map(|id| Node(NodeImpl { id, file: self.file }))
+        self.data().parent.map(|id| {
+            Node(NodeImpl {
+                id,
+                file: self.file,
+            })
+        })
     }
 
     pub fn children(&self) -> NodeChildren<'f> {
-        NodeChildren { file: self.file, inner: self.data().children.iter() }
+        NodeChildren {
+            file: self.file,
+            inner: self.data().children.iter(),
+        }
     }
 
     pub fn debug(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        write!(f, "Node({})", self.file.imp.lang.node_type_info(self.ty()).name)
+        write!(
+            f,
+            "Node({})",
+            self.file.imp.lang.node_type_info(self.ty()).name
+        )
     }
 
     fn data(&self) -> &'f NodeData {
@@ -92,7 +109,12 @@ impl<'f> Iterator for NodeChildren<'f> {
     type Item = Node<'f>;
 
     fn next(&mut self) -> Option<Node<'f>> {
-        self.inner.next().map(|&id| Node(NodeImpl { id, file: self.file }))
+        self.inner.next().map(|&id| {
+            Node(NodeImpl {
+                id,
+                file: self.file,
+            })
+        })
     }
 }
 
@@ -102,7 +124,6 @@ impl Index<NodeId> for FileImpl {
         &self.nodes[index.0 as usize]
     }
 }
-
 
 pub fn new_file(lang: Language, text: TextBuf, metrics: Metrics, builder: TreeBuilder) -> FileImpl {
     FileImpl {

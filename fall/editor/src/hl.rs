@@ -1,4 +1,4 @@
-use fall_tree::{TextRange, NodeType, Node, tu, ERROR as ERROR_TY};
+use fall_tree::{tu, Node, NodeType, TextRange, ERROR as ERROR_TY};
 
 use fall_tree::visitor::{Visit, VisitorBuilder};
 
@@ -14,7 +14,6 @@ pub const PARAMETER: HlTag = HlTag("parameter");
 pub const BUILTIN: HlTag = HlTag("builtin");
 pub const ATTRIBUTE: HlTag = HlTag("attribute");
 pub const LITERAL: HlTag = HlTag("literal");
-
 
 pub type Highlights = Vec<(TextRange, HlTag)>;
 pub type HlMap = &'static [(HlTag, &'static [NodeType])];
@@ -52,4 +51,3 @@ impl<'f> Visit<'f> for HlVisitor {
 pub fn hl(node: Node, tag: HlTag, highlights: &mut Highlights) {
     highlights.push((node.range(), tag))
 }
-

@@ -1,5 +1,5 @@
-use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
+use fall_parse::runtime as rt;
 pub const WHITESPACE: rt::NodeType = rt::NodeType(100);
 pub const EOL_COMMENT: rt::NodeType = rt::NodeType(101);
 pub const NODE: rt::NodeType = rt::NodeType(102);
@@ -87,16 +87,73 @@ pub fn language() -> &'static rt::Language {
         ::fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
-                WHITESPACE, EOL_COMMENT, NODE, CLASS, TRAIT, TOKENIZER, RULE, VERBATIM, AST, PUB, TEST, EQ, PIPE, STAR, QUESTION, DOT, COMMA, COLON, HASH, L_CURLY, R_CURLY, L_SQUARE, R_SQUARE, L_ANGLE, R_ANGLE, L_PAREN, R_PAREN, NUMBER, SIMPLE_STRING, HASH_STRING, IDENT, FALL_FILE, SYN_RULE, PARAMETERS, PARAMETER, REF_EXPR, SEQ_EXPR, BLOCK_EXPR, OPT_EXPR, REP_EXPR, CALL_EXPR, TOKENIZER_DEF, LEX_RULE, TEST_DEF, ATTRIBUTES, ATTRIBUTE, ATTRIBUTE_VALUE, STRING, VERBATIM_DEF, AST_DEF, AST_NODE_DEF, AST_CLASS_DEF, AST_TRAIT_DEF, METHOD_DEF, AST_SELECTOR,
+                WHITESPACE,
+                EOL_COMMENT,
+                NODE,
+                CLASS,
+                TRAIT,
+                TOKENIZER,
+                RULE,
+                VERBATIM,
+                AST,
+                PUB,
+                TEST,
+                EQ,
+                PIPE,
+                STAR,
+                QUESTION,
+                DOT,
+                COMMA,
+                COLON,
+                HASH,
+                L_CURLY,
+                R_CURLY,
+                L_SQUARE,
+                R_SQUARE,
+                L_ANGLE,
+                R_ANGLE,
+                L_PAREN,
+                R_PAREN,
+                NUMBER,
+                SIMPLE_STRING,
+                HASH_STRING,
+                IDENT,
+                FALL_FILE,
+                SYN_RULE,
+                PARAMETERS,
+                PARAMETER,
+                REF_EXPR,
+                SEQ_EXPR,
+                BLOCK_EXPR,
+                OPT_EXPR,
+                REP_EXPR,
+                CALL_EXPR,
+                TOKENIZER_DEF,
+                LEX_RULE,
+                TEST_DEF,
+                ATTRIBUTES,
+                ATTRIBUTE,
+                ATTRIBUTE_VALUE,
+                STRING,
+                VERBATIM_DEF,
+                AST_DEF,
+                AST_NODE_DEF,
+                AST_CLASS_DEF,
+                AST_TRAIT_DEF,
+                METHOD_DEF,
+                AST_SELECTOR,
             ],
             syntactical_rules: rt::parser_from_str(parser_json),
-            .. Default::default()
+            ..Default::default()
         }
     }
     use self::rt::*;
     lazy_static! {
         static ref LANG: rt::Language = {
-            struct Impl { parser_definition: rt::ParserDefinition, lexer: rt::RegexLexer };
+            struct Impl {
+                parser_definition: rt::ParserDefinition,
+                lexer: rt::RegexLexer,
+            };
             impl rt::LanguageImpl for Impl {
                 fn parse(
                     &self,
@@ -104,7 +161,14 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::parse(&LANG, &self.lexer, &self.parser_definition, text, metrics, builder)
+                    rt::parse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn reparse(
                     &self,
@@ -114,73 +178,250 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::reparse(&LANG, &self.lexer, &self.parser_definition, incremental_data, edit, new_text, metrics, builder)
+                    rt::reparse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        incremental_data,
+                        edit,
+                        new_text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn node_type_info(&self, ty: rt::NodeType) -> rt::NodeTypeInfo {
                     match ty {
-                        ERROR => rt::NodeTypeInfo { name: "ERROR", whitespace_like: false },
-                        WHITESPACE => rt::NodeTypeInfo { name: "WHITESPACE", whitespace_like: true },
-                        EOL_COMMENT => rt::NodeTypeInfo { name: "EOL_COMMENT", whitespace_like: true },
-                        NODE => rt::NodeTypeInfo { name: "NODE", whitespace_like: false },
-                        CLASS => rt::NodeTypeInfo { name: "CLASS", whitespace_like: false },
-                        TRAIT => rt::NodeTypeInfo { name: "TRAIT", whitespace_like: false },
-                        TOKENIZER => rt::NodeTypeInfo { name: "TOKENIZER", whitespace_like: false },
-                        RULE => rt::NodeTypeInfo { name: "RULE", whitespace_like: false },
-                        VERBATIM => rt::NodeTypeInfo { name: "VERBATIM", whitespace_like: false },
-                        AST => rt::NodeTypeInfo { name: "AST", whitespace_like: false },
-                        PUB => rt::NodeTypeInfo { name: "PUB", whitespace_like: false },
-                        TEST => rt::NodeTypeInfo { name: "TEST", whitespace_like: false },
-                        EQ => rt::NodeTypeInfo { name: "EQ", whitespace_like: false },
-                        PIPE => rt::NodeTypeInfo { name: "PIPE", whitespace_like: false },
-                        STAR => rt::NodeTypeInfo { name: "STAR", whitespace_like: false },
-                        QUESTION => rt::NodeTypeInfo { name: "QUESTION", whitespace_like: false },
-                        DOT => rt::NodeTypeInfo { name: "DOT", whitespace_like: false },
-                        COMMA => rt::NodeTypeInfo { name: "COMMA", whitespace_like: false },
-                        COLON => rt::NodeTypeInfo { name: "COLON", whitespace_like: false },
-                        HASH => rt::NodeTypeInfo { name: "HASH", whitespace_like: false },
-                        L_CURLY => rt::NodeTypeInfo { name: "L_CURLY", whitespace_like: false },
-                        R_CURLY => rt::NodeTypeInfo { name: "R_CURLY", whitespace_like: false },
-                        L_SQUARE => rt::NodeTypeInfo { name: "L_SQUARE", whitespace_like: false },
-                        R_SQUARE => rt::NodeTypeInfo { name: "R_SQUARE", whitespace_like: false },
-                        L_ANGLE => rt::NodeTypeInfo { name: "L_ANGLE", whitespace_like: false },
-                        R_ANGLE => rt::NodeTypeInfo { name: "R_ANGLE", whitespace_like: false },
-                        L_PAREN => rt::NodeTypeInfo { name: "L_PAREN", whitespace_like: false },
-                        R_PAREN => rt::NodeTypeInfo { name: "R_PAREN", whitespace_like: false },
-                        NUMBER => rt::NodeTypeInfo { name: "NUMBER", whitespace_like: false },
-                        SIMPLE_STRING => rt::NodeTypeInfo { name: "SIMPLE_STRING", whitespace_like: false },
-                        HASH_STRING => rt::NodeTypeInfo { name: "HASH_STRING", whitespace_like: false },
-                        IDENT => rt::NodeTypeInfo { name: "IDENT", whitespace_like: false },
-                        FALL_FILE => rt::NodeTypeInfo { name: "FALL_FILE", whitespace_like: false },
-                        SYN_RULE => rt::NodeTypeInfo { name: "SYN_RULE", whitespace_like: false },
-                        PARAMETERS => rt::NodeTypeInfo { name: "PARAMETERS", whitespace_like: false },
-                        PARAMETER => rt::NodeTypeInfo { name: "PARAMETER", whitespace_like: false },
-                        REF_EXPR => rt::NodeTypeInfo { name: "REF_EXPR", whitespace_like: false },
-                        SEQ_EXPR => rt::NodeTypeInfo { name: "SEQ_EXPR", whitespace_like: false },
-                        BLOCK_EXPR => rt::NodeTypeInfo { name: "BLOCK_EXPR", whitespace_like: false },
-                        OPT_EXPR => rt::NodeTypeInfo { name: "OPT_EXPR", whitespace_like: false },
-                        REP_EXPR => rt::NodeTypeInfo { name: "REP_EXPR", whitespace_like: false },
-                        CALL_EXPR => rt::NodeTypeInfo { name: "CALL_EXPR", whitespace_like: false },
-                        TOKENIZER_DEF => rt::NodeTypeInfo { name: "TOKENIZER_DEF", whitespace_like: false },
-                        LEX_RULE => rt::NodeTypeInfo { name: "LEX_RULE", whitespace_like: false },
-                        TEST_DEF => rt::NodeTypeInfo { name: "TEST_DEF", whitespace_like: false },
-                        ATTRIBUTES => rt::NodeTypeInfo { name: "ATTRIBUTES", whitespace_like: false },
-                        ATTRIBUTE => rt::NodeTypeInfo { name: "ATTRIBUTE", whitespace_like: false },
-                        ATTRIBUTE_VALUE => rt::NodeTypeInfo { name: "ATTRIBUTE_VALUE", whitespace_like: false },
-                        STRING => rt::NodeTypeInfo { name: "STRING", whitespace_like: false },
-                        VERBATIM_DEF => rt::NodeTypeInfo { name: "VERBATIM_DEF", whitespace_like: false },
-                        AST_DEF => rt::NodeTypeInfo { name: "AST_DEF", whitespace_like: false },
-                        AST_NODE_DEF => rt::NodeTypeInfo { name: "AST_NODE_DEF", whitespace_like: false },
-                        AST_CLASS_DEF => rt::NodeTypeInfo { name: "AST_CLASS_DEF", whitespace_like: false },
-                        AST_TRAIT_DEF => rt::NodeTypeInfo { name: "AST_TRAIT_DEF", whitespace_like: false },
-                        METHOD_DEF => rt::NodeTypeInfo { name: "METHOD_DEF", whitespace_like: false },
-                        AST_SELECTOR => rt::NodeTypeInfo { name: "AST_SELECTOR", whitespace_like: false },
-                        _ => panic!("Unknown rt::NodeType: {:?}", ty)
+                        ERROR => rt::NodeTypeInfo {
+                            name: "ERROR",
+                            whitespace_like: false,
+                        },
+                        WHITESPACE => rt::NodeTypeInfo {
+                            name: "WHITESPACE",
+                            whitespace_like: true,
+                        },
+                        EOL_COMMENT => rt::NodeTypeInfo {
+                            name: "EOL_COMMENT",
+                            whitespace_like: true,
+                        },
+                        NODE => rt::NodeTypeInfo {
+                            name: "NODE",
+                            whitespace_like: false,
+                        },
+                        CLASS => rt::NodeTypeInfo {
+                            name: "CLASS",
+                            whitespace_like: false,
+                        },
+                        TRAIT => rt::NodeTypeInfo {
+                            name: "TRAIT",
+                            whitespace_like: false,
+                        },
+                        TOKENIZER => rt::NodeTypeInfo {
+                            name: "TOKENIZER",
+                            whitespace_like: false,
+                        },
+                        RULE => rt::NodeTypeInfo {
+                            name: "RULE",
+                            whitespace_like: false,
+                        },
+                        VERBATIM => rt::NodeTypeInfo {
+                            name: "VERBATIM",
+                            whitespace_like: false,
+                        },
+                        AST => rt::NodeTypeInfo {
+                            name: "AST",
+                            whitespace_like: false,
+                        },
+                        PUB => rt::NodeTypeInfo {
+                            name: "PUB",
+                            whitespace_like: false,
+                        },
+                        TEST => rt::NodeTypeInfo {
+                            name: "TEST",
+                            whitespace_like: false,
+                        },
+                        EQ => rt::NodeTypeInfo {
+                            name: "EQ",
+                            whitespace_like: false,
+                        },
+                        PIPE => rt::NodeTypeInfo {
+                            name: "PIPE",
+                            whitespace_like: false,
+                        },
+                        STAR => rt::NodeTypeInfo {
+                            name: "STAR",
+                            whitespace_like: false,
+                        },
+                        QUESTION => rt::NodeTypeInfo {
+                            name: "QUESTION",
+                            whitespace_like: false,
+                        },
+                        DOT => rt::NodeTypeInfo {
+                            name: "DOT",
+                            whitespace_like: false,
+                        },
+                        COMMA => rt::NodeTypeInfo {
+                            name: "COMMA",
+                            whitespace_like: false,
+                        },
+                        COLON => rt::NodeTypeInfo {
+                            name: "COLON",
+                            whitespace_like: false,
+                        },
+                        HASH => rt::NodeTypeInfo {
+                            name: "HASH",
+                            whitespace_like: false,
+                        },
+                        L_CURLY => rt::NodeTypeInfo {
+                            name: "L_CURLY",
+                            whitespace_like: false,
+                        },
+                        R_CURLY => rt::NodeTypeInfo {
+                            name: "R_CURLY",
+                            whitespace_like: false,
+                        },
+                        L_SQUARE => rt::NodeTypeInfo {
+                            name: "L_SQUARE",
+                            whitespace_like: false,
+                        },
+                        R_SQUARE => rt::NodeTypeInfo {
+                            name: "R_SQUARE",
+                            whitespace_like: false,
+                        },
+                        L_ANGLE => rt::NodeTypeInfo {
+                            name: "L_ANGLE",
+                            whitespace_like: false,
+                        },
+                        R_ANGLE => rt::NodeTypeInfo {
+                            name: "R_ANGLE",
+                            whitespace_like: false,
+                        },
+                        L_PAREN => rt::NodeTypeInfo {
+                            name: "L_PAREN",
+                            whitespace_like: false,
+                        },
+                        R_PAREN => rt::NodeTypeInfo {
+                            name: "R_PAREN",
+                            whitespace_like: false,
+                        },
+                        NUMBER => rt::NodeTypeInfo {
+                            name: "NUMBER",
+                            whitespace_like: false,
+                        },
+                        SIMPLE_STRING => rt::NodeTypeInfo {
+                            name: "SIMPLE_STRING",
+                            whitespace_like: false,
+                        },
+                        HASH_STRING => rt::NodeTypeInfo {
+                            name: "HASH_STRING",
+                            whitespace_like: false,
+                        },
+                        IDENT => rt::NodeTypeInfo {
+                            name: "IDENT",
+                            whitespace_like: false,
+                        },
+                        FALL_FILE => rt::NodeTypeInfo {
+                            name: "FALL_FILE",
+                            whitespace_like: false,
+                        },
+                        SYN_RULE => rt::NodeTypeInfo {
+                            name: "SYN_RULE",
+                            whitespace_like: false,
+                        },
+                        PARAMETERS => rt::NodeTypeInfo {
+                            name: "PARAMETERS",
+                            whitespace_like: false,
+                        },
+                        PARAMETER => rt::NodeTypeInfo {
+                            name: "PARAMETER",
+                            whitespace_like: false,
+                        },
+                        REF_EXPR => rt::NodeTypeInfo {
+                            name: "REF_EXPR",
+                            whitespace_like: false,
+                        },
+                        SEQ_EXPR => rt::NodeTypeInfo {
+                            name: "SEQ_EXPR",
+                            whitespace_like: false,
+                        },
+                        BLOCK_EXPR => rt::NodeTypeInfo {
+                            name: "BLOCK_EXPR",
+                            whitespace_like: false,
+                        },
+                        OPT_EXPR => rt::NodeTypeInfo {
+                            name: "OPT_EXPR",
+                            whitespace_like: false,
+                        },
+                        REP_EXPR => rt::NodeTypeInfo {
+                            name: "REP_EXPR",
+                            whitespace_like: false,
+                        },
+                        CALL_EXPR => rt::NodeTypeInfo {
+                            name: "CALL_EXPR",
+                            whitespace_like: false,
+                        },
+                        TOKENIZER_DEF => rt::NodeTypeInfo {
+                            name: "TOKENIZER_DEF",
+                            whitespace_like: false,
+                        },
+                        LEX_RULE => rt::NodeTypeInfo {
+                            name: "LEX_RULE",
+                            whitespace_like: false,
+                        },
+                        TEST_DEF => rt::NodeTypeInfo {
+                            name: "TEST_DEF",
+                            whitespace_like: false,
+                        },
+                        ATTRIBUTES => rt::NodeTypeInfo {
+                            name: "ATTRIBUTES",
+                            whitespace_like: false,
+                        },
+                        ATTRIBUTE => rt::NodeTypeInfo {
+                            name: "ATTRIBUTE",
+                            whitespace_like: false,
+                        },
+                        ATTRIBUTE_VALUE => rt::NodeTypeInfo {
+                            name: "ATTRIBUTE_VALUE",
+                            whitespace_like: false,
+                        },
+                        STRING => rt::NodeTypeInfo {
+                            name: "STRING",
+                            whitespace_like: false,
+                        },
+                        VERBATIM_DEF => rt::NodeTypeInfo {
+                            name: "VERBATIM_DEF",
+                            whitespace_like: false,
+                        },
+                        AST_DEF => rt::NodeTypeInfo {
+                            name: "AST_DEF",
+                            whitespace_like: false,
+                        },
+                        AST_NODE_DEF => rt::NodeTypeInfo {
+                            name: "AST_NODE_DEF",
+                            whitespace_like: false,
+                        },
+                        AST_CLASS_DEF => rt::NodeTypeInfo {
+                            name: "AST_CLASS_DEF",
+                            whitespace_like: false,
+                        },
+                        AST_TRAIT_DEF => rt::NodeTypeInfo {
+                            name: "AST_TRAIT_DEF",
+                            whitespace_like: false,
+                        },
+                        METHOD_DEF => rt::NodeTypeInfo {
+                            name: "METHOD_DEF",
+                            whitespace_like: false,
+                        },
+                        AST_SELECTOR => rt::NodeTypeInfo {
+                            name: "AST_SELECTOR",
+                            whitespace_like: false,
+                        },
+                        _ => panic!("Unknown rt::NodeType: {:?}", ty),
                     }
                 }
             }
             rt::Language::new(Impl {
                 parser_definition: create_parser_definition(),
-                lexer: create_lexer()
+                lexer: create_lexer(),
             })
         };
     }
@@ -191,12 +432,16 @@ fn parse_raw_string(s: &str) -> Option<usize> {
     // Who needs more then 25 hashes anyway? :)
     let q_hashes = concat!('"', "######", "######", "######", "######", "######");
     let closing = &q_hashes[..quote_start];
-    s[quote_start + 1..].find(closing).map(|i| i + quote_start + 1 + closing.len())
+    s[quote_start + 1..]
+        .find(closing)
+        .map(|i| i + quote_start + 1 + closing.len())
 }
 #[allow(unused)]
 use self::rt::AstNode;
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct FallFile<'f> { node: rt::Node<'f> }
+pub struct FallFile<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for FallFile<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == FALL_FILE {
@@ -205,7 +450,9 @@ impl<'f> rt::AstNode<'f> for FallFile<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> FallFile<'f> {
     pub fn tokenizer_def(&self) -> Option<TokenizerDef<'f>> {
@@ -232,7 +479,9 @@ impl<'f> ::std::fmt::Debug for FallFile<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TokenizerDef<'f> { node: rt::Node<'f> }
+pub struct TokenizerDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TokenizerDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TOKENIZER_DEF {
@@ -241,7 +490,9 @@ impl<'f> rt::AstNode<'f> for TokenizerDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> TokenizerDef<'f> {
     pub fn lex_rules(&self) -> rt::AstChildren<'f, LexRule<'f>> {
@@ -256,7 +507,9 @@ impl<'f> ::std::fmt::Debug for TokenizerDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct LexRule<'f> { node: rt::Node<'f> }
+pub struct LexRule<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for LexRule<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == LEX_RULE {
@@ -265,7 +518,9 @@ impl<'f> rt::AstNode<'f> for LexRule<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> LexRule<'f> {
     pub fn attributes(&self) -> Option<Attributes<'f>> {
@@ -283,7 +538,9 @@ impl<'f> ::std::fmt::Debug for LexRule<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SynRule<'f> { node: rt::Node<'f> }
+pub struct SynRule<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for SynRule<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == SYN_RULE {
@@ -292,7 +549,9 @@ impl<'f> rt::AstNode<'f> for SynRule<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> SynRule<'f> {
     pub fn attributes(&self) -> Option<Attributes<'f>> {
@@ -319,7 +578,9 @@ impl<'f> ::std::fmt::Debug for SynRule<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Parameters<'f> { node: rt::Node<'f> }
+pub struct Parameters<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Parameters<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == PARAMETERS {
@@ -328,7 +589,9 @@ impl<'f> rt::AstNode<'f> for Parameters<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Parameters<'f> {
     pub fn parameters(&self) -> rt::AstChildren<'f, Parameter<'f>> {
@@ -343,7 +606,9 @@ impl<'f> ::std::fmt::Debug for Parameters<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Parameter<'f> { node: rt::Node<'f> }
+pub struct Parameter<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Parameter<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == PARAMETER {
@@ -352,7 +617,9 @@ impl<'f> rt::AstNode<'f> for Parameter<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Parameter<'f> {
     pub fn name(&self) -> rt::Text<'f> {
@@ -367,7 +634,9 @@ impl<'f> ::std::fmt::Debug for Parameter<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Attributes<'f> { node: rt::Node<'f> }
+pub struct Attributes<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Attributes<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == ATTRIBUTES {
@@ -376,7 +645,9 @@ impl<'f> rt::AstNode<'f> for Attributes<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Attributes<'f> {
     pub fn attributes(&self) -> rt::AstChildren<'f, Attribute<'f>> {
@@ -391,7 +662,9 @@ impl<'f> ::std::fmt::Debug for Attributes<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Attribute<'f> { node: rt::Node<'f> }
+pub struct Attribute<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Attribute<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == ATTRIBUTE {
@@ -400,7 +673,9 @@ impl<'f> rt::AstNode<'f> for Attribute<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Attribute<'f> {
     pub fn name(&self) -> rt::Text<'f> {
@@ -418,7 +693,9 @@ impl<'f> ::std::fmt::Debug for Attribute<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AttributeValue<'f> { node: rt::Node<'f> }
+pub struct AttributeValue<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AttributeValue<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == ATTRIBUTE_VALUE {
@@ -427,10 +704,11 @@ impl<'f> rt::AstNode<'f> for AttributeValue<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> AttributeValue<'f> {
-}
+impl<'f> AttributeValue<'f> {}
 impl<'f> ::std::fmt::Debug for AttributeValue<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("AttributeValue@")?;
@@ -439,7 +717,9 @@ impl<'f> ::std::fmt::Debug for AttributeValue<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct VerbatimDef<'f> { node: rt::Node<'f> }
+pub struct VerbatimDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for VerbatimDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == VERBATIM_DEF {
@@ -448,7 +728,9 @@ impl<'f> rt::AstNode<'f> for VerbatimDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> VerbatimDef<'f> {
     pub fn literal_string(&self) -> rt::Text<'f> {
@@ -463,7 +745,9 @@ impl<'f> ::std::fmt::Debug for VerbatimDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AstDef<'f> { node: rt::Node<'f> }
+pub struct AstDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AstDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == AST_DEF {
@@ -472,7 +756,9 @@ impl<'f> rt::AstNode<'f> for AstDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> AstDef<'f> {
     pub fn ast_nodes(&self) -> rt::AstChildren<'f, AstNodeDef<'f>> {
@@ -493,7 +779,9 @@ impl<'f> ::std::fmt::Debug for AstDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AstNodeDef<'f> { node: rt::Node<'f> }
+pub struct AstNodeDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AstNodeDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == AST_NODE_DEF {
@@ -502,7 +790,9 @@ impl<'f> rt::AstNode<'f> for AstNodeDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> AstNodeDef<'f> {
     pub fn name_ident(&self) -> rt::Node<'f> {
@@ -523,7 +813,9 @@ impl<'f> ::std::fmt::Debug for AstNodeDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AstTraitDef<'f> { node: rt::Node<'f> }
+pub struct AstTraitDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AstTraitDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == AST_TRAIT_DEF {
@@ -532,7 +824,9 @@ impl<'f> rt::AstNode<'f> for AstTraitDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> AstTraitDef<'f> {
     pub fn name_ident(&self) -> rt::Node<'f> {
@@ -553,7 +847,9 @@ impl<'f> ::std::fmt::Debug for AstTraitDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AstClassDef<'f> { node: rt::Node<'f> }
+pub struct AstClassDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AstClassDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == AST_CLASS_DEF {
@@ -562,7 +858,9 @@ impl<'f> rt::AstNode<'f> for AstClassDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> AstClassDef<'f> {
     pub fn name_ident(&self) -> rt::Node<'f> {
@@ -577,7 +875,9 @@ impl<'f> ::std::fmt::Debug for AstClassDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct MethodDef<'f> { node: rt::Node<'f> }
+pub struct MethodDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for MethodDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == METHOD_DEF {
@@ -586,7 +886,9 @@ impl<'f> rt::AstNode<'f> for MethodDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> MethodDef<'f> {
     pub fn name(&self) -> rt::Text<'f> {
@@ -604,7 +906,9 @@ impl<'f> ::std::fmt::Debug for MethodDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AstSelector<'f> { node: rt::Node<'f> }
+pub struct AstSelector<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for AstSelector<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == AST_SELECTOR {
@@ -613,7 +917,9 @@ impl<'f> rt::AstNode<'f> for AstSelector<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> AstSelector<'f> {
     pub fn child(&self) -> rt::Text<'f> {
@@ -637,7 +943,9 @@ impl<'f> ::std::fmt::Debug for AstSelector<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct TestDef<'f> { node: rt::Node<'f> }
+pub struct TestDef<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for TestDef<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TEST_DEF {
@@ -646,7 +954,9 @@ impl<'f> rt::AstNode<'f> for TestDef<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> TestDef<'f> {
     pub fn literal_string(&self) -> Option<rt::Text<'f>> {
@@ -661,7 +971,9 @@ impl<'f> ::std::fmt::Debug for TestDef<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct RefExpr<'f> { node: rt::Node<'f> }
+pub struct RefExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for RefExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == REF_EXPR {
@@ -670,10 +982,11 @@ impl<'f> rt::AstNode<'f> for RefExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> RefExpr<'f> {
-}
+impl<'f> RefExpr<'f> {}
 impl<'f> ::std::fmt::Debug for RefExpr<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("RefExpr@")?;
@@ -682,7 +995,9 @@ impl<'f> ::std::fmt::Debug for RefExpr<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct CallExpr<'f> { node: rt::Node<'f> }
+pub struct CallExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for CallExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == CALL_EXPR {
@@ -691,7 +1006,9 @@ impl<'f> rt::AstNode<'f> for CallExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> CallExpr<'f> {
     pub fn fn_name(&self) -> rt::Text<'f> {
@@ -709,7 +1026,9 @@ impl<'f> ::std::fmt::Debug for CallExpr<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct BlockExpr<'f> { node: rt::Node<'f> }
+pub struct BlockExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for BlockExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == BLOCK_EXPR {
@@ -718,7 +1037,9 @@ impl<'f> rt::AstNode<'f> for BlockExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> BlockExpr<'f> {
     pub fn alts(&self) -> rt::AstChildren<'f, Expr<'f>> {
@@ -733,7 +1054,9 @@ impl<'f> ::std::fmt::Debug for BlockExpr<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct OptExpr<'f> { node: rt::Node<'f> }
+pub struct OptExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for OptExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == OPT_EXPR {
@@ -742,7 +1065,9 @@ impl<'f> rt::AstNode<'f> for OptExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> OptExpr<'f> {
     pub fn expr(&self) -> Expr<'f> {
@@ -757,7 +1082,9 @@ impl<'f> ::std::fmt::Debug for OptExpr<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct RepExpr<'f> { node: rt::Node<'f> }
+pub struct RepExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for RepExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == REP_EXPR {
@@ -766,7 +1093,9 @@ impl<'f> rt::AstNode<'f> for RepExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> RepExpr<'f> {
     pub fn expr(&self) -> Expr<'f> {
@@ -781,7 +1110,9 @@ impl<'f> ::std::fmt::Debug for RepExpr<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SeqExpr<'f> { node: rt::Node<'f> }
+pub struct SeqExpr<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for SeqExpr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == SEQ_EXPR {
@@ -790,7 +1121,9 @@ impl<'f> rt::AstNode<'f> for SeqExpr<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> SeqExpr<'f> {
     pub fn parts(&self) -> rt::AstChildren<'f, Expr<'f>> {
@@ -806,55 +1139,55 @@ impl<'f> ::std::fmt::Debug for SeqExpr<'f> {
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Expr<'f> {
-        RefExpr(RefExpr<'f>),
-        CallExpr(CallExpr<'f>),
-        BlockExpr(BlockExpr<'f>),
-        OptExpr(OptExpr<'f>),
-        RepExpr(RepExpr<'f>),
-        SeqExpr(SeqExpr<'f>),
+    RefExpr(RefExpr<'f>),
+    CallExpr(CallExpr<'f>),
+    BlockExpr(BlockExpr<'f>),
+    OptExpr(OptExpr<'f>),
+    RepExpr(RepExpr<'f>),
+    SeqExpr(SeqExpr<'f>),
 }
 impl<'f> rt::AstNode<'f> for Expr<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if let Some(n) = RefExpr::wrap(node) {
-            return Some(Expr::RefExpr(n))
+            return Some(Expr::RefExpr(n));
         }
         if let Some(n) = CallExpr::wrap(node) {
-            return Some(Expr::CallExpr(n))
+            return Some(Expr::CallExpr(n));
         }
         if let Some(n) = BlockExpr::wrap(node) {
-            return Some(Expr::BlockExpr(n))
+            return Some(Expr::BlockExpr(n));
         }
         if let Some(n) = OptExpr::wrap(node) {
-            return Some(Expr::OptExpr(n))
+            return Some(Expr::OptExpr(n));
         }
         if let Some(n) = RepExpr::wrap(node) {
-            return Some(Expr::RepExpr(n))
+            return Some(Expr::RepExpr(n));
         }
         if let Some(n) = SeqExpr::wrap(node) {
-            return Some(Expr::SeqExpr(n))
+            return Some(Expr::SeqExpr(n));
         }
         None
     }
     fn node(self) -> rt::Node<'f> {
         match self {
-                Expr::RefExpr(n) => n.node(),
-                Expr::CallExpr(n) => n.node(),
-                Expr::BlockExpr(n) => n.node(),
-                Expr::OptExpr(n) => n.node(),
-                Expr::RepExpr(n) => n.node(),
-                Expr::SeqExpr(n) => n.node(),
+            Expr::RefExpr(n) => n.node(),
+            Expr::CallExpr(n) => n.node(),
+            Expr::BlockExpr(n) => n.node(),
+            Expr::OptExpr(n) => n.node(),
+            Expr::RepExpr(n) => n.node(),
+            Expr::SeqExpr(n) => n.node(),
         }
     }
 }
 impl<'f> ::std::fmt::Debug for Expr<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str(match *self {
-                Expr::RefExpr(..) => "RefExpr@",
-                Expr::CallExpr(..) => "CallExpr@",
-                Expr::BlockExpr(..) => "BlockExpr@",
-                Expr::OptExpr(..) => "OptExpr@",
-                Expr::RepExpr(..) => "RepExpr@",
-                Expr::SeqExpr(..) => "SeqExpr@",
+            Expr::RefExpr(..) => "RefExpr@",
+            Expr::CallExpr(..) => "CallExpr@",
+            Expr::BlockExpr(..) => "BlockExpr@",
+            Expr::OptExpr(..) => "OptExpr@",
+            Expr::RepExpr(..) => "RepExpr@",
+            Expr::SeqExpr(..) => "SeqExpr@",
         })?;
         rt::AstNode::node(*self).range().fmt(f)?;
         Ok(())

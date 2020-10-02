@@ -8,6 +8,6 @@ fn inline_tests() {
     fall_tree::test_util::check_inline_tests(
         &lang_bnf::lang_bnf(),
         Path::new("src/bnf.fall"),
-        Path::new("tests/inline.txt")
+        Path::new("tests/inline.txt"),
     )
 }

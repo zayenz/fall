@@ -1,18 +1,17 @@
 use std::path::PathBuf;
 
+use file;
 use fst;
 use fst::IntoStreamer;
-use file;
 
-use fall_tree::{TextRange, NodeType};
+use fall_tree::{NodeType, TextRange};
 use indxr::{FileIndex, IndexableFileSet};
 
-use crate::editor::line_index::{LineCol, LineIndex};
-use crate::editor::fst_subseq::FstSubSeq;
 use crate::editor::file_symbols::process_symbols;
+use crate::editor::fst_subseq::FstSubSeq;
+use crate::editor::line_index::{LineCol, LineIndex};
 
-use crate::syntax::{STRUCT_DEF, ENUM_DEF, TRAIT_DEF, TYPE_DEF};
-
+use crate::syntax::{ENUM_DEF, STRUCT_DEF, TRAIT_DEF, TYPE_DEF};
 
 pub struct SymbolIndex {
     index: FileIndex<FileSymbols>,
@@ -21,10 +20,13 @@ pub struct SymbolIndex {
 impl SymbolIndex {
     pub fn new(roots: Vec<PathBuf>) -> SymbolIndex {
         let file_set = IndexableFileSet::new(roots, "rs");
-        let index = FileIndex::new(file_set, Box::new(|path| {
-            let text = file::get_text(path).ok()?;
-            Some(FileSymbols::new(text))
-        }));
+        let index = FileIndex::new(
+            file_set,
+            Box::new(|path| {
+                let text = file::get_text(path).ok()?;
+                Some(FileSymbols::new(text))
+            }),
+        );
         SymbolIndex { index }
     }
 
@@ -57,7 +59,8 @@ struct Query {
 impl Query {
     fn new(query: &str) -> Query {
         let all_symbols = query.contains("#");
-        let query: String = query.chars()
+        let query: String = query
+            .chars()
             .filter(|&c| c != '#')
             .flat_map(char::to_lowercase)
             .collect();
@@ -67,7 +70,7 @@ impl Query {
     fn process(&self, file: &FileSymbols, acc: &mut dyn FnMut(Symbol)) {
         fn is_type(ty: NodeType) -> bool {
             match ty {
-                STRUCT_DEF | ENUM_DEF | TRAIT_DEF| TYPE_DEF => true,
+                STRUCT_DEF | ENUM_DEF | TRAIT_DEF | TYPE_DEF => true,
                 _ => false,
             }
         }
@@ -99,15 +102,17 @@ impl FileSymbols {
                 ty: node.ty(),
                 name: name.to_string(),
                 range,
-                lc_range: [line_index.translate(range.start()), line_index.translate(range.end())],
+                lc_range: [
+                    line_index.translate(range.start()),
+                    line_index.translate(range.end()),
+                ],
             })
         });
         symbols.sort_by_key(|s| s.name.to_lowercase());
         symbols.dedup_by_key(|s| s.name.to_lowercase());
 
-        let map = fst::Map::from_iter(
-            symbols.iter().map(|s| (s.name.to_lowercase())).zip(0u64..)
-        ).unwrap();
+        let map = fst::Map::from_iter(symbols.iter().map(|s| (s.name.to_lowercase())).zip(0u64..))
+            .unwrap();
 
         FileSymbols { symbols, map }
     }
@@ -118,5 +123,5 @@ pub struct Symbol {
     pub ty: NodeType,
     pub name: String,
     pub range: TextRange,
-    pub lc_range: [LineCol; 2]
+    pub lc_range: [LineCol; 2],
 }

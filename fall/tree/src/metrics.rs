@@ -1,6 +1,6 @@
+use std::fmt;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
-use std::fmt;
 
 pub struct Metrics {
     metrics: Mutex<Vec<Metric>>,
@@ -17,11 +17,16 @@ impl fmt::Display for Metrics {
 
 impl Metrics {
     pub fn new() -> Metrics {
-        Metrics { metrics: Default::default() }
+        Metrics {
+            metrics: Default::default(),
+        }
     }
 
     pub fn record(&self, name: &'static str, value: u64, unit: &'static str) {
-        self.metrics.lock().unwrap().push(Metric { name, value, unit })
+        self.metrics
+            .lock()
+            .unwrap()
+            .push(Metric { name, value, unit })
     }
 
     pub fn record_time(&self, name: &'static str, value: Duration) {
@@ -29,7 +34,7 @@ impl Metrics {
         self.record(name, value, "ms")
     }
 
-    pub fn measure_time<T, F: FnOnce() -> T, >(&self, name: &'static str, f: F) -> T {
+    pub fn measure_time<T, F: FnOnce() -> T>(&self, name: &'static str, f: F) -> T {
         let instant = Instant::now();
         let result = f();
         self.record_time(name, instant.elapsed());
@@ -37,7 +42,12 @@ impl Metrics {
     }
 
     pub fn get(&self, name: &'static str) -> Option<u64> {
-        self.metrics.lock().unwrap().iter().find(|m| m.name == name).map(|m| m.value)
+        self.metrics
+            .lock()
+            .unwrap()
+            .iter()
+            .find(|m| m.name == name)
+            .map(|m| m.value)
     }
 }
 

@@ -1,18 +1,18 @@
-use std::sync::Arc;
 use std::collections::btree_map::{self, BTreeMap};
+use std::sync::Arc;
 
-use fall_tree::{Text, AstNode};
-use fall_tree::visitor::{visitor, process_subtree_bottom_up};
-use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::db::{self, DB};
+use crate::analysis::diagnostics::DiagnosticSink;
 use crate::syntax::CallExpr;
+use fall_tree::visitor::{process_subtree_bottom_up, visitor};
+use fall_tree::{AstNode, Text};
 
 impl<'f> db::OnceQExecutor<'f> for super::AllContexts {
     fn execute(self, db: &DB<'f>, d: &mut DiagnosticSink) -> Arc<Vec<Text<'f>>> {
         let result = process_subtree_bottom_up(
             db.file().node(),
-            visitor(BTreeMap::<Text<'f>, Option<CallExpr<'f>>>::new())
-                .visit::<CallExpr, _>(|call, contexts| {
+            visitor(BTreeMap::<Text<'f>, Option<CallExpr<'f>>>::new()).visit::<CallExpr, _>(
+                |call, contexts| {
                     if let Some(ctx) = call.context_name() {
                         match contexts.entry(ctx) {
                             btree_map::Entry::Occupied(mut occupied) => {
@@ -23,7 +23,8 @@ impl<'f> db::OnceQExecutor<'f> for super::AllContexts {
                             }
                         }
                     }
-                })
+                },
+            ),
         );
 
         for (k, v) in result.iter() {

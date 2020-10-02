@@ -1,19 +1,19 @@
 use crate::analysis::Analysis;
 
-use fall_tree::{File, TextEdit, TextRange, TextUnit, AstNode};
-use fall_tree::search::find_leaf_at_offset;
-use fall_tree::search::ast;
-use fall_editor::{EditorFileImpl, gen_syntax_tree, FileStructureNode, Diagnostic};
-use fall_editor::hl::Highlights;
-use fall_editor::actions::ActionResult;
 use crate::syntax::lang_fall;
 use crate::syntax::TestDef;
+use fall_editor::actions::ActionResult;
+use fall_editor::hl::Highlights;
+use fall_editor::{gen_syntax_tree, Diagnostic, EditorFileImpl, FileStructureNode};
+use fall_tree::search::ast;
+use fall_tree::search::find_leaf_at_offset;
+use fall_tree::{AstNode, File, TextEdit, TextRange, TextUnit};
 
-mod highlighting;
-mod structure;
 mod actions;
 mod formatter;
+mod highlighting;
 mod references;
+mod structure;
 
 pub use crate::analysis::FileWithAnalysis;
 
@@ -96,9 +96,7 @@ impl FileWithAnalysis {
     }
 
     fn record_analysis<R, F: FnOnce(&Analysis) -> R>(&self, tag: &'static str, f: F) -> R {
-        self.analyse(|a| {
-            self.file().metrics().measure_time(tag, || f(a))
-        })
+        self.analyse(|a| self.file().metrics().measure_time(tag, || f(a)))
     }
 }
 
@@ -106,12 +104,15 @@ impl FileWithAnalysis {
 fn test_extend_selection() {
     use fall_tree::tu;
 
-    let file = crate::analyse(r####"
+    let file = crate::analyse(
+        r####"
 tokenizer { number r"\d+"}
 pub rule foo { bar }
 rule bar { number }
-"####);
-    let s1 = file.extend_selection(TextRange::from_len(tu(44), tu(0)))
+"####,
+    );
+    let s1 = file
+        .extend_selection(TextRange::from_len(tu(44), tu(0)))
         .unwrap();
     let s2 = file.extend_selection(s1).unwrap();
     let s3 = file.extend_selection(s2).unwrap();

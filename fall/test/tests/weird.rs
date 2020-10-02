@@ -1,9 +1,8 @@
 extern crate fall_test;
 extern crate fall_tree;
 
-use fall_test::{weird, match_ast};
+use fall_test::{match_ast, weird};
 use fall_tree::dump_file_ws;
-
 
 fn ast(code: &str) -> String {
     dump_file_ws(&weird::language().parse(code.to_owned()))
@@ -11,18 +10,23 @@ fn ast(code: &str) -> String {
 
 #[test]
 fn external_rule() {
-    match_ast(&ast(r###"_1 r##"f#"o"#o"## "###), r###"
+    match_ast(
+        &ast(r###"_1 r##"f#"o"#o"## "###),
+        r###"
 FILE
   T1 "_1"
   WHITESPACE " "
   RAW_STRING "r##\"f#\"o\"#o\"##"
   WHITESPACE " "
-"###)
+"###,
+    )
 }
 
 #[test]
 fn empty_nodes() {
-    match_ast(&ast("_2 hello "), r#"
+    match_ast(
+        &ast("_2 hello "),
+        r#"
 FILE
   T2 "_2"
   WHITESPACE " "
@@ -30,13 +34,15 @@ FILE
   ATOM "hello"
   WHITESPACE " "
   EMPTY ""
-"#)
+"#,
+    )
 }
-
 
 #[test]
 fn rollbacks_private_rules() {
-    match_ast(&ast("_3 foo bar"), r#"
+    match_ast(
+        &ast("_3 foo bar"),
+        r#"
 FILE
   T3 "_3"
   WHITESPACE " "
@@ -44,9 +50,12 @@ FILE
     FOO "foo"
     WHITESPACE " "
     BAR "bar"
-"#);
+"#,
+    );
 
-    match_ast(&ast("_3 foo foo"), r#"
+    match_ast(
+        &ast("_3 foo foo"),
+        r#"
 FILE
   T3 "_3"
   WHITESPACE " "
@@ -54,12 +63,15 @@ FILE
     FOO "foo"
     WHITESPACE " "
     FOO "foo"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn block1() {
-    match_ast(&ast("_4 { foo }"), r#"
+    match_ast(
+        &ast("_4 { foo }"),
+        r#"
 FILE
   T4 "_4"
   WHITESPACE " "
@@ -69,12 +81,15 @@ FILE
     FOO "foo"
     WHITESPACE " "
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn block2() {
-    match_ast(&ast("_4 { foo { {foo} foo {bar}} bar }"), r#"
+    match_ast(
+        &ast("_4 { foo { {foo} foo {bar}} bar }"),
+        r#"
 FILE
   T4 "_4"
   WHITESPACE " "
@@ -99,24 +114,30 @@ FILE
     BAR "bar"
     WHITESPACE " "
     RBRACE "}"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn block3() {
-    match_ast(&ast("_4 {"), r#"
+    match_ast(
+        &ast("_4 {"),
+        r#"
 FILE
   T4 "_4"
   WHITESPACE " "
   BLOCK
     LBRACE "{"
     ERROR ""
-"#);
+"#,
+    );
 }
 
 #[test]
 fn block4() {
-    match_ast(&ast("_4 { foo { {} bar"), r#"
+    match_ast(
+        &ast("_4 { foo { {} bar"),
+        r#"
 FILE
   T4 "_4"
   WHITESPACE " "
@@ -133,5 +154,6 @@ FILE
     BAR "bar"
     ERROR ""
     ERROR ""
-"#);
+"#,
+    );
 }

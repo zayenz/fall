@@ -2,10 +2,9 @@ extern crate fall_tree;
 extern crate tempdir;
 
 use std::{
+    env, fs,
+    path::{Path, PathBuf},
     process,
-    env,
-    fs,
-    path::{PathBuf, Path},
 };
 
 use tempdir::TempDir;
@@ -33,10 +32,11 @@ fn check_by_path<T: AsRef<Path>>(grammar_path: T, should_rewrite: bool) {
             .expect("Failed to execute process");
 
         if !output.status.success() {
-            panic!("Generator exited with code {:?}\nERR:\n----\n{}\nOUT:\n----\n{}\n---\n",
-                   output.status.code(),
-                   std::str::from_utf8(&output.stderr).unwrap(),
-                   std::str::from_utf8(&output.stdout).unwrap(),
+            panic!(
+                "Generator exited with code {:?}\nERR:\n----\n{}\nOUT:\n----\n{}\n---\n",
+                output.status.code(),
+                std::str::from_utf8(&output.stderr).unwrap(),
+                std::str::from_utf8(&output.stdout).unwrap(),
             )
         } else {
             let err = std::str::from_utf8(&output.stderr).unwrap();
@@ -53,8 +53,9 @@ fn check_by_path<T: AsRef<Path>>(grammar_path: T, should_rewrite: bool) {
     if expected != generated {
         if should_rewrite {
             println!("UPDATING {}", grammar_path.display());
-            fs::write(generated_path, generated)
-                .unwrap_or_else(|_| panic!("Failed to write result to {}", generated_path.display()));
+            fs::write(generated_path, generated).unwrap_or_else(|_| {
+                panic!("Failed to write result to {}", generated_path.display())
+            });
             return;
         }
         let difference = fall_tree::test_util::compare_trees(&expected, &generated);

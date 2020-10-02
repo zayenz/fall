@@ -1,7 +1,7 @@
+use crate::syntax::{BlockExpr, PIPE};
 use fall_editor::actions::ActionResult;
-use fall_tree::{AstNode, File, Node, TextUnit, FileEdit};
 use fall_tree::search::{find_leaf_at_offset, LeafAtOffset};
-use crate::syntax::{PIPE, BlockExpr};
+use fall_tree::{AstNode, File, FileEdit, Node, TextUnit};
 
 pub fn swap_alternatives(file: &File, offset: TextUnit, apply: bool) -> Option<ActionResult> {
     let (left, right) = find_swappable_nodes(file, offset)?;
@@ -18,14 +18,22 @@ pub fn swap_alternatives(file: &File, offset: TextUnit, apply: bool) -> Option<A
 fn find_swappable_nodes<'f>(file: &'f File, offset: TextUnit) -> Option<(Node<'f>, Node<'f>)> {
     let pipe = match find_leaf_at_offset(file.root(), offset) {
         LeafAtOffset::None => return None,
-        LeafAtOffset::Single(n) => if n.ty() == PIPE { n } else { return None; },
-        LeafAtOffset::Between(n1, n2) => if n1.ty() == PIPE {
-            n1
-        } else if n2.ty() == PIPE {
-            n2
-        } else {
-            return None;
-        },
+        LeafAtOffset::Single(n) => {
+            if n.ty() == PIPE {
+                n
+            } else {
+                return None;
+            }
+        }
+        LeafAtOffset::Between(n1, n2) => {
+            if n1.ty() == PIPE {
+                n1
+            } else if n2.ty() == PIPE {
+                n2
+            } else {
+                return None;
+            }
+        }
     };
     println!("B");
 
@@ -36,7 +44,7 @@ fn find_swappable_nodes<'f>(file: &'f File, offset: TextUnit) -> Option<(Node<'f
         if n1.range() < pipe.range() && pipe.range() < n2.range() {
             return Some((n1, n2));
         }
-    };
+    }
     None
 }
 
@@ -46,12 +54,16 @@ mod tests {
 
     #[test]
     fn test_swap_alternatives() {
-        check_context_action::<crate::FileWithAnalysis>("Swap alternatives", r##"
+        check_context_action::<crate::FileWithAnalysis>(
+            "Swap alternatives",
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { bar ^^| baz }
-"##, r##"
+"##,
+            r##"
 tokenizer { number r"\d+"}
 pub rule foo { baz | bar }
-"##);
+"##,
+        );
     }
 }

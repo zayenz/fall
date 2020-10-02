@@ -1,10 +1,10 @@
-use fall_tree::{Text, TextRange, AstNode};
-use fall_tree::search::{children_of_type, child_of_type_exn, child_of_type};
+use fall_tree::search::{child_of_type, child_of_type_exn, children_of_type};
+use fall_tree::{AstNode, Text, TextRange};
 
-use crate::{STRING, IDENT, SIMPLE_STRING, PUB,
-       LexRule, SynRule, VerbatimDef,
-       RefExpr, AstClassDef, Attributes, Attribute, TestDef,
-       CallExpr};
+use crate::{
+    AstClassDef, Attribute, Attributes, CallExpr, LexRule, RefExpr, SynRule, TestDef, VerbatimDef,
+    IDENT, PUB, SIMPLE_STRING, STRING,
+};
 
 impl<'f> LexRule<'f> {
     pub fn token_re(&self) -> Option<String> {
@@ -34,9 +34,9 @@ impl<'f> LexRule<'f> {
     }
 
     pub fn extern_fn(&self) -> Option<Text<'f>> {
-        children_of_type(self.node(), STRING).nth(1).map(|n| {
-            lit_body(n.text())
-        })
+        children_of_type(self.node(), STRING)
+            .nth(1)
+            .map(|n| lit_body(n.text()))
     }
 
     pub fn token_name(&self) -> Text<'f> {
@@ -84,7 +84,9 @@ impl<'f> SynRule<'f> {
         self.has_attribute("replaces")
     }
 
-    pub fn is_cached(&self) -> bool { self.has_attribute("cached") }
+    pub fn is_cached(&self) -> bool {
+        self.has_attribute("cached")
+    }
 
     fn has_attribute(&self, attribute: &str) -> bool {
         if let Some(attrs) = self.attributes() {
@@ -127,8 +129,12 @@ impl<'f> AstClassDef<'f> {
         child_of_type(self.node(), IDENT).unwrap().text()
     }
 
-    pub fn variants<'a>(&'a self) -> Box<dyn Iterator<Item=Text<'f>> + 'a> {
-        Box::new(children_of_type(self.node(), IDENT).skip(1).map(|it| it.text()))
+    pub fn variants<'a>(&'a self) -> Box<dyn Iterator<Item = Text<'f>> + 'a> {
+        Box::new(
+            children_of_type(self.node(), IDENT)
+                .skip(1)
+                .map(|it| it.text()),
+        )
     }
 }
 
@@ -145,7 +151,9 @@ impl<'f> CallExpr<'f> {
         if !(self.fn_name() == "is_in" || self.fn_name() == "enter" || self.fn_name() == "exit") {
             return None;
         }
-        return self.args().next()
+        return self
+            .args()
+            .next()
             .and_then(|arg| child_of_type(arg.node(), SIMPLE_STRING))
             .map(|ctx| lit_body(ctx.text()));
     }

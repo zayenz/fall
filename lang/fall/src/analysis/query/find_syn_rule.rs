@@ -1,7 +1,6 @@
 use crate::analysis::db::{self, DB};
 use crate::analysis::query;
-use crate::syntax::{SynRule};
-
+use crate::syntax::SynRule;
 
 impl<'f> db::QExecutor<'f> for super::FindSynRule<'f> {
     fn execute(self, db: &DB<'f>) -> Option<SynRule<'f>> {

@@ -1,12 +1,11 @@
-use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::db::{self, DB};
+use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::query;
 use crate::analysis::RefKind;
 use fall_tree::search::ast;
 use fall_tree::AstNode;
 
-use crate::syntax::{SynRule, CallExpr};
-
+use crate::syntax::{CallExpr, SynRule};
 
 impl<'f> db::OnceQExecutor<'f> for super::ResolveRefExpr<'f> {
     fn execute(self, db: &DB<'f>, d: &mut DiagnosticSink) -> Option<RefKind<'f>> {
@@ -15,7 +14,8 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveRefExpr<'f> {
 
         if let Some(param) = ast::ancestor_exn::<SynRule>(ref_.node())
             .parameters()
-            .and_then(|params| params.parameters().find(|p| p.name() == reference_name)) {
+            .and_then(|params| params.parameters().find(|p| p.name() == reference_name))
+        {
             return Some(RefKind::Param(param));
         }
 
@@ -28,7 +28,9 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveRefExpr<'f> {
         }
         let parent = ref_.node().parent().unwrap();
         if let Some(call) = CallExpr::wrap(parent) {
-            if call.context_name().is_some() && call.args().next().map(|a| a.node()) == Some(ref_.node()) {
+            if call.context_name().is_some()
+                && call.args().next().map(|a| a.node()) == Some(ref_.node())
+            {
                 return None;
             }
         }

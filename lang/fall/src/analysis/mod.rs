@@ -1,17 +1,16 @@
-use fall_tree::{File, AstNode};
-use fall_tree::visitor::{visitor, process_subtree_bottom_up};
 use fall_editor::{Diagnostic, Severity};
+use fall_tree::visitor::{process_subtree_bottom_up, visitor};
+use fall_tree::{AstNode, File};
 
+use crate::syntax::{AstNodeDef, AstTraitDef, CallExpr, FallFile, MethodDef, RefExpr, SynRule};
 use std::sync::Arc;
-use crate::syntax::{FallFile, RefExpr, CallExpr, SynRule, MethodDef, AstNodeDef, AstTraitDef};
 
-mod diagnostics;
 mod db;
+mod diagnostics;
 mod query;
 
 use self::diagnostics::DiagnosticSink;
-pub use self::query::{CallKind, RefKind, PratVariant, PrattOp, MethodKind, ChildKind, Arity};
-
+pub use self::query::{Arity, CallKind, ChildKind, MethodKind, PratVariant, PrattOp, RefKind};
 
 pub struct Analysis<'f> {
     db: db::DB<'f>,
@@ -20,7 +19,10 @@ pub struct Analysis<'f> {
 
 impl<'f> Analysis<'f> {
     pub fn new(file: FallFile) -> Analysis {
-        Analysis { db: db::DB::new(file), file }
+        Analysis {
+            db: db::DB::new(file),
+            file,
+        }
     }
 
     pub fn ast(&self) -> FallFile<'f> {
@@ -55,10 +57,18 @@ impl<'f> Analysis<'f> {
         process_subtree_bottom_up(
             self.ast().node(),
             visitor(())
-                .visit::<RefExpr, _>(|ref_, _| { self.db.get(query::ResolveRefExpr(ref_)); })
-                .visit::<CallExpr, _>(|call, _| { self.db.get(query::ResolveCall(call)); })
-                .visit::<SynRule, _>(|rule, _| { self.db.get(query::ResolvePrattVariant(rule)); })
-                .visit::<AstNodeDef, _>(|rule, _| { self.db.get(query::AstNodeTraits(rule)); })
+                .visit::<RefExpr, _>(|ref_, _| {
+                    self.db.get(query::ResolveRefExpr(ref_));
+                })
+                .visit::<CallExpr, _>(|call, _| {
+                    self.db.get(query::ResolveCall(call));
+                })
+                .visit::<SynRule, _>(|rule, _| {
+                    self.db.get(query::ResolvePrattVariant(rule));
+                })
+                .visit::<AstNodeDef, _>(|rule, _| {
+                    self.db.get(query::AstNodeTraits(rule));
+                }),
         );
         self.db.get(query::UnusedRules);
         self.db.get(query::AllLexRules);
@@ -76,7 +86,7 @@ impl<'f> Analysis<'f> {
 }
 
 pub struct FileWithAnalysis {
-    rent: rent::R
+    rent: rent::R,
 }
 
 impl FileWithAnalysis {
@@ -84,7 +94,7 @@ impl FileWithAnalysis {
         FileWithAnalysis {
             rent: rent::R::new(Box::new(file), |file| {
                 Analysis::new(FallFile::wrap(file.root()).unwrap())
-            })
+            }),
         }
     }
 
@@ -117,9 +127,9 @@ fn analysis_is_sync() {
 
 #[cfg(test)]
 fn check_diagnostics(code: &str, expected_diagnostics: &str) {
-    use fall_tree::ERROR;
-    use fall_tree::test_util::report_diff;
     use fall_tree::search::subtree;
+    use fall_tree::test_util::report_diff;
+    use fall_tree::ERROR;
     let file = crate::analyse(code.to_string());
 
     for node in subtree(file.file().root()) {
@@ -130,13 +140,22 @@ fn check_diagnostics(code: &str, expected_diagnostics: &str) {
 
     file.analyse(|a| {
         let d = a.collect_all_diagnostics();
-        let actual = d.into_iter().map(|d| {
-            let s = match d.severity {
-                Severity::Error => 'E',
-                Severity::Warning => 'W',
-            };
-            format!("{} {}: {}", s, a.ast().node().text().slice(d.range), d.message)
-        }).collect::<Vec<_>>().join("\n");
+        let actual = d
+            .into_iter()
+            .map(|d| {
+                let s = match d.severity {
+                    Severity::Error => 'E',
+                    Severity::Warning => 'W',
+                };
+                format!(
+                    "{} {}: {}",
+                    s,
+                    a.ast().node().text().slice(d.range),
+                    d.message
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
 
         report_diff(expected_diagnostics, &actual);
     })
@@ -144,13 +163,15 @@ fn check_diagnostics(code: &str, expected_diagnostics: &str) {
 
 #[test]
 fn test_syn_rule_diagnostics() {
-    check_diagnostics(r"
+    check_diagnostics(
+        r"
        pub rule foo { <eof x> }
        rule bar { foo <abracadabra>}
        rule baz { <prev_is foo> <prev_is bar> <prev_is {foo}>}
        rule dupe { dupe }
        rule dupe { dupe }
-    ", "\
+    ",
+        "\
 E <eof x>: Wrong number of arguments, expected 0, got 1
 E x: Unresolved reference
 E abracadabra: Unresolved reference
@@ -158,30 +179,37 @@ E <prev_is bar>: <prev_is> arguments must be public rules
 E <prev_is {foo}>: <prev_is> arguments must be public rules
 E dupe: Duplicate rule
 W baz: Unused rule
-W dupe: Unused rule");
+W dupe: Unused rule",
+    );
 }
 
 #[test]
 fn test_lex_rule_diagnostics() {
-    check_diagnostics(r"
+    check_diagnostics(
+        r"
        tokenizer {
            class 'class'
            class 'trait'
        }
-    ", "\
+    ",
+        "\
 E class 'trait': Duplicate token
-");
+",
+    );
 }
 
 #[test]
 fn test_ast_diagnostics() {
-    check_diagnostics(r"
+    check_diagnostics(
+        r"
        ast {
            trait foo {}
            node a: foo {}
            node b: bar {}
        }
-    ", "\
+    ",
+        "\
 E bar: Unresolved trait
-");
+",
+    );
 }

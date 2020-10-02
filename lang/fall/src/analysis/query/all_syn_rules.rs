@@ -1,10 +1,10 @@
 use std::collections::hash_map::{self, HashMap};
 use std::sync::Arc;
 
-use fall_tree::Text;
-use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::db::{self, DB};
-use crate::syntax::{SynRule};
+use crate::analysis::diagnostics::DiagnosticSink;
+use crate::syntax::SynRule;
+use fall_tree::Text;
 
 impl<'f> db::OnceQExecutor<'f> for super::AllSynRules {
     fn execute(self, db: &DB<'f>, d: &mut DiagnosticSink) -> Arc<HashMap<Text<'f>, SynRule<'f>>> {

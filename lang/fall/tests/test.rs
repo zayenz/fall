@@ -3,12 +3,16 @@ extern crate lang_fall;
 
 use std::path::Path;
 
-use fall_tree::{TextRange, TextBuf, TextEditBuilder, dump_file_ws, tu};
 use fall_tree::test_util::{check_inline_tests, report_diff};
+use fall_tree::{dump_file_ws, tu, TextBuf, TextEditBuilder, TextRange};
 
 #[test]
 fn inline_tests() {
-    check_inline_tests(&lang_fall::syntax::lang_fall(), Path::new("syntax/src/fall.fall"), Path::new("tests/inline.txt"))
+    check_inline_tests(
+        &lang_fall::syntax::lang_fall(),
+        Path::new("syntax/src/fall.fall"),
+        Path::new("tests/inline.txt"),
+    )
 }
 
 #[test]

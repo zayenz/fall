@@ -1,9 +1,8 @@
-use fall_tree::{File, AstNode};
-use fall_tree::visitor::{visitor, process_subtree_bottom_up};
 use fall_editor::FileStructureNode;
+use fall_tree::visitor::{process_subtree_bottom_up, visitor};
+use fall_tree::{AstNode, File};
 
-use crate::syntax::{SynRule, TokenizerDef, AstDef};
-
+use crate::syntax::{AstDef, SynRule, TokenizerDef};
 
 pub(crate) fn structure(file: &File) -> Vec<FileStructureNode> {
     process_subtree_bottom_up(
@@ -35,17 +34,18 @@ pub(crate) fn structure(file: &File) -> Vec<FileStructureNode> {
     )
 }
 
-
 #[test]
 fn test_structure() {
-    let file = crate::parse(r#"
+    let file = crate::parse(
+        r#"
 tokenizer { number r"\d+"}
 pub rule foo { bar }
 rule bar { number }
 ast {
   node foo { }
 }
-"#);
+"#,
+    );
     let s = structure(&file);
 
     assert_eq!(

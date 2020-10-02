@@ -1,19 +1,18 @@
 use std::path::Path;
 
-use file;
-use crate::{Language, File, dump_file, dump_file_ws, TextRange, TextUnit, tu};
+use crate::{dump_file, dump_file_ws, tu, File, Language, TextRange, TextUnit};
 use difference::Changeset;
-
-
+use file;
 
 pub fn extract_range(input: &str, caret: &str) -> (String, TextRange) {
-    let left_offset = input.find(caret).expect(
-        &format!("No caret ({}) in\n{}\n", caret, input)
-    );
+    let left_offset = input
+        .find(caret)
+        .expect(&format!("No caret ({}) in\n{}\n", caret, input));
     let mid_offset = left_offset + caret.len();
-    let right_offset = mid_offset + input[mid_offset..].find(caret).expect(
-        &format!("Only single caret ({}) in \n{}\n", caret, input)
-    );
+    let right_offset = mid_offset
+        + input[mid_offset..]
+            .find(caret)
+            .expect(&format!("Only single caret ({}) in \n{}\n", caret, input));
     let input = input[..left_offset].to_string()
         + &input[mid_offset..right_offset]
         + &input[right_offset + caret.len()..];
@@ -25,9 +24,9 @@ pub fn extract_range(input: &str, caret: &str) -> (String, TextRange) {
 }
 
 pub fn extract_offset(input: &str, caret: &str) -> (String, TextUnit) {
-    let left_offset = input.find(caret).expect(
-        &format!("No caret ({}) in\n{}\n", caret, input)
-    );
+    let left_offset = input
+        .find(caret)
+        .expect(&format!("No caret ({}) in\n{}\n", caret, input));
     let right_offset = left_offset + caret.len();
     let input = input[..left_offset].to_string() + &input[right_offset..];
     (input, tu(left_offset as u32))
@@ -72,7 +71,7 @@ pub fn check_directory(lang: &Language, directory: &Path) {
         let file = file.unwrap();
         let path = file.path();
         if path.extension().unwrap_or_default() != "rs" {
-            continue
+            continue;
         }
         let tree = path.with_extension("txt");
         check_file(lang, &path, &tree, rewrite);
@@ -81,8 +80,8 @@ pub fn check_directory(lang: &Language, directory: &Path) {
 
 pub fn check_inline_tests(lang: &Language, grammar: &Path, test_data: &Path) {
     let rewrite = ::std::env::var("rewrite_test_data").is_ok();
-    let grammar = file::get_text(grammar)
-        .unwrap_or_else(|_| panic!("Can't read {}", grammar.display()));
+    let grammar =
+        file::get_text(grammar).unwrap_or_else(|_| panic!("Can't read {}", grammar.display()));
 
     let tests = collect_tests(&grammar);
     let expected = render_tests(lang, &tests);
@@ -128,11 +127,12 @@ fn render_tests(lang: &Language, tests: &[String]) -> String {
     result
 }
 
-
 pub fn report_diff(expected: &str, actual: &str) {
     if let Some(diff) = compute_diff(expected, actual) {
-        println!("Actual\n{}\n\nExpected:\n{}\n\nDiff:\n{}\n",
-                 actual, expected, diff);
+        println!(
+            "Actual\n{}\n\nExpected:\n{}\n\nDiff:\n{}\n",
+            actual, expected, diff
+        );
         panic!("Mismatch")
     }
 }
@@ -147,8 +147,8 @@ fn compute_diff(expected: &str, actual: &str) -> Option<Changeset> {
 }
 
 fn check_file(lang: &Language, source_path: &Path, tree: &Path, rewrite: bool) {
-    let source = file::get_text(source_path)
-        .expect(&format!("Can't read {}", source_path.display()));
+    let source =
+        file::get_text(source_path).expect(&format!("Can't read {}", source_path.display()));
 
     let file = lang.parse(source);
     let actual_tree = dump_file(&file);
@@ -166,6 +166,6 @@ fn check_file(lang: &Language, source_path: &Path, tree: &Path, rewrite: bool) {
                 file::put_text(tree, actual_tree).unwrap();
             }
         }
-        (false, Some(expected_tree)) => report_diff(&expected_tree, &actual_tree)
+        (false, Some(expected_tree)) => report_diff(&expected_tree, &actual_tree),
     }
 }

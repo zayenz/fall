@@ -1,15 +1,15 @@
-use std::fmt;
 use std::borrow::Cow;
+use std::fmt;
 
 use serde::{Serialize, Serializer};
 
-use crate::{TextRange, TextUnit, TextBuf};
 use crate::text_slice::TextSlice;
+use crate::{TextBuf, TextRange, TextUnit};
 
 #[derive(Clone, Copy, Eq)]
 pub struct Text<'f> {
     pub(crate) owned: &'f String,
-    pub(crate) range: TextRange
+    pub(crate) range: TextRange,
 }
 
 impl<'f> Text<'f> {
@@ -17,7 +17,9 @@ impl<'f> Text<'f> {
         self.range.end() - self.range.start()
     }
 
-    pub fn is_empty(self) -> bool { self.range.is_empty() }
+    pub fn is_empty(self) -> bool {
+        self.range.is_empty()
+    }
 
     pub fn slice<S: TextSlice>(&self, slice: S) -> Text<'f> {
         let r = slice.into_proper_range(*self);
@@ -55,9 +57,7 @@ impl<'f> Text<'f> {
             !c.is_whitespace()
         }
 
-        let left = self.as_str()
-            .find(non_ws)
-            .unwrap_or(self.as_str().len());
+        let left = self.as_str().find(non_ws).unwrap_or(self.as_str().len());
         let s = &self.as_str()[left..];
         let right = s
             .rfind(non_ws)
@@ -65,7 +65,7 @@ impl<'f> Text<'f> {
             .unwrap_or(0);
         self.slice(TextRange::from_to(
             TextUnit(left as u32),
-            TextUnit((left + right) as u32)
+            TextUnit((left + right) as u32),
         ))
     }
 
@@ -92,7 +92,9 @@ impl<'f> Text<'f> {
 
 impl<'f> Serialize for Text<'f> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         self.as_str().serialize(serializer)
     }
 }
@@ -109,13 +111,11 @@ impl<'f> fmt::Debug for Text<'f> {
     }
 }
 
-
 impl<'a, 'b> PartialEq<Text<'b>> for Text<'a> {
     fn eq(&self, other: &Text<'b>) -> bool {
         self.as_str() == other.as_str()
     }
 }
-
 
 impl<'f, 's> PartialEq<&'s str> for Text<'f> {
     fn eq(&self, other: &&str) -> bool {
@@ -129,13 +129,11 @@ impl<'f, 's> PartialEq<Text<'f>> for &'s str {
     }
 }
 
-
 impl<'a, 'b> PartialOrd<Text<'b>> for Text<'a> {
     fn partial_cmp(&self, other: &Text<'b>) -> Option<::std::cmp::Ordering> {
         self.as_str().partial_cmp(other.as_str())
     }
 }
-
 
 impl<'f, 's> PartialOrd<&'s str> for Text<'f> {
     fn partial_cmp(&self, other: &&str) -> Option<::std::cmp::Ordering> {
@@ -143,13 +141,11 @@ impl<'f, 's> PartialOrd<&'s str> for Text<'f> {
     }
 }
 
-
 impl<'a, 'b> Ord for Text<'a> {
     fn cmp(&self, other: &Text<'a>) -> ::std::cmp::Ordering {
         self.as_str().cmp(other.as_str())
     }
 }
-
 
 impl<'f> ::std::hash::Hash for Text<'f> {
     fn hash<H: ::std::hash::Hasher>(&self, state: &mut H) {

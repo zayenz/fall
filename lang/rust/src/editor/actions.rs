@@ -1,13 +1,10 @@
-use fall_tree::{File, TextUnit, FileEdit, AstNode};
-use fall_tree::search::ast;
+use crate::syntax::{EnumDef, NameOwner, StructDef, TypeParametersOwner, UseDecl};
 use fall_editor::actions::ActionResult;
-use crate::syntax::{NameOwner, TypeParametersOwner, EnumDef, StructDef, UseDecl};
+use fall_tree::search::ast;
+use fall_tree::{AstNode, File, FileEdit, TextUnit};
 
-
-pub const ACTIONS: &[(&str, fn(&File, TextUnit, bool) -> Option<ActionResult>)] = &[
-    ("Add braces", add_use_braces),
-    ("Add impl", add_impl),
-];
+pub const ACTIONS: &[(&str, fn(&File, TextUnit, bool) -> Option<ActionResult>)] =
+    &[("Add braces", add_use_braces), ("Add impl", add_impl)];
 
 fn add_use_braces(file: &File, offset: TextUnit, apply: bool) -> Option<ActionResult> {
     let use_decl: UseDecl = ast::node_at_offset(file.root(), offset)?;
@@ -28,17 +25,19 @@ fn add_use_braces(file: &File, offset: TextUnit, apply: bool) -> Option<ActionRe
 fn test_add_use_braces() {
     use fall_editor::actions::check_context_action;
 
-    check_context_action::<crate::editor::RustEditorFile>("Add braces", r"
+    check_context_action::<crate::editor::RustEditorFile>(
+        "Add braces",
+        r"
 use foo::^^bar;
-", r"
+",
+        r"
 use foo::{bar};
-");
+",
+    );
 }
 
-
 fn add_impl(file: &File, offset: TextUnit, apply: bool) -> Option<ActionResult> {
-    None
-        .or_else(|| add_impl_for::<StructDef>(file, offset, apply))
+    None.or_else(|| add_impl_for::<StructDef>(file, offset, apply))
         .or_else(|| add_impl_for::<EnumDef>(file, offset, apply))
 }
 
@@ -86,20 +85,23 @@ fn add_impl_for<'f, T: NameOwner<'f> + TypeParametersOwner<'f>>(
     Some(ActionResult::Applied(edit.into_text_edit()))
 }
 
-
 #[test]
 fn test_add_impl() {
     use fall_editor::actions::check_context_action;
 
-    check_context_action::<crate::editor::RustEditorFile>("Add impl", r"
+    check_context_action::<crate::editor::RustEditorFile>(
+        "Add impl",
+        r"
 struct ^^Foo<X, Y: Clone> {}
-", r"
+",
+        r"
 struct Foo<X, Y: Clone> {}
 
 impl<X, Y: Clone> Foo<X, Y> {
 
 }
-");
+",
+    );
 }
 
 #[test]

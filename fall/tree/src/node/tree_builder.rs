@@ -1,4 +1,4 @@
-use crate::{NodeType, TextUnit, TextRange, tu};
+use crate::{tu, NodeType, TextRange, TextUnit};
 
 pub struct TreeBuilder {
     nodes: Vec<NodeData>,
@@ -84,7 +84,6 @@ impl TreeBuilder {
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct NodeId(pub u32);
-
 
 pub(crate) struct NodeData {
     pub(crate) ty: NodeType,

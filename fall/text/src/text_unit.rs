@@ -1,9 +1,9 @@
-use std::ops;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
-use serde::{Serialize, Serializer, Deserialize, Deserializer};
+use std::ops;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TextUnit(pub (super) u32);
+pub struct TextUnit(pub(super) u32);
 
 impl TextUnit {
     pub fn utf8_len(self) -> usize {
@@ -42,7 +42,7 @@ impl ops::AddAssign<TextUnit> for TextUnit {
 }
 
 impl ::std::iter::Sum for TextUnit {
-    fn sum<I: Iterator<Item=TextUnit>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = TextUnit>>(iter: I) -> Self {
         TextUnit(iter.map(|u| u.0).sum())
     }
 }

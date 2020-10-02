@@ -4,7 +4,10 @@ use std::sync::Arc;
 use fall_tree::Text;
 
 use super::db::Query;
-use crate::syntax::{SynRule, LexRule, RefExpr, Parameter, Expr, CallExpr, MethodDef, AstNodeDef, AstClassDef, AstTraitDef};
+use crate::syntax::{
+    AstClassDef, AstNodeDef, AstTraitDef, CallExpr, Expr, LexRule, MethodDef, Parameter, RefExpr,
+    SynRule,
+};
 
 #[derive(Eq, PartialEq, Hash, Clone, Debug)]
 pub(crate) struct AllLexRules;
@@ -34,14 +37,12 @@ impl<'f> Query<'f> for FindSynRule<'f> {
     type Result = Option<SynRule<'f>>;
 }
 
-
 #[derive(Eq, PartialEq, Hash, Clone, Debug)]
 pub(crate) struct UnusedRules;
 mod unused_rules;
 impl<'f> Query<'f> for UnusedRules {
     type Result = ();
 }
-
 
 #[derive(Eq, PartialEq, Hash, Clone, Debug)]
 pub(crate) struct AllContexts;
@@ -63,8 +64,6 @@ mod resolve_ref_expr;
 impl<'f> Query<'f> for ResolveRefExpr<'f> {
     type Result = Option<RefKind<'f>>;
 }
-
-
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum CallKind<'f> {
@@ -92,8 +91,6 @@ impl<'f> Query<'f> for ResolveCall<'f> {
     type Result = Option<CallKind<'f>>;
 }
 
-
-
 #[derive(Copy, Clone)]
 pub enum PratVariant<'f> {
     Atom(Expr<'f>),
@@ -105,9 +102,8 @@ pub enum PratVariant<'f> {
 #[derive(Copy, Clone)]
 pub struct PrattOp<'f> {
     pub op: Expr<'f>,
-    pub priority: u32
+    pub priority: u32,
 }
-
 
 #[derive(Eq, PartialEq, Hash, Clone, Debug)]
 pub(crate) struct ResolvePrattVariant<'f>(pub SynRule<'f>);
@@ -116,19 +112,18 @@ impl<'f> Query<'f> for ResolvePrattVariant<'f> {
     type Result = Option<PratVariant<'f>>;
 }
 
-
 #[derive(Copy, Clone)]
 pub enum Arity {
     Single,
     Optional,
-    Many
+    Many,
 }
 
 #[derive(Copy, Clone)]
 pub enum ChildKind<'f> {
     AstNode(AstNodeDef<'f>),
     AstClass(AstClassDef<'f>),
-    Token(LexRule<'f>)
+    Token(LexRule<'f>),
 }
 
 #[derive(Copy, Clone)]
@@ -150,4 +145,3 @@ mod ast_node_traits;
 impl<'f> Query<'f> for AstNodeTraits<'f> {
     type Result = Arc<Vec<AstTraitDef<'f>>>;
 }
-

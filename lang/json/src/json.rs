@@ -1,5 +1,5 @@
-use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
+use fall_parse::runtime as rt;
 
 pub const WHITESPACE: rt::NodeType = rt::NodeType(100);
 pub const LBRACE: rt::NodeType = rt::NodeType(101);
@@ -17,7 +17,6 @@ pub const OBJECT: rt::NodeType = rt::NodeType(112);
 pub const FIELD: rt::NodeType = rt::NodeType(113);
 pub const ARRAY: rt::NodeType = rt::NodeType(114);
 pub const PRIMITIVE: rt::NodeType = rt::NodeType(115);
-
 
 pub fn language() -> &'static rt::Language {
     fn create_lexer() -> rt::RegexLexer {
@@ -42,17 +41,35 @@ pub fn language() -> &'static rt::Language {
         ::fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
-                WHITESPACE, LBRACE, RBRACE, LBRACK, RBRACK, COLON, COMMA, NULL, BOOL, STRING, NUMBER, FILE, OBJECT, FIELD, ARRAY, PRIMITIVE,
+                WHITESPACE,
+                LBRACE,
+                RBRACE,
+                LBRACK,
+                RBRACK,
+                COLON,
+                COMMA,
+                NULL,
+                BOOL,
+                STRING,
+                NUMBER,
+                FILE,
+                OBJECT,
+                FIELD,
+                ARRAY,
+                PRIMITIVE,
             ],
             syntactical_rules: rt::parser_from_str(parser_json),
-            
-            .. Default::default()
+
+            ..Default::default()
         }
     }
     use self::rt::*;
     lazy_static! {
         static ref LANG: rt::Language = {
-            struct Impl { parser_definition: rt::ParserDefinition, lexer: rt::RegexLexer };
+            struct Impl {
+                parser_definition: rt::ParserDefinition,
+                lexer: rt::RegexLexer,
+            };
             impl rt::LanguageImpl for Impl {
                 fn parse(
                     &self,
@@ -60,7 +77,14 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::parse(&LANG, &self.lexer, &self.parser_definition, text, metrics, builder)
+                    rt::parse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        text,
+                        metrics,
+                        builder,
+                    )
                 }
 
                 fn reparse(
@@ -71,42 +95,99 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::reparse(&LANG, &self.lexer, &self.parser_definition, incremental_data, edit, new_text, metrics, builder)
+                    rt::reparse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        incremental_data,
+                        edit,
+                        new_text,
+                        metrics,
+                        builder,
+                    )
                 }
 
                 fn node_type_info(&self, ty: rt::NodeType) -> rt::NodeTypeInfo {
                     match ty {
-                        ERROR => rt::NodeTypeInfo { name: "ERROR", whitespace_like: false },
-                        WHITESPACE => rt::NodeTypeInfo { name: "WHITESPACE", whitespace_like: true },
-                        LBRACE => rt::NodeTypeInfo { name: "LBRACE", whitespace_like: false },
-                        RBRACE => rt::NodeTypeInfo { name: "RBRACE", whitespace_like: false },
-                        LBRACK => rt::NodeTypeInfo { name: "LBRACK", whitespace_like: false },
-                        RBRACK => rt::NodeTypeInfo { name: "RBRACK", whitespace_like: false },
-                        COLON => rt::NodeTypeInfo { name: "COLON", whitespace_like: false },
-                        COMMA => rt::NodeTypeInfo { name: "COMMA", whitespace_like: false },
-                        NULL => rt::NodeTypeInfo { name: "NULL", whitespace_like: false },
-                        BOOL => rt::NodeTypeInfo { name: "BOOL", whitespace_like: false },
-                        STRING => rt::NodeTypeInfo { name: "STRING", whitespace_like: false },
-                        NUMBER => rt::NodeTypeInfo { name: "NUMBER", whitespace_like: false },
-                        FILE => rt::NodeTypeInfo { name: "FILE", whitespace_like: false },
-                        OBJECT => rt::NodeTypeInfo { name: "OBJECT", whitespace_like: false },
-                        FIELD => rt::NodeTypeInfo { name: "FIELD", whitespace_like: false },
-                        ARRAY => rt::NodeTypeInfo { name: "ARRAY", whitespace_like: false },
-                        PRIMITIVE => rt::NodeTypeInfo { name: "PRIMITIVE", whitespace_like: false },
-                        _ => panic!("Unknown rt::NodeType: {:?}", ty)
+                        ERROR => rt::NodeTypeInfo {
+                            name: "ERROR",
+                            whitespace_like: false,
+                        },
+                        WHITESPACE => rt::NodeTypeInfo {
+                            name: "WHITESPACE",
+                            whitespace_like: true,
+                        },
+                        LBRACE => rt::NodeTypeInfo {
+                            name: "LBRACE",
+                            whitespace_like: false,
+                        },
+                        RBRACE => rt::NodeTypeInfo {
+                            name: "RBRACE",
+                            whitespace_like: false,
+                        },
+                        LBRACK => rt::NodeTypeInfo {
+                            name: "LBRACK",
+                            whitespace_like: false,
+                        },
+                        RBRACK => rt::NodeTypeInfo {
+                            name: "RBRACK",
+                            whitespace_like: false,
+                        },
+                        COLON => rt::NodeTypeInfo {
+                            name: "COLON",
+                            whitespace_like: false,
+                        },
+                        COMMA => rt::NodeTypeInfo {
+                            name: "COMMA",
+                            whitespace_like: false,
+                        },
+                        NULL => rt::NodeTypeInfo {
+                            name: "NULL",
+                            whitespace_like: false,
+                        },
+                        BOOL => rt::NodeTypeInfo {
+                            name: "BOOL",
+                            whitespace_like: false,
+                        },
+                        STRING => rt::NodeTypeInfo {
+                            name: "STRING",
+                            whitespace_like: false,
+                        },
+                        NUMBER => rt::NodeTypeInfo {
+                            name: "NUMBER",
+                            whitespace_like: false,
+                        },
+                        FILE => rt::NodeTypeInfo {
+                            name: "FILE",
+                            whitespace_like: false,
+                        },
+                        OBJECT => rt::NodeTypeInfo {
+                            name: "OBJECT",
+                            whitespace_like: false,
+                        },
+                        FIELD => rt::NodeTypeInfo {
+                            name: "FIELD",
+                            whitespace_like: false,
+                        },
+                        ARRAY => rt::NodeTypeInfo {
+                            name: "ARRAY",
+                            whitespace_like: false,
+                        },
+                        PRIMITIVE => rt::NodeTypeInfo {
+                            name: "PRIMITIVE",
+                            whitespace_like: false,
+                        },
+                        _ => panic!("Unknown rt::NodeType: {:?}", ty),
                     }
                 }
             }
 
             rt::Language::new(Impl {
                 parser_definition: create_parser_definition(),
-                lexer: create_lexer()
+                lexer: create_lexer(),
             })
         };
     }
 
     &*LANG
 }
-
-
-

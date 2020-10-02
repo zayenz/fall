@@ -1,5 +1,5 @@
+use fall_tree::{tu, NodeType, Text, TextEdit, TextEditOp, TextSuffix, TextUnit, ERROR};
 use std::cmp::Ordering;
-use fall_tree::{Text, tu, TextSuffix, TextEditOp, TextEdit, TextUnit, NodeType, ERROR};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Token {
@@ -31,9 +31,8 @@ pub fn relex<L: Lexer>(
     lexer: &L,
     old_tokens: &[Token],
     edit: &TextEdit,
-    new_text: Text
-) -> (Vec<Token>, usize)
-{
+    new_text: Text,
+) -> (Vec<Token>, usize) {
     if old_tokens.iter().any(|&token| token.ty == ERROR) {
         return (lex(lexer, new_text), 0);
     }
@@ -49,9 +48,7 @@ pub fn relex<L: Lexer>(
 
     for op in edit.ops.iter() {
         match *op {
-            TextEditOp::Insert(ref buf) => {
-                edit_point += buf.as_text().len()
-            }
+            TextEditOp::Insert(ref buf) => edit_point += buf.as_text().len(),
             TextEditOp::Copy(range) => {
                 let mut txt = new_text.slice(TextSuffix::from(new_len));
                 while new_len < edit_point {
@@ -68,7 +65,7 @@ pub fn relex<L: Lexer>(
                     let new_consumed = new_len - edit_point;
                     let old_consumed = old_len - range.start();
                     if new_consumed >= range.len() || old_consumed >= range.len() {
-                        break
+                        break;
                     }
 
                     match new_consumed.cmp(&old_consumed) {
@@ -103,8 +100,7 @@ pub fn relex<L: Lexer>(
     let mut txt = new_text.slice(TextSuffix::from(new_len));
     while !txt.is_empty() {
         new_tokens.push(lexer.step(&mut txt));
-    };
+    }
     let relexed_region = (new_text.len() - reused).utf8_len();
     (new_tokens, relexed_region)
 }
-

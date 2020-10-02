@@ -1,6 +1,6 @@
-use super::{MethodKind, ChildKind, Arity};
-use crate::analysis::diagnostics::DiagnosticSink;
+use super::{Arity, ChildKind, MethodKind};
 use crate::analysis::db::{self, DB};
+use crate::analysis::diagnostics::DiagnosticSink;
 use crate::syntax::{AstSelector, FallFile};
 
 impl<'f> db::OnceQExecutor<'f> for super::ResolveMethod<'f> {
@@ -19,7 +19,7 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveMethod<'f> {
         if method.selector().dot().is_some() {
             return match child_kind {
                 ChildKind::Token(t) => Some(MethodKind::TextAccessor(t, arity)),
-                _ => None
+                _ => None,
             };
         }
 
@@ -35,12 +35,14 @@ fn child_kind<'f>(file: FallFile<'f>, selector: AstSelector<'f>) -> Option<Child
     if let Some(class) = ast_def.ast_classes().find(|c| c.name() == selector.child()) {
         return Some(ChildKind::AstClass(class));
     }
-    if let Some(lex_rule) = file.tokenizer_def().and_then(|td| td.lex_rules().find(|r| r.node_type() == selector.child())) {
+    if let Some(lex_rule) = file
+        .tokenizer_def()
+        .and_then(|td| td.lex_rules().find(|r| r.node_type() == selector.child()))
+    {
         return Some(ChildKind::Token(lex_rule));
     }
     None
 }
-
 
 #[cfg(test)]
 mod tests {}

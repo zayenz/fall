@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use fall_tree::{TextUnit, Text, TextSuffix, NodeType, tu};
 use crate::lex_engine::Token;
-use crate::syn_engine::{Grammar, Event};
-use crate::{NodeTypeRef, ExprRef};
+use crate::syn_engine::{Event, Grammar};
+use crate::{ExprRef, NodeTypeRef};
+use fall_tree::{tu, NodeType, Text, TextSuffix, TextUnit};
 
 pub(crate) struct Parser<'g> {
     cache: Option<(HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &'g [Event])>,
@@ -76,7 +76,6 @@ impl<'g> Parser<'g> {
         (parser, pos)
     }
 
-
     pub fn done(self) -> (Vec<Event>, u64) {
         (self.events, self.ticks)
     }
@@ -84,7 +83,6 @@ impl<'g> Parser<'g> {
     pub fn tick(&mut self) {
         self.ticks += 1
     }
-
 
     pub fn start(&mut self, ty_idx: NodeTypeRef) -> Mark {
         let ty = self[ty_idx];
@@ -103,7 +101,9 @@ impl<'g> Parser<'g> {
         if let Some((ref cache, events)) = self.cache {
             let text_pos = self.non_ws_indexes[pos.0 as usize].0;
             if let Some(&(start_event, n_events, n_tokens)) = cache.get(&(text_pos, expr)) {
-                self.events.extend_from_slice(&events[start_event as usize..(start_event + n_events) as usize]);
+                self.events.extend_from_slice(
+                    &events[start_event as usize..(start_event + n_events) as usize],
+                );
                 return Some(Pos(pos.0 + n_tokens, pos.1));
             }
         }
@@ -113,7 +113,10 @@ impl<'g> Parser<'g> {
 
     pub fn start_cached(&mut self, expr: ExprRef) -> Mark {
         let mark = self.mark();
-        self.event(Event::Cached { key: expr.0, n_events: 0 });
+        self.event(Event::Cached {
+            key: expr.0,
+            n_events: 0,
+        });
         mark
     }
 
@@ -121,7 +124,9 @@ impl<'g> Parser<'g> {
         if !self.predicate_mode {
             let len = self.events.len() as u32 - (mark.0 + 1);
             match self.events[mark.0 as usize] {
-                Event::Cached { ref mut n_events, .. } => *n_events = len,
+                Event::Cached {
+                    ref mut n_events, ..
+                } => *n_events = len,
                 _ => unreachable!(),
             }
         }
@@ -131,7 +136,7 @@ impl<'g> Parser<'g> {
         if !self.predicate_mode {
             match self.events.pop() {
                 Some(Event::End) => {}
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         }
     }
@@ -152,15 +157,19 @@ impl<'g> Parser<'g> {
     pub fn replace(&mut self, mark: Mark, ty_idx: NodeTypeRef) {
         let ty = self[ty_idx];
         match self.events[mark.0 as usize] {
-            Event::Start { ty: ref mut prev, .. } => *prev = ty,
-            _ => unreachable!()
+            Event::Start {
+                ty: ref mut prev, ..
+            } => *prev = ty,
+            _ => unreachable!(),
         }
     }
 
     pub fn forward_parent(&mut self, child: Mark, parent: Mark) {
         match self.events[child.0 as usize] {
-            Event::Start { ref mut forward_parent, .. } =>
-                *forward_parent = Some(parent.0 - child.0),
+            Event::Start {
+                ref mut forward_parent,
+                ..
+            } => *forward_parent = Some(parent.0 - child.0),
             _ => unreachable!(),
         }
     }
@@ -213,7 +222,10 @@ impl<'g> Parser<'g> {
 
     fn start_ty(&mut self, ty: NodeType) -> Mark {
         let mark = Mark(self.events.len() as u32);
-        self.event(Event::Start { ty, forward_parent: None });
+        self.event(Event::Start {
+            ty,
+            forward_parent: None,
+        });
         mark
     }
 

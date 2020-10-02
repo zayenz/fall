@@ -1,5 +1,5 @@
-use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
+use fall_parse::runtime as rt;
 
 pub const WHITESPACE: rt::NodeType = rt::NodeType(100);
 pub const RAW_STRING: rt::NodeType = rt::NodeType(101);
@@ -16,7 +16,6 @@ pub const FILE: rt::NodeType = rt::NodeType(111);
 pub const PRIVATE_PARTIAL: rt::NodeType = rt::NodeType(112);
 pub const EMPTY: rt::NodeType = rt::NodeType(113);
 pub const BLOCK: rt::NodeType = rt::NodeType(114);
-
 
 pub fn language() -> &'static rt::Language {
     fn create_lexer() -> rt::RegexLexer {
@@ -41,17 +40,34 @@ pub fn language() -> &'static rt::Language {
         ::fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
-                WHITESPACE, RAW_STRING, FOO, BAR, T1, T2, T3, T4, LBRACE, RBRACE, ATOM, FILE, PRIVATE_PARTIAL, EMPTY, BLOCK,
+                WHITESPACE,
+                RAW_STRING,
+                FOO,
+                BAR,
+                T1,
+                T2,
+                T3,
+                T4,
+                LBRACE,
+                RBRACE,
+                ATOM,
+                FILE,
+                PRIVATE_PARTIAL,
+                EMPTY,
+                BLOCK,
             ],
             syntactical_rules: rt::parser_from_str(parser_json),
-            
-            .. Default::default()
+
+            ..Default::default()
         }
     }
     use self::rt::*;
     lazy_static! {
         static ref LANG: rt::Language = {
-            struct Impl { parser_definition: rt::ParserDefinition, lexer: rt::RegexLexer };
+            struct Impl {
+                parser_definition: rt::ParserDefinition,
+                lexer: rt::RegexLexer,
+            };
             impl rt::LanguageImpl for Impl {
                 fn parse(
                     &self,
@@ -59,7 +75,14 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::parse(&LANG, &self.lexer, &self.parser_definition, text, metrics, builder)
+                    rt::parse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        text,
+                        metrics,
+                        builder,
+                    )
                 }
 
                 fn reparse(
@@ -70,35 +93,92 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::reparse(&LANG, &self.lexer, &self.parser_definition, incremental_data, edit, new_text, metrics, builder)
+                    rt::reparse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        incremental_data,
+                        edit,
+                        new_text,
+                        metrics,
+                        builder,
+                    )
                 }
 
                 fn node_type_info(&self, ty: rt::NodeType) -> rt::NodeTypeInfo {
                     match ty {
-                        ERROR => rt::NodeTypeInfo { name: "ERROR", whitespace_like: false },
-                        WHITESPACE => rt::NodeTypeInfo { name: "WHITESPACE", whitespace_like: true },
-                        RAW_STRING => rt::NodeTypeInfo { name: "RAW_STRING", whitespace_like: false },
-                        FOO => rt::NodeTypeInfo { name: "FOO", whitespace_like: false },
-                        BAR => rt::NodeTypeInfo { name: "BAR", whitespace_like: false },
-                        T1 => rt::NodeTypeInfo { name: "T1", whitespace_like: false },
-                        T2 => rt::NodeTypeInfo { name: "T2", whitespace_like: false },
-                        T3 => rt::NodeTypeInfo { name: "T3", whitespace_like: false },
-                        T4 => rt::NodeTypeInfo { name: "T4", whitespace_like: false },
-                        LBRACE => rt::NodeTypeInfo { name: "LBRACE", whitespace_like: false },
-                        RBRACE => rt::NodeTypeInfo { name: "RBRACE", whitespace_like: false },
-                        ATOM => rt::NodeTypeInfo { name: "ATOM", whitespace_like: false },
-                        FILE => rt::NodeTypeInfo { name: "FILE", whitespace_like: false },
-                        PRIVATE_PARTIAL => rt::NodeTypeInfo { name: "PRIVATE_PARTIAL", whitespace_like: false },
-                        EMPTY => rt::NodeTypeInfo { name: "EMPTY", whitespace_like: false },
-                        BLOCK => rt::NodeTypeInfo { name: "BLOCK", whitespace_like: false },
-                        _ => panic!("Unknown rt::NodeType: {:?}", ty)
+                        ERROR => rt::NodeTypeInfo {
+                            name: "ERROR",
+                            whitespace_like: false,
+                        },
+                        WHITESPACE => rt::NodeTypeInfo {
+                            name: "WHITESPACE",
+                            whitespace_like: true,
+                        },
+                        RAW_STRING => rt::NodeTypeInfo {
+                            name: "RAW_STRING",
+                            whitespace_like: false,
+                        },
+                        FOO => rt::NodeTypeInfo {
+                            name: "FOO",
+                            whitespace_like: false,
+                        },
+                        BAR => rt::NodeTypeInfo {
+                            name: "BAR",
+                            whitespace_like: false,
+                        },
+                        T1 => rt::NodeTypeInfo {
+                            name: "T1",
+                            whitespace_like: false,
+                        },
+                        T2 => rt::NodeTypeInfo {
+                            name: "T2",
+                            whitespace_like: false,
+                        },
+                        T3 => rt::NodeTypeInfo {
+                            name: "T3",
+                            whitespace_like: false,
+                        },
+                        T4 => rt::NodeTypeInfo {
+                            name: "T4",
+                            whitespace_like: false,
+                        },
+                        LBRACE => rt::NodeTypeInfo {
+                            name: "LBRACE",
+                            whitespace_like: false,
+                        },
+                        RBRACE => rt::NodeTypeInfo {
+                            name: "RBRACE",
+                            whitespace_like: false,
+                        },
+                        ATOM => rt::NodeTypeInfo {
+                            name: "ATOM",
+                            whitespace_like: false,
+                        },
+                        FILE => rt::NodeTypeInfo {
+                            name: "FILE",
+                            whitespace_like: false,
+                        },
+                        PRIVATE_PARTIAL => rt::NodeTypeInfo {
+                            name: "PRIVATE_PARTIAL",
+                            whitespace_like: false,
+                        },
+                        EMPTY => rt::NodeTypeInfo {
+                            name: "EMPTY",
+                            whitespace_like: false,
+                        },
+                        BLOCK => rt::NodeTypeInfo {
+                            name: "BLOCK",
+                            whitespace_like: false,
+                        },
+                        _ => panic!("Unknown rt::NodeType: {:?}", ty),
                     }
                 }
             }
 
             rt::Language::new(Impl {
                 parser_definition: create_parser_definition(),
-                lexer: create_lexer()
+                lexer: create_lexer(),
             })
         };
     }
@@ -110,6 +190,7 @@ fn parse_raw_string(s: &str) -> Option<usize> {
     let quote_start = s.find('"').unwrap();
     let q_hashes = concat!('"', "######", "######", "######", "######", "######");
     let closing = &q_hashes[..quote_start];
-    s[quote_start + 1..].find(closing).map(|i| i + quote_start + 1 + closing.len())
+    s[quote_start + 1..]
+        .find(closing)
+        .map(|i| i + quote_start + 1 + closing.len())
 }
-

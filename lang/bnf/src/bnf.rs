@@ -1,5 +1,5 @@
-use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
+use fall_parse::runtime as rt;
 pub const WHITESPACE: rt::NodeType = rt::NodeType(100);
 pub const ARROW: rt::NodeType = rt::NodeType(101);
 pub const PIPE: rt::NodeType = rt::NodeType(102);
@@ -25,16 +25,28 @@ pub fn language() -> &'static rt::Language {
         ::fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
-                WHITESPACE, ARROW, PIPE, TERMINAL, NONTERMINAL, GRAMMAR, PROD, PROD_BODY, ALT, SYMBOL,
+                WHITESPACE,
+                ARROW,
+                PIPE,
+                TERMINAL,
+                NONTERMINAL,
+                GRAMMAR,
+                PROD,
+                PROD_BODY,
+                ALT,
+                SYMBOL,
             ],
             syntactical_rules: rt::parser_from_str(parser_json),
-            .. Default::default()
+            ..Default::default()
         }
     }
     use self::rt::*;
     lazy_static! {
         static ref LANG: rt::Language = {
-            struct Impl { parser_definition: rt::ParserDefinition, lexer: rt::RegexLexer };
+            struct Impl {
+                parser_definition: rt::ParserDefinition,
+                lexer: rt::RegexLexer,
+            };
             impl rt::LanguageImpl for Impl {
                 fn parse(
                     &self,
@@ -42,7 +54,14 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::parse(&LANG, &self.lexer, &self.parser_definition, text, metrics, builder)
+                    rt::parse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn reparse(
                     &self,
@@ -52,28 +71,70 @@ pub fn language() -> &'static rt::Language {
                     metrics: &rt::Metrics,
                     builder: &mut rt::TreeBuilder,
                 ) -> Option<Box<dyn std::any::Any + Sync + Send>> {
-                    rt::reparse(&LANG, &self.lexer, &self.parser_definition, incremental_data, edit, new_text, metrics, builder)
+                    rt::reparse(
+                        &LANG,
+                        &self.lexer,
+                        &self.parser_definition,
+                        incremental_data,
+                        edit,
+                        new_text,
+                        metrics,
+                        builder,
+                    )
                 }
                 fn node_type_info(&self, ty: rt::NodeType) -> rt::NodeTypeInfo {
                     match ty {
-                        ERROR => rt::NodeTypeInfo { name: "ERROR", whitespace_like: false },
-                        WHITESPACE => rt::NodeTypeInfo { name: "WHITESPACE", whitespace_like: true },
-                        ARROW => rt::NodeTypeInfo { name: "ARROW", whitespace_like: false },
-                        PIPE => rt::NodeTypeInfo { name: "PIPE", whitespace_like: false },
-                        TERMINAL => rt::NodeTypeInfo { name: "TERMINAL", whitespace_like: false },
-                        NONTERMINAL => rt::NodeTypeInfo { name: "NONTERMINAL", whitespace_like: false },
-                        GRAMMAR => rt::NodeTypeInfo { name: "GRAMMAR", whitespace_like: false },
-                        PROD => rt::NodeTypeInfo { name: "PROD", whitespace_like: false },
-                        PROD_BODY => rt::NodeTypeInfo { name: "PROD_BODY", whitespace_like: false },
-                        ALT => rt::NodeTypeInfo { name: "ALT", whitespace_like: false },
-                        SYMBOL => rt::NodeTypeInfo { name: "SYMBOL", whitespace_like: false },
-                        _ => panic!("Unknown rt::NodeType: {:?}", ty)
+                        ERROR => rt::NodeTypeInfo {
+                            name: "ERROR",
+                            whitespace_like: false,
+                        },
+                        WHITESPACE => rt::NodeTypeInfo {
+                            name: "WHITESPACE",
+                            whitespace_like: true,
+                        },
+                        ARROW => rt::NodeTypeInfo {
+                            name: "ARROW",
+                            whitespace_like: false,
+                        },
+                        PIPE => rt::NodeTypeInfo {
+                            name: "PIPE",
+                            whitespace_like: false,
+                        },
+                        TERMINAL => rt::NodeTypeInfo {
+                            name: "TERMINAL",
+                            whitespace_like: false,
+                        },
+                        NONTERMINAL => rt::NodeTypeInfo {
+                            name: "NONTERMINAL",
+                            whitespace_like: false,
+                        },
+                        GRAMMAR => rt::NodeTypeInfo {
+                            name: "GRAMMAR",
+                            whitespace_like: false,
+                        },
+                        PROD => rt::NodeTypeInfo {
+                            name: "PROD",
+                            whitespace_like: false,
+                        },
+                        PROD_BODY => rt::NodeTypeInfo {
+                            name: "PROD_BODY",
+                            whitespace_like: false,
+                        },
+                        ALT => rt::NodeTypeInfo {
+                            name: "ALT",
+                            whitespace_like: false,
+                        },
+                        SYMBOL => rt::NodeTypeInfo {
+                            name: "SYMBOL",
+                            whitespace_like: false,
+                        },
+                        _ => panic!("Unknown rt::NodeType: {:?}", ty),
                     }
                 }
             }
             rt::Language::new(Impl {
                 parser_definition: create_parser_definition(),
-                lexer: create_lexer()
+                lexer: create_lexer(),
             })
         };
     }
@@ -82,7 +143,9 @@ pub fn language() -> &'static rt::Language {
 #[allow(unused)]
 use self::rt::AstNode;
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Grammar<'f> { node: rt::Node<'f> }
+pub struct Grammar<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Grammar<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == GRAMMAR {
@@ -91,7 +154,9 @@ impl<'f> rt::AstNode<'f> for Grammar<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Grammar<'f> {
     pub fn productions(&self) -> rt::AstChildren<'f, Prod<'f>> {
@@ -106,7 +171,9 @@ impl<'f> ::std::fmt::Debug for Grammar<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Prod<'f> { node: rt::Node<'f> }
+pub struct Prod<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Prod<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == PROD {
@@ -115,7 +182,9 @@ impl<'f> rt::AstNode<'f> for Prod<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Prod<'f> {
     pub fn head(&self) -> Nonterminal<'f> {
@@ -133,7 +202,9 @@ impl<'f> ::std::fmt::Debug for Prod<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Alt<'f> { node: rt::Node<'f> }
+pub struct Alt<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Alt<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == ALT {
@@ -142,7 +213,9 @@ impl<'f> rt::AstNode<'f> for Alt<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
 impl<'f> Alt<'f> {
     pub fn symbols(&self) -> rt::AstChildren<'f, Symbol<'f>> {
@@ -157,7 +230,9 @@ impl<'f> ::std::fmt::Debug for Alt<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Terminal<'f> { node: rt::Node<'f> }
+pub struct Terminal<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Terminal<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == TERMINAL {
@@ -166,10 +241,11 @@ impl<'f> rt::AstNode<'f> for Terminal<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> Terminal<'f> {
-}
+impl<'f> Terminal<'f> {}
 impl<'f> ::std::fmt::Debug for Terminal<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("Terminal@")?;
@@ -178,7 +254,9 @@ impl<'f> ::std::fmt::Debug for Terminal<'f> {
     }
 }
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Nonterminal<'f> { node: rt::Node<'f> }
+pub struct Nonterminal<'f> {
+    node: rt::Node<'f>,
+}
 impl<'f> rt::AstNode<'f> for Nonterminal<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if node.ty() == NONTERMINAL {
@@ -187,10 +265,11 @@ impl<'f> rt::AstNode<'f> for Nonterminal<'f> {
             None
         }
     }
-    fn node(self) -> rt::Node<'f> { self.node }
+    fn node(self) -> rt::Node<'f> {
+        self.node
+    }
 }
-impl<'f> Nonterminal<'f> {
-}
+impl<'f> Nonterminal<'f> {}
 impl<'f> ::std::fmt::Debug for Nonterminal<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str("Nonterminal@")?;
@@ -200,31 +279,31 @@ impl<'f> ::std::fmt::Debug for Nonterminal<'f> {
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Symbol<'f> {
-        Terminal(Terminal<'f>),
-        Nonterminal(Nonterminal<'f>),
+    Terminal(Terminal<'f>),
+    Nonterminal(Nonterminal<'f>),
 }
 impl<'f> rt::AstNode<'f> for Symbol<'f> {
     fn wrap(node: rt::Node<'f>) -> Option<Self> {
         if let Some(n) = Terminal::wrap(node) {
-            return Some(Symbol::Terminal(n))
+            return Some(Symbol::Terminal(n));
         }
         if let Some(n) = Nonterminal::wrap(node) {
-            return Some(Symbol::Nonterminal(n))
+            return Some(Symbol::Nonterminal(n));
         }
         None
     }
     fn node(self) -> rt::Node<'f> {
         match self {
-                Symbol::Terminal(n) => n.node(),
-                Symbol::Nonterminal(n) => n.node(),
+            Symbol::Terminal(n) => n.node(),
+            Symbol::Nonterminal(n) => n.node(),
         }
     }
 }
 impl<'f> ::std::fmt::Debug for Symbol<'f> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         f.write_str(match *self {
-                Symbol::Terminal(..) => "Terminal@",
-                Symbol::Nonterminal(..) => "Nonterminal@",
+            Symbol::Terminal(..) => "Terminal@",
+            Symbol::Nonterminal(..) => "Nonterminal@",
         })?;
         rt::AstNode::node(*self).range().fmt(f)?;
         Ok(())

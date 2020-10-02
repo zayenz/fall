@@ -3,7 +3,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate fall_tree;
 
-use fall_tree::{File, dump_file, TextEdit, TextRange, FileEdit};
+use fall_tree::{dump_file, File, FileEdit, TextEdit, TextRange};
 
 pub mod hl;
 use self::hl::Highlights;
@@ -12,22 +12,24 @@ mod extend_selection;
 
 pub mod actions;
 
-
 #[derive(Serialize, Debug)]
 pub struct FileStructureNode {
     pub name: String,
     pub range: TextRange,
-    pub children: Vec<FileStructureNode>
+    pub children: Vec<FileStructureNode>,
 }
 
 #[derive(Serialize, Debug, Copy, Clone)]
-pub enum Severity { Error, Warning }
+pub enum Severity {
+    Error,
+    Warning,
+}
 
 #[derive(Serialize, Debug, Clone)]
 pub struct Diagnostic {
     pub range: TextRange,
     pub severity: Severity,
-    pub message: String
+    pub message: String,
 }
 
 pub trait EditorFileImpl: Sync + 'static {
@@ -67,7 +69,6 @@ pub trait EditorFileImpl: Sync + 'static {
 
     fn file(&self) -> &File;
 }
-
 
 pub fn gen_syntax_tree(file: &File) -> String {
     dump_file(&file)

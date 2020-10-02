@@ -1,6 +1,6 @@
+use crate::{File, Metrics, NodeType, NodeTypeInfo, Text, TextBuf, TextEdit, TreeBuilder};
 use std::any::Any;
 use std::sync::Arc;
-use crate::{Text, TextBuf, TextEdit, File, NodeType, NodeTypeInfo, Metrics, TreeBuilder};
 
 pub trait LanguageImpl: 'static + Send + Sync {
     fn parse(
@@ -24,7 +24,7 @@ pub trait LanguageImpl: 'static + Send + Sync {
 
 #[derive(Clone)]
 pub struct Language {
-    imp: Arc<dyn LanguageImpl>
+    imp: Arc<dyn LanguageImpl>,
 }
 
 impl Language {
@@ -45,7 +45,13 @@ impl Language {
         let metrics = Metrics::new();
         let mut builder = TreeBuilder::new();
         let incremental = if let Some(incremental) = file.incremental_data() {
-            self.imp.reparse(incremental, edit, new_text.as_text(), &metrics, &mut builder)
+            self.imp.reparse(
+                incremental,
+                edit,
+                new_text.as_text(),
+                &metrics,
+                &mut builder,
+            )
         } else {
             self.imp.parse(new_text.as_text(), &metrics, &mut builder)
         };

@@ -1,15 +1,13 @@
 use serde_json;
 use tera::Context;
 
-use fall_tree::{Text, AstNode};
-use lang_fall::syntax::{FallFile, SynRule, LexRule, Expr, BlockExpr,
-                        MethodDef, Parameter};
-use lang_fall::{RefKind, CallKind, MethodKind, Analysis, PratVariant, PrattOp, Arity, ChildKind};
+use fall_tree::{AstNode, Text};
+use lang_fall::syntax::{BlockExpr, Expr, FallFile, LexRule, MethodDef, Parameter, SynRule};
+use lang_fall::{Analysis, Arity, CallKind, ChildKind, MethodKind, PratVariant, PrattOp, RefKind};
 
 use fall_parse as dst;
 
-use crate::util::{scream, camel};
-
+use crate::util::{camel, scream};
 
 pub type Result<T> = std::result::Result<T, ::failure::Error>;
 
@@ -25,17 +23,15 @@ impl<'a, 'f> Codegen<'a, 'f> {
         let node_types = {
             let mut result = Vec::new();
             if let Some(tokenizer) = analysis.ast().tokenizer_def() {
-                result.extend(
-                    tokenizer.lex_rules()
-                        .map(|r| (r.node_type(), r.is_skip()))
-                )
+                result.extend(tokenizer.lex_rules().map(|r| (r.node_type(), r.is_skip())))
             }
             result.extend(
-                analysis.ast()
+                analysis
+                    .ast()
                     .syn_rules()
                     .filter(|r| r.is_pub() && r.type_attr().is_none())
                     .filter_map(|r| r.name())
-                    .map(|n| (n, false))
+                    .map(|n| (n, false)),
             );
             result
         };
@@ -61,54 +57,84 @@ impl<'a, 'f> Codegen<'a, 'f> {
         let parser = serde_json::to_string(&self.expressions).unwrap();
         context.insert("parser_json", &parser);
 
-        let lex_rules = self.file().tokenizer_def()
+        let lex_rules = self
+            .file()
+            .tokenizer_def()
             .ok_or(format_err!("no tokens defined"))?
             .lex_rules()
             .filter(|r| !r.is_contextual())
             .map(|r| {
                 let re = r.token_re().ok_or(format_err!("Bad token"))?;
-                Ok(CtxLexRule { ty: r.node_type(), re: format!("{:?}", re), f: r.extern_fn() })
-            }).collect::<Result<Vec<_>>>()?;
+                Ok(CtxLexRule {
+                    ty: r.node_type(),
+                    re: format!("{:?}", re),
+                    f: r.extern_fn(),
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
 
         context.insert("lex_rules", &lex_rules);
 
         let verbatim = self.file().verbatim_def().map(|v| v.contents());
         context.insert("verbatim", &verbatim);
-        context.insert("has_whitespace_binder", &verbatim.map(|t| t.contains("whitespace_binder")).unwrap_or(false));
-
+        context.insert(
+            "has_whitespace_binder",
+            &verbatim
+                .map(|t| t.contains("whitespace_binder"))
+                .unwrap_or(false),
+        );
 
         if let Some(ast) = self.file().ast_def() {
-            context.insert("ast_nodes", &ast.ast_nodes().map(|node| {
-                Ok(CtxAstNode {
-                    struct_name: camel(node.name()),
-                    node_type_name: scream(node.name()),
-                    methods: node.methods()
-                        .map(|method| self.gen_method(method))
-                        .collect::<Result<Vec<CtxMethod>>>()?,
-                })
-            }).collect::<Result<Vec<_>>>()?);
-
-            context.insert("ast_classes", &ast.ast_classes().map(|class| {
-                CtxAstClass {
-                    enum_name: camel(class.name()),
-                    variants: class.variants().map(|variant| (scream(variant), camel(variant))).collect(),
-                }
-            }).collect::<Vec<_>>());
-
-            context.insert("ast_traits", &ast.ast_traits().map(|trait_| {
-                Ok(CtxAstTrait {
-                    trait_name: camel(trait_.name()),
-                    methods: trait_.methods()
-                        .map(|method| self.gen_method(method))
-                        .collect::<Result<Vec<CtxMethod>>>()?,
-                    impl_for: ast.ast_nodes()
-                        .filter(|&node| {
-                            self.analysis.ast_node_traits(node).contains(&trait_)
+            context.insert(
+                "ast_nodes",
+                &ast.ast_nodes()
+                    .map(|node| {
+                        Ok(CtxAstNode {
+                            struct_name: camel(node.name()),
+                            node_type_name: scream(node.name()),
+                            methods: node
+                                .methods()
+                                .map(|method| self.gen_method(method))
+                                .collect::<Result<Vec<CtxMethod>>>()?,
                         })
-                        .map(|node| camel(node.name()))
-                        .collect(),
-                })
-            }).collect::<Result<Vec<_>>>()?);
+                    })
+                    .collect::<Result<Vec<_>>>()?,
+            );
+
+            context.insert(
+                "ast_classes",
+                &ast.ast_classes()
+                    .map(|class| CtxAstClass {
+                        enum_name: camel(class.name()),
+                        variants: class
+                            .variants()
+                            .map(|variant| (scream(variant), camel(variant)))
+                            .collect(),
+                    })
+                    .collect::<Vec<_>>(),
+            );
+
+            context.insert(
+                "ast_traits",
+                &ast.ast_traits()
+                    .map(|trait_| {
+                        Ok(CtxAstTrait {
+                            trait_name: camel(trait_.name()),
+                            methods: trait_
+                                .methods()
+                                .map(|method| self.gen_method(method))
+                                .collect::<Result<Vec<CtxMethod>>>()?,
+                            impl_for: ast
+                                .ast_nodes()
+                                .filter(|&node| {
+                                    self.analysis.ast_node_traits(node).contains(&trait_)
+                                })
+                                .map(|node| camel(node.name()))
+                                .collect(),
+                        })
+                    })
+                    .collect::<Result<Vec<_>>>()?,
+            );
         }
 
         Ok(context)
@@ -120,26 +146,35 @@ impl<'a, 'f> Codegen<'a, 'f> {
 
     fn syn_rule_ty(&self, rule: SynRule<'f>) -> Option<dst::NodeTypeRef> {
         let name = rule.ty_name()?;
-        self.node_types.iter()
+        self.node_types
+            .iter()
             .position(|&(ty_name, _)| ty_name == name)
             .map(|i| dst::NodeTypeRef((i + 1) as u32))
     }
 
     fn syn_rule_ref(&self, rule: SynRule<'f>) -> dst::ExprRef {
-        let idx = self.file().syn_rules().position(|r| r.node() == rule.node()).unwrap();
+        let idx = self
+            .file()
+            .syn_rules()
+            .position(|r| r.node() == rule.node())
+            .unwrap();
         dst::ExprRef(idx as u32)
     }
 
     fn lex_rule_ty(&self, rule: LexRule<'f>) -> dst::NodeTypeRef {
         let name = rule.node_type();
-        let i = self.node_types.iter()
+        let i = self
+            .node_types
+            .iter()
             .position(|&(ty_name, _)| ty_name == name)
             .unwrap();
         dst::NodeTypeRef((i + 1) as u32)
     }
 
     fn param_ref(&self, param: Parameter<'f>) -> dst::Arg {
-        let idx = self.file().syn_rules()
+        let idx = self
+            .file()
+            .syn_rules()
             .filter_map(|rule| rule.parameters())
             .flat_map(|p| p.parameters())
             .position(|p| p.node() == param.node())
@@ -155,14 +190,11 @@ impl<'a, 'f> Codegen<'a, 'f> {
                 self.push_expr(pratt)
             }
             (true, _) => unreachable!(),
-            (false, body) => self.gen_expr(body)?
+            (false, body) => self.gen_expr(body)?,
         };
 
         let body = match (self.syn_rule_ty(rule), rule.is_replaces(), rule.is_cached()) {
-            (Some(ty), true, _) => dst::Expr::PubReplace {
-                ty,
-                body,
-            },
+            (Some(ty), true, _) => dst::Expr::PubReplace { ty, body },
             (Some(ty), false, false) => dst::Expr::Pub {
                 ty,
                 body,
@@ -198,15 +230,20 @@ impl<'a, 'f> Codegen<'a, 'f> {
 
     fn gen_expr(&mut self, expr: Expr<'f>) -> Result<dst::ExprRef> {
         let result = match expr {
-            Expr::BlockExpr(block) =>
-                dst::Expr::Or(block.alts().map(|e| self.gen_expr(e)).collect::<Result<Vec<_>>>()?),
+            Expr::BlockExpr(block) => dst::Expr::Or(
+                block
+                    .alts()
+                    .map(|e| self.gen_expr(e))
+                    .collect::<Result<Vec<_>>>()?,
+            ),
 
             Expr::SeqExpr(seq) => {
                 fn is_commit(part: Expr) -> bool {
                     part.node().text() == "<commit>"
                 }
                 let commit = seq.parts().position(is_commit);
-                let parts = seq.parts()
+                let parts = seq
+                    .parts()
                     .filter(|&p| !is_commit(p))
                     .map(|e| self.gen_expr(e))
                     .collect::<Result<Vec<_>>>()?;
@@ -214,7 +251,9 @@ impl<'a, 'f> Codegen<'a, 'f> {
             }
 
             Expr::RefExpr(ref_) => {
-                let ref_ = self.analysis.resolve_reference(ref_)
+                let ref_ = self
+                    .analysis
+                    .resolve_reference(ref_)
                     .ok_or(format_err!("Unresolved references: {}", ref_.node().text()))?;
 
                 match ref_ {
@@ -237,36 +276,31 @@ impl<'a, 'f> Codegen<'a, 'f> {
             }
 
             Expr::CallExpr(call) => {
-                let call = self.analysis.resolve_call(call)
+                let call = self
+                    .analysis
+                    .resolve_call(call)
                     .ok_or(format_err!("Failed to compile {}", call.node().text()))?;
 
                 match call {
                     CallKind::Eof => dst::Expr::Eof,
                     CallKind::Any => dst::Expr::Any,
-                    CallKind::Enter(idx, expr) => dst::Expr::Enter(
-                        dst::Context(idx as u32),
-                        self.gen_expr(expr)?,
-                    ),
-                    CallKind::Exit(idx, expr) => dst::Expr::Exit(
-                        dst::Context(idx as u32),
-                        self.gen_expr(expr)?,
-                    ),
-                    CallKind::IsIn(idx) => dst::Expr::IsIn(
-                        dst::Context(idx as u32)
-                    ),
+                    CallKind::Enter(idx, expr) => {
+                        dst::Expr::Enter(dst::Context(idx as u32), self.gen_expr(expr)?)
+                    }
+                    CallKind::Exit(idx, expr) => {
+                        dst::Expr::Exit(dst::Context(idx as u32), self.gen_expr(expr)?)
+                    }
+                    CallKind::IsIn(idx) => dst::Expr::IsIn(dst::Context(idx as u32)),
                     CallKind::Not(expr) => dst::Expr::Not(self.gen_expr(expr)?),
-                    CallKind::Layer(e1, e2) => dst::Expr::Layer(
-                        self.gen_expr(e1)?,
-                        self.gen_expr(e2)?,
-                    ),
-                    CallKind::WithSkip(e1, e2) => dst::Expr::WithSkip(
-                        self.gen_expr(e1)?,
-                        self.gen_expr(e2)?,
-                    ),
-                    CallKind::Inject(e1, e2) => dst::Expr::Inject(
-                        self.gen_expr(e1)?,
-                        self.gen_expr(e2)?,
-                    ),
+                    CallKind::Layer(e1, e2) => {
+                        dst::Expr::Layer(self.gen_expr(e1)?, self.gen_expr(e2)?)
+                    }
+                    CallKind::WithSkip(e1, e2) => {
+                        dst::Expr::WithSkip(self.gen_expr(e1)?, self.gen_expr(e2)?)
+                    }
+                    CallKind::Inject(e1, e2) => {
+                        dst::Expr::Inject(self.gen_expr(e1)?, self.gen_expr(e2)?)
+                    }
                     CallKind::RuleCall(rule, args) => dst::Expr::Call(
                         self.syn_rule_ref(rule),
                         args.iter()
@@ -274,7 +308,10 @@ impl<'a, 'f> Codegen<'a, 'f> {
                             .collect::<Result<Vec<_>>>()?,
                     ),
                     CallKind::PrevIs(tokens) => dst::Expr::PrevIs(
-                        tokens.iter().map(|&r| self.syn_rule_ty(r).unwrap()).collect()
+                        tokens
+                            .iter()
+                            .map(|&r| self.syn_rule_ty(r).unwrap())
+                            .collect(),
                     ),
                     CallKind::Commit => panic!("Should be handled specially"),
                 }
@@ -294,9 +331,9 @@ impl<'a, 'f> Codegen<'a, 'f> {
                         Some(RefKind::RuleReference(rule)) => Ok(rule),
                         _ => return Err(format_err!("Bad pratt spec")),
                     },
-                    _ => return Err(format_err!("Bad pratt spec"))
+                    _ => return Err(format_err!("Bad pratt spec")),
                 },
-                _ => return Err(format_err!("Bad pratt spec"))
+                _ => return Err(format_err!("Bad pratt spec")),
             }
         }
 
@@ -308,15 +345,17 @@ impl<'a, 'f> Codegen<'a, 'f> {
         for alt in ast.alts() {
             let rule = alt_to_rule(&self.analysis, alt)?;
 
-            let ty = self.syn_rule_ty(rule)
+            let ty = self
+                .syn_rule_ty(rule)
                 .ok_or(format_err!("non public pratt rule"))?;
 
-            let prat_kind = self.analysis.resolve_pratt_variant(rule)
+            let prat_kind = self
+                .analysis
+                .resolve_pratt_variant(rule)
                 .ok_or(format_err!("pratt rule without attributes"))?;
 
             match prat_kind {
-                PratVariant::Atom(_) =>
-                    result.atoms.push(self.syn_rule_ref(rule)),
+                PratVariant::Atom(_) => result.atoms.push(self.syn_rule_ref(rule)),
                 PratVariant::Postfix(PrattOp { op, priority }) => {
                     result.infixes.push(dst::Infix {
                         ty,
@@ -347,66 +386,85 @@ impl<'a, 'f> Codegen<'a, 'f> {
     }
 
     fn gen_method(&self, method: MethodDef<'f>) -> Result<CtxMethod<'f>> {
-        let description = self.analysis.resolve_method(method)
+        let description = self
+            .analysis
+            .resolve_method(method)
             .ok_or(format_err!("Bad method `{}`", method.node().text()))?;
 
         let (ret_type, body) = match description {
             MethodKind::TextAccessor(lex_rule, arity) => {
                 let node_type = scream(lex_rule.node_type());
                 match arity {
-                    Arity::Single =>
-                        ("rt::Text<'f>".to_owned(),
-                         format!("rt::child_of_type_exn(self.node(), {}).text()", node_type)),
+                    Arity::Single => (
+                        "rt::Text<'f>".to_owned(),
+                        format!("rt::child_of_type_exn(self.node(), {}).text()", node_type),
+                    ),
 
-                    Arity::Optional =>
-                        ("Option<rt::Text<'f>>".to_owned(),
-                         format!("rt::child_of_type(self.node(), {}).map(|n| n.text())", node_type)),
+                    Arity::Optional => (
+                        "Option<rt::Text<'f>>".to_owned(),
+                        format!(
+                            "rt::child_of_type(self.node(), {}).map(|n| n.text())",
+                            node_type
+                        ),
+                    ),
 
                     Arity::Many => unimplemented!(),
                 }
             }
-            MethodKind::NodeAccessor(kind, arity) => {
-                match (kind, arity) {
-                    (ChildKind::AstNode(n), Arity::Single) =>
-                        (format!("{}<'f>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children()).next().unwrap()".to_owned()),
-                    (ChildKind::AstNode(n), Arity::Optional) =>
-                        (format!("Option<{}<'f>>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children()).next()".to_owned()),
-                    (ChildKind::AstNode(n), Arity::Many) =>
-                        (format!("rt::AstChildren<'f, {}<'f>>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children())".to_owned()),
+            MethodKind::NodeAccessor(kind, arity) => match (kind, arity) {
+                (ChildKind::AstNode(n), Arity::Single) => (
+                    format!("{}<'f>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children()).next().unwrap()".to_owned(),
+                ),
+                (ChildKind::AstNode(n), Arity::Optional) => (
+                    format!("Option<{}<'f>>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children()).next()".to_owned(),
+                ),
+                (ChildKind::AstNode(n), Arity::Many) => (
+                    format!("rt::AstChildren<'f, {}<'f>>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children())".to_owned(),
+                ),
 
-                    (ChildKind::AstClass(n), Arity::Single) =>
-                        (format!("{}<'f>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children()).next().unwrap()".to_owned()),
-                    (ChildKind::AstClass(n), Arity::Optional) =>
-                        (format!("Option<{}<'f>>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children()).next()".to_owned()),
-                    (ChildKind::AstClass(n), Arity::Many) =>
-                        (format!("rt::AstChildren<'f, {}<'f>>", camel(n.name())),
-                         "rt::AstChildren::new(self.node().children())".to_owned()),
+                (ChildKind::AstClass(n), Arity::Single) => (
+                    format!("{}<'f>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children()).next().unwrap()".to_owned(),
+                ),
+                (ChildKind::AstClass(n), Arity::Optional) => (
+                    format!("Option<{}<'f>>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children()).next()".to_owned(),
+                ),
+                (ChildKind::AstClass(n), Arity::Many) => (
+                    format!("rt::AstChildren<'f, {}<'f>>", camel(n.name())),
+                    "rt::AstChildren::new(self.node().children())".to_owned(),
+                ),
 
-                    (ChildKind::Token(lex_rule), arity) => {
-                        let node_type = scream(lex_rule.node_type());
-                        match arity {
-                            Arity::Single =>
-                                ("rt::Node<'f>".to_owned(),
-                                 format!("self.node().children().find(|n| n.ty() == {}).unwrap()", node_type)),
-                            Arity::Optional =>
-                                ("Option<rt::Node<'f>>".to_owned(),
-                                 format!("self.node().children().find(|n| n.ty() == {})", node_type)),
-                            Arity::Many => unimplemented!(),
-                        }
+                (ChildKind::Token(lex_rule), arity) => {
+                    let node_type = scream(lex_rule.node_type());
+                    match arity {
+                        Arity::Single => (
+                            "rt::Node<'f>".to_owned(),
+                            format!(
+                                "self.node().children().find(|n| n.ty() == {}).unwrap()",
+                                node_type
+                            ),
+                        ),
+                        Arity::Optional => (
+                            "Option<rt::Node<'f>>".to_owned(),
+                            format!("self.node().children().find(|n| n.ty() == {})", node_type),
+                        ),
+                        Arity::Many => unimplemented!(),
                     }
                 }
-            }
+            },
         };
 
-        Ok(CtxMethod { name: method.name(), ret_type, body })
+        Ok(CtxMethod {
+            name: method.name(),
+            ret_type,
+            body,
+        })
     }
 }
-
 
 #[derive(Serialize)]
 struct CtxLexRule<'f> {
@@ -441,4 +499,3 @@ struct CtxMethod<'f> {
     ret_type: String,
     body: String,
 }
-

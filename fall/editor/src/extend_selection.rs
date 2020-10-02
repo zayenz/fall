@@ -1,6 +1,5 @@
-use fall_tree::{TextRange, Node, File, TextSuffix};
-use fall_tree::search::{ancestors, find_leaf_at_offset, find_covering_node};
-
+use fall_tree::search::{ancestors, find_covering_node, find_leaf_at_offset};
+use fall_tree::{File, Node, TextRange, TextSuffix};
 
 pub fn extend_selection(file: &File, range: TextRange) -> Option<TextRange> {
     let lang = file.language();
@@ -12,11 +11,12 @@ pub fn extend_selection(file: &File, range: TextRange) -> Option<TextRange> {
             return Some(leaf.range());
         }
         let ws = leaves.next()?;
-        let ws_suffix = file.text().slice(
-            TextRange::from_to(offset, ws.range().end())
-        );
+        let ws_suffix = file
+            .text()
+            .slice(TextRange::from_to(offset, ws.range().end()));
         if ws.text().contains("\n") && !ws_suffix.contains("\n") {
-            if let Some(line_end) = file.text()
+            if let Some(line_end) = file
+                .text()
                 .slice(TextSuffix::from(ws.range().end()))
                 .find("\n")
             {

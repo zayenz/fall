@@ -1,9 +1,9 @@
-use itertools::Itertools;
 use super::{PratVariant, PrattOp};
-use fall_tree::AstNode;
-use crate::analysis::diagnostics::DiagnosticSink;
 use crate::analysis::db::{self, DB};
+use crate::analysis::diagnostics::DiagnosticSink;
 use crate::syntax::Expr;
+use fall_tree::AstNode;
+use itertools::Itertools;
 
 impl<'f> db::OnceQExecutor<'f> for super::ResolvePrattVariant<'f> {
     fn execute(self, _: &DB<'f>, d: &mut DiagnosticSink) -> Option<PratVariant<'f>> {
@@ -19,10 +19,12 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolvePrattVariant<'f> {
                 None => return None,
                 Some(attrs) => attrs,
             };
-            match kinds.iter()
+            match kinds
+                .iter()
                 .filter_map(|&k| attrs.find(k).map(|a| (k, a)))
                 .next()
-                .map(|(k, a)| (k, a.u32_value())) {
+                .map(|(k, a)| (k, a.u32_value()))
+            {
                 Some(a) => a,
                 None => return None,
             }
@@ -37,14 +39,14 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolvePrattVariant<'f> {
 
         let args = match rule.body() {
             Expr::BlockExpr(block) => match block.alts().collect_tuple() {
-                Some((alt, )) => match alt {
+                Some((alt,)) => match alt {
                     Expr::SeqExpr(args) => args.parts(),
                     _ => return None,
                 },
                 None => {
                     d.error(
                         block.node(),
-                        "Expression rule requires a single alternative"
+                        "Expression rule requires a single alternative",
                     );
                     return None;
                 }
@@ -57,12 +59,12 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolvePrattVariant<'f> {
                 if let Some((_expr, op)) = args.collect_tuple() {
                     PratVariant::Postfix(PrattOp {
                         op,
-                        priority: priority.unwrap_or(999)
+                        priority: priority.unwrap_or(999),
                     })
                 } else {
                     d.error(
                         rule.body().node(),
-                        "Postfix rule requires a single expression and an operation"
+                        "Postfix rule requires a single expression and an operation",
                     );
                     return None;
                 }
@@ -71,39 +73,34 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolvePrattVariant<'f> {
                 if let Some((op, _expr)) = args.collect_tuple() {
                     PratVariant::Prefix(PrattOp {
                         op,
-                        priority: priority.unwrap_or(999)
+                        priority: priority.unwrap_or(999),
                     })
                 } else {
                     d.error(
                         rule.body().node(),
-                        "Prefix rule requires an operation and a single expression"
+                        "Prefix rule requires an operation and a single expression",
                     );
                     return None;
                 }
             }
-            "bin" => {
-                match (args.collect_tuple(), priority) {
-                    (Some((_lhs, op, _rhs)), Some(priority)) => PratVariant::Bin(
-                        PrattOp { op, priority }
-                    ),
-                    (None, _) => {
-                        d.error(
-                            rule.body().node(),
-                            "Binary expression requires a left hand side expression, an operator \
-                             and a right hand side expression"
-                        );
-                        return None;
-                    }
-                    (Some(_), None) => {
-                        d.error(
-                            name_ident,
-                            "Binary expression requires explicit priority"
-                        );
-                        return None;
-                    }
+            "bin" => match (args.collect_tuple(), priority) {
+                (Some((_lhs, op, _rhs)), Some(priority)) => {
+                    PratVariant::Bin(PrattOp { op, priority })
                 }
-            }
-            _ => unreachable!()
+                (None, _) => {
+                    d.error(
+                        rule.body().node(),
+                        "Binary expression requires a left hand side expression, an operator \
+                             and a right hand side expression",
+                    );
+                    return None;
+                }
+                (Some(_), None) => {
+                    d.error(name_ident, "Binary expression requires explicit priority");
+                    return None;
+                }
+            },
+            _ => unreachable!(),
         };
         Some(result)
     }
@@ -117,7 +114,7 @@ mod tests {
     fn pratt_atom() {
         check_diagnostics(
             "#[atom(92)] rule foo { }",
-            "E foo: Atom rules don't have priority"
+            "E foo: Atom rules don't have priority",
         );
     }
 
@@ -125,7 +122,7 @@ mod tests {
     fn pratt_args() {
         check_diagnostics(
             "#[postfix] rule foo { foo | foo }",
-            "E { foo | foo }: Expression rule requires a single alternative"
+            "E { foo | foo }: Expression rule requires a single alternative",
         );
     }
 
@@ -133,7 +130,7 @@ mod tests {
     fn pratt_postfix() {
         check_diagnostics(
             "#[postfix] rule foo { <eof> <eof> <eof>}",
-            "E { <eof> <eof> <eof>}: Postfix rule requires a single expression and an operation"
+            "E { <eof> <eof> <eof>}: Postfix rule requires a single expression and an operation",
         );
     }
 
@@ -141,7 +138,7 @@ mod tests {
     fn pratt_prefix() {
         check_diagnostics(
             "#[prefix] rule foo { }",
-            "E { }: Prefix rule requires an operation and a single expression"
+            "E { }: Prefix rule requires an operation and a single expression",
         );
     }
 
@@ -150,11 +147,11 @@ mod tests {
         check_diagnostics(
             "#[bin(92)] rule foo { }",
             "E { }: Binary expression requires a left hand side expression, an operator \
-             and a right hand side expression"
+             and a right hand side expression",
         );
         check_diagnostics(
             "#[bin] rule foo { <eof> <eof> <eof> }",
-            "E foo: Binary expression requires explicit priority"
+            "E foo: Binary expression requires explicit priority",
         );
     }
 }

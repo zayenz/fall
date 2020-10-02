@@ -4,23 +4,27 @@ extern crate fall_tree;
 use fall_test::{arith, match_ast};
 use fall_tree::dump_file;
 
-
 fn ast(code: &str) -> String {
     dump_file(&arith::language().parse(code.to_owned()))
 }
 
 #[test]
 fn trivial() {
-    match_ast(&ast("1"), r#"
+    match_ast(
+        &ast("1"),
+        r#"
 FILE
   CONSTANT_EXPR
     NUMBER "1"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn simple() {
-    match_ast(&ast("1 + 2"), r#"
+    match_ast(
+        &ast("1 + 2"),
+        r#"
 FILE
   SUM_EXPR
     CONSTANT_EXPR
@@ -28,8 +32,11 @@ FILE
     PLUS "+"
     CONSTANT_EXPR
       NUMBER "2"
-"#);
-    match_ast(&ast("1 * 2"), r#"
+"#,
+    );
+    match_ast(
+        &ast("1 * 2"),
+        r#"
 FILE
   PRODUCT_EXPR
     CONSTANT_EXPR
@@ -37,12 +44,15 @@ FILE
     STAR "*"
     CONSTANT_EXPR
       NUMBER "2"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn associativity() {
-    match_ast(&ast("1 + 2 + 3"), r#"
+    match_ast(
+        &ast("1 + 2 + 3"),
+        r#"
   FILE
   SUM_EXPR
     SUM_EXPR
@@ -53,12 +63,15 @@ fn associativity() {
         NUMBER "2"
     PLUS "+"
     CONSTANT_EXPR
-      NUMBER "3""#);
+      NUMBER "3""#,
+    );
 }
 
 #[test]
 fn precedence() {
-    match_ast(&ast("1 + 2 * 3 + 4"), r#"
+    match_ast(
+        &ast("1 + 2 * 3 + 4"),
+        r#"
 FILE
   SUM_EXPR
     SUM_EXPR
@@ -74,12 +87,15 @@ FILE
     PLUS "+"
     CONSTANT_EXPR
       NUMBER "4"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn complex() {
-    match_ast(&ast("1 * (2 + 3) * 4"), r#"
+    match_ast(
+        &ast("1 * (2 + 3) * 4"),
+        r#"
 FILE
   PRODUCT_EXPR
     PRODUCT_EXPR
@@ -98,12 +114,15 @@ FILE
     STAR "*"
     CONSTANT_EXPR
       NUMBER "4"
-"#);
+"#,
+    );
 }
 
 #[test]
 fn postfix() {
-    match_ast(&ast("1! + 2!! + 3*4! * (5)!"), r#"
+    match_ast(
+        &ast("1! + 2!! + 3*4! * (5)!"),
+        r#"
 FILE
   SUM_EXPR
     SUM_EXPR
@@ -136,12 +155,15 @@ FILE
             NUMBER "5"
           RPAREN ")"
         BANG "!"
-"#)
+"#,
+    )
 }
 
 #[test]
 fn prefix_simple() {
-    match_ast(&ast("--1"), r#"
+    match_ast(
+        &ast("--1"),
+        r#"
 FILE
   NEGATE_EXPR
     MINUS "-"
@@ -149,13 +171,15 @@ FILE
       MINUS "-"
       CONSTANT_EXPR
         NUMBER "1"
-"#)
-
+"#,
+    )
 }
 
 #[test]
 fn prefix() {
-    match_ast(&ast("1 + --1! - -2!"), r#"
+    match_ast(
+        &ast("1 + --1! - -2!"),
+        r#"
 FILE
   SUM_EXPR
     SUM_EXPR
@@ -177,5 +201,6 @@ FILE
         CONSTANT_EXPR
           NUMBER "2"
         BANG "!"
-    "#)
+    "#,
+    )
 }

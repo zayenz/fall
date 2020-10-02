@@ -10,7 +10,6 @@ impl TextSlice for TextRange {
     }
 }
 
-
 #[derive(Copy, Clone)]
 pub struct TextSuffix(TextUnit);
 

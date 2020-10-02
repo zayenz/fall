@@ -1,13 +1,13 @@
 #[macro_use]
 extern crate proptest;
-extern crate lang_fall_syntax;
 extern crate fall_tree;
+extern crate lang_fall_syntax;
 
 use proptest::prelude::prop::collection::vec;
 
-use fall_tree::{TextBuf, TextRange, tu};
 use fall_tree::prop::{self, ArbTextEdit};
 use fall_tree::test_util::check_equal_files;
+use fall_tree::{tu, TextBuf, TextRange};
 
 use lang_fall_syntax::lang_fall;
 
@@ -21,9 +21,9 @@ fn regression1() {
             ops: vec![
                 (false, TextRange::from_to(tu(0), tu(2761050404))),
                 (true, TextRange::from_to(tu(0), tu(306783379))),
-            ]
+            ],
         },
-        ArbTextEdit { ops: vec![] }
+        ArbTextEdit { ops: vec![] },
     ];
     incremental_reparse_is_equivalent_to_full_parse(text, &edits);
 }
@@ -65,16 +65,16 @@ fn regression2() {
             ops: vec![
                 (false, TextRange::from_to(tu(3166362751), tu(3417163761))),
                 (true, TextRange::from_to(tu(135850548), tu(689702778))),
-                (true, TextRange::from_to(tu(762853072), tu(2664760731)))
-            ]
+                (true, TextRange::from_to(tu(762853072), tu(2664760731))),
+            ],
         },
         ArbTextEdit {
             ops: vec![
                 (true, TextRange::from_to(tu(0), tu(0))),
                 (true, TextRange::from_to(tu(0), tu(1426128137))),
-                (true, TextRange::from_to(tu(1442711022), tu(1459293908)))
-            ]
-        }
+                (true, TextRange::from_to(tu(1442711022), tu(1459293908))),
+            ],
+        },
     ];
     incremental_reparse_is_equivalent_to_full_parse(text, &edits);
 }
@@ -116,21 +116,21 @@ fn regression3() {
             ops: vec![
                 (true, TextRange::from_to(tu(679252736), tu(1421205723))),
                 (true, TextRange::from_to(tu(1786957196), tu(2340809426))),
-                (true, TextRange::from_to(tu(2476659974), tu(2591610436)))
-            ]
+                (true, TextRange::from_to(tu(2476659974), tu(2591610436))),
+            ],
         },
         ArbTextEdit {
             ops: vec![
                 (true, TextRange::from_to(tu(0), tu(540847734))),
-                (true, TextRange::from_to(tu(2036132644), tu(3149642683)))
-            ]
+                (true, TextRange::from_to(tu(2036132644), tu(3149642683))),
+            ],
         },
         ArbTextEdit {
             ops: vec![
                 (true, TextRange::from_to(tu(0), tu(4129776246))),
-                (false, TextRange::from_to(tu(0), tu(1817101548)))
-            ]
-        }
+                (false, TextRange::from_to(tu(0), tu(1817101548))),
+            ],
+        },
     ];
     incremental_reparse_is_equivalent_to_full_parse(text, &edits);
 }
@@ -181,10 +181,7 @@ proptest! {
     }
 }
 
-fn incremental_reparse_is_equivalent_to_full_parse(
-    initial_text: &str,
-    edits: &[ArbTextEdit],
-) {
+fn incremental_reparse_is_equivalent_to_full_parse(initial_text: &str, edits: &[ArbTextEdit]) {
     let initial_text = normalize(initial_text);
     let mut current_text = TextBuf::from(initial_text);
     let mut current_file = lang_fall().parse(current_text.as_text());
@@ -205,11 +202,13 @@ fn normalize(text: &str) -> String {
     }
     let text = text.trim_end();
     let n_blank_lines = text.lines().take_while(|&line| is_blank(line)).count();
-    let indent = text.lines()
+    let indent = text
+        .lines()
         .skip(n_blank_lines)
         .filter(|&line| !is_blank(line))
         .map(|line| line.chars().take_while(|&c| c == ' ').count())
-        .min().unwrap();
+        .min()
+        .unwrap();
     let mut result = String::new();
     for line in text.lines().skip(n_blank_lines) {
         if !is_blank(line) {

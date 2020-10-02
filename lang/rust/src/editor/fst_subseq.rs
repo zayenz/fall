@@ -1,11 +1,15 @@
 use fst;
 
 #[derive(Clone, Copy)]
-pub struct FstSubSeq<'a> { query: &'a str }
+pub struct FstSubSeq<'a> {
+    query: &'a str,
+}
 
 impl<'a> FstSubSeq<'a> {
     pub fn new<S: AsRef<str>>(query: &'a S) -> FstSubSeq<'a> {
-        FstSubSeq { query: query.as_ref() }
+        FstSubSeq {
+            query: query.as_ref(),
+        }
     }
 }
 

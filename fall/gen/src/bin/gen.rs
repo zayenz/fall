@@ -1,18 +1,13 @@
 extern crate clap;
 extern crate fall_gen;
-extern crate lang_fall;
 extern crate fall_tree;
+extern crate lang_fall;
 
-use std::{
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
-use fall_gen::{
-    process, Task, Result
-};
+use fall_gen::{process, Result, Task};
 
 use clap::{App, Arg};
-
 
 fn main() -> Result<()> {
     let matches = App::new("Fall parser generator")

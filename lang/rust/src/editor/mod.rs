@@ -1,11 +1,14 @@
-use fall_tree::{File, TextEdit, TextRange, TextUnit, tu, AstNode, TextSuffix, FileEdit};
-use fall_tree::search::{find_leaf_at_offset, ancestors};
-use fall_tree::search::ast;
-use fall_tree::visitor::{visitor, process_node, process_subtree_bottom_up};
-use fall_editor::{EditorFileImpl, gen_syntax_tree, FileStructureNode};
+use crate::syntax::{
+    EnumDef, ExprStmt, FnDef, ImplDef, LetStmt, NameOwner, StructDef, TraitDef, TypeReference, EQ,
+    LET, SEMI,
+};
 use fall_editor::actions::ActionResult;
 use fall_editor::hl::{self, Highlights};
-use crate::syntax::{LET, SEMI, EQ, TypeReference, FnDef, ImplDef, LetStmt, NameOwner, StructDef, EnumDef, TraitDef, ExprStmt};
+use fall_editor::{gen_syntax_tree, EditorFileImpl, FileStructureNode};
+use fall_tree::search::ast;
+use fall_tree::search::{ancestors, find_leaf_at_offset};
+use fall_tree::visitor::{process_node, process_subtree_bottom_up, visitor};
+use fall_tree::{tu, AstNode, File, FileEdit, TextEdit, TextRange, TextSuffix, TextUnit};
 
 mod actions;
 use self::actions::ACTIONS;
@@ -16,11 +19,11 @@ use self::file_symbols::process_symbols;
 mod symbol_index;
 pub use self::symbol_index::SymbolIndex;
 
-mod line_index;
 mod fst_subseq;
+mod line_index;
 
 pub struct RustEditorFile {
-    file: File
+    file: File,
 }
 
 impl RustEditorFile {
@@ -34,29 +37,35 @@ impl RustEditorFile {
             return None;
         }
         let let_stmt: LetStmt = ast::ancestor(let_kw)?;
-        if let_stmt.node().children().any(|node| node.ty() == SEMI || node.ty() == EQ) {
+        if let_stmt
+            .node()
+            .children()
+            .any(|node| node.ty() == SEMI || node.ty() == EQ)
+        {
             return None;
         }
-        if self.file.text().slice(TextSuffix::from(let_stmt.node().range().end())).starts_with(";") {
+        if self
+            .file
+            .text()
+            .slice(TextSuffix::from(let_stmt.node().range().end()))
+            .starts_with(";")
+        {
             return None;
         }
         Some(";".into())
     }
 
     pub fn expand(&self, offset: TextUnit) -> Option<TextEdit> {
-        let leaf = find_leaf_at_offset(self.file.root(), offset - tu(2))
-            .left_biased()?;
+        let leaf = find_leaf_at_offset(self.file.root(), offset - tu(2)).left_biased()?;
         let expr: ExprStmt = ast::ancestor(leaf)?;
         let mut edit = FileEdit::new(&self.file);
-        let text = self.file.text().slice(
-            TextRange::from_to(
-                expr.node().range().start(),
-                expr.node().range().end() - tu(3),
-            ),
-        );
+        let text = self.file.text().slice(TextRange::from_to(
+            expr.node().range().start(),
+            expr.node().range().end() - tu(3),
+        ));
         edit.replace_substring(
             TextRange::from_to(expr.node().range().start(), offset),
-            format!("eprintln!(\"{text} = {{:?}}\", {text});", text = text)
+            format!("eprintln!(\"{text} = {{:?}}\", {text});", text = text),
         );
         let edit = edit.into_text_edit();
         Some(edit)
@@ -86,9 +95,13 @@ impl RustEditorFile {
                         let t1 = trefs.next();
                         let t2 = trefs.next();
                         match (t1, t2) {
-                            (Some(t1), Some(t2)) => acc.push(format!("impl {} for {}", t1.node().text(), t2.node().text())),
+                            (Some(t1), Some(t2)) => acc.push(format!(
+                                "impl {} for {}",
+                                t1.node().text(),
+                                t2.node().text()
+                            )),
                             (Some(t1), None) => acc.push(format!("impl {}", t1.node().text())),
-                            _ => ()
+                            _ => (),
                         }
                     }),
             );
@@ -96,7 +109,6 @@ impl RustEditorFile {
         acc.reverse();
         acc
     }
-
 }
 
 impl EditorFileImpl for RustEditorFile {
@@ -117,17 +129,12 @@ impl EditorFileImpl for RustEditorFile {
     }
 
     fn highlight(&self) -> Highlights {
-        process_subtree_bottom_up(
-            self.file.root(),
-            hl::visitor(
-                &[]
-            ),
-        )
+        process_subtree_bottom_up(self.file.root(), hl::visitor(&[]))
     }
 
     fn structure(&self) -> Vec<FileStructureNode> {
         let mut nodes = Vec::new();
-        process_symbols(self.file(), &mut|name, node| {
+        process_symbols(self.file(), &mut |name, node| {
             nodes.push(FileStructureNode {
                 name: name.to_string(),
                 range: node.range(),
@@ -139,11 +146,7 @@ impl EditorFileImpl for RustEditorFile {
 
     fn context_actions(&self, range: TextRange) -> Vec<&'static str> {
         let mut result = Vec::new();
-        ::fall_editor::actions::default_context_actions(
-            self.file(),
-            range,
-            &mut result,
-        );
+        ::fall_editor::actions::default_context_actions(self.file(), range, &mut result);
         for &(action_id, action) in ACTIONS {
             if action(self.file(), range.start(), false).is_some() {
                 result.push(action_id);
@@ -153,13 +156,9 @@ impl EditorFileImpl for RustEditorFile {
     }
 
     fn apply_context_action(&self, range: TextRange, id: &str) -> Option<TextEdit> {
-        let def = ::fall_editor::actions::apply_default_context_action(
-            self.file(),
-            range,
-            id,
-        );
+        let def = ::fall_editor::actions::apply_default_context_action(self.file(), range, id);
         if let Some(result) = def {
-            return result
+            return result;
         }
         let &(_, action) = ACTIONS.iter().find(|&&(aid, _)| aid == id)?;
         action(self.file(), range.start(), true).map(ActionResult::into_edit)
@@ -168,14 +167,17 @@ impl EditorFileImpl for RustEditorFile {
 
 #[test]
 fn extend_selection() {
-    use fall_tree::{tu};
-    let (text, range) = ::fall_tree::test_util::extract_range(r"
+    use fall_tree::tu;
+    let (text, range) = ::fall_tree::test_util::extract_range(
+        r"
 impl S {
 
 ^^    fn foo() {
 
     }
-}", "^");
+}",
+        "^",
+    );
 
     let file = RustEditorFile::parse(&text);
     let range = file.extend_selection(range).unwrap();
@@ -191,23 +193,35 @@ fn space_after_let() {
         assert_eq!(actual.as_ref().map(|s| s.as_str()), expcted_result)
     }
 
-    do_test(Some(";"), r"
+    do_test(
+        Some(";"),
+        r"
 fn main() {
     let ^
-}");
+}",
+    );
 
-    do_test(None, r"
+    do_test(
+        None,
+        r"
 fn main() {
     if let ^
-}");
+}",
+    );
 
-    do_test(None, r"
+    do_test(
+        None,
+        r"
 fn main() {
     let ^;
-}");
+}",
+    );
 
-    do_test(None, r"
+    do_test(
+        None,
+        r"
 fn main() {
     if let ^x = 92;
-}");
+}",
+    );
 }

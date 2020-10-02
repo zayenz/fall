@@ -2,9 +2,9 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::ops;
 
-use serde::{Serialize, Serializer, Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use super::{TextUnit, tu};
+use super::{tu, TextUnit};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct TextRange {
@@ -37,7 +37,6 @@ impl<'de> Deserialize<'de> for TextRange {
     }
 }
 
-
 impl TextRange {
     pub fn empty() -> TextRange {
         TextRange::from_to(tu(0), tu(0))
@@ -45,7 +44,10 @@ impl TextRange {
 
     pub fn from_to(from: TextUnit, to: TextUnit) -> TextRange {
         assert!(from <= to, "Invalid text range [{}; {})", from, to);
-        TextRange { start: from, end: to }
+        TextRange {
+            start: from,
+            end: to,
+        }
     }
 
     pub fn from_len(from: TextUnit, len: TextUnit) -> TextRange {
@@ -93,7 +95,6 @@ impl TextRange {
         TextRange::from_len(self.start() + offset, self.len())
     }
 }
-
 
 impl ops::Index<TextRange> for str {
     type Output = str;
