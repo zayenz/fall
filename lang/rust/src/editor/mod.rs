@@ -146,7 +146,7 @@ impl EditorFileImpl for RustEditorFile {
 
     fn context_actions(&self, range: TextRange) -> Vec<&'static str> {
         let mut result = Vec::new();
-        ::fall_editor::actions::default_context_actions(self.file(), range, &mut result);
+        fall_editor::actions::default_context_actions(self.file(), range, &mut result);
         for &(action_id, action) in ACTIONS {
             if action(self.file(), range.start(), false).is_some() {
                 result.push(action_id);
@@ -156,7 +156,7 @@ impl EditorFileImpl for RustEditorFile {
     }
 
     fn apply_context_action(&self, range: TextRange, id: &str) -> Option<TextEdit> {
-        let def = ::fall_editor::actions::apply_default_context_action(self.file(), range, id);
+        let def = fall_editor::actions::apply_default_context_action(self.file(), range, id);
         if let Some(result) = def {
             return result;
         }
@@ -168,7 +168,7 @@ impl EditorFileImpl for RustEditorFile {
 #[test]
 fn extend_selection() {
     use fall_tree::tu;
-    let (text, range) = ::fall_tree::test_util::extract_range(
+    let (text, range) = fall_tree::test_util::extract_range(
         r"
 impl S {
 
@@ -187,7 +187,7 @@ impl S {
 #[test]
 fn space_after_let() {
     fn do_test(expcted_result: Option<&str>, text: &str) {
-        let (text, offset) = ::fall_tree::test_util::extract_offset(text, "^");
+        let (text, offset) = fall_tree::test_util::extract_offset(text, "^");
         let file = RustEditorFile::parse(&text);
         let actual = file.after_space_typed(offset);
         assert_eq!(actual.as_ref().map(|s| s.as_str()), expcted_result)

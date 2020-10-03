@@ -41,7 +41,7 @@ impl ops::AddAssign<TextUnit> for TextUnit {
     }
 }
 
-impl ::std::iter::Sum for TextUnit {
+impl std::iter::Sum for TextUnit {
     fn sum<I: Iterator<Item = TextUnit>>(iter: I) -> Self {
         TextUnit(iter.map(|u| u.0).sum())
     }
@@ -92,8 +92,8 @@ impl<'de> Deserialize<'de> for TextUnit {
     }
 }
 
-impl ::rand::Rand for TextUnit {
-    fn rand<R: ::rand::Rng>(rng: &mut R) -> TextUnit {
+impl rand::Rand for TextUnit {
+    fn rand<R: rand::Rng>(rng: &mut R) -> TextUnit {
         TextUnit(u32::rand(rng))
     }
 }

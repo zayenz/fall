@@ -3,7 +3,7 @@ use tera::Tera;
 
 mod codegen;
 
-pub type Result<T> = ::std::result::Result<T, ::failure::Error>;
+pub type Result<T> = std::result::Result<T, failure::Error>;
 
 pub fn generate(analysis: &Analysis) -> Result<String> {
     let mut cg = codegen::Codegen::new(analysis);
@@ -32,7 +32,7 @@ pub fn language() -> &'static rt::Language {
     fn create_parser_definition() -> rt::ParserDefinition {
         let parser_json = r##"{{ parser_json }}"##;
 
-        ::fall_parse::ParserDefinition {
+        fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
                 {% for node_type in node_types %}{{ node_type.0 | upper }}, {% endfor %}
@@ -121,8 +121,8 @@ impl<'f> {{ node.struct_name }}<'f> {
     {% endfor %}
 }
 
-impl<'f> ::std::fmt::Debug for {{ node.struct_name }}<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for {{ node.struct_name }}<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("{{ node.struct_name }}@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -157,8 +157,8 @@ impl<'f> rt::AstNode<'f> for {{ class.enum_name }}<'f> {
     }
 }
 
-impl<'f> ::std::fmt::Debug for {{ class.enum_name }}<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for {{ class.enum_name }}<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str(match *self {
             {% for v in class.variants %}
                 {{ class.enum_name }}::{{ v.1 }}(..) => "{{ v.1 }}@",

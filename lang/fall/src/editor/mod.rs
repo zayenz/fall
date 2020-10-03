@@ -49,7 +49,7 @@ impl EditorFileImpl for FileWithAnalysis {
 
     fn context_actions(&self, range: TextRange) -> Vec<&'static str> {
         let mut result = Vec::new();
-        ::fall_editor::actions::default_context_actions(self.file(), range, &mut result);
+        fall_editor::actions::default_context_actions(self.file(), range, &mut result);
         for &(action_id, action) in actions::ACTIONS.iter() {
             if action(self.file(), range, false).is_some() {
                 result.push(action_id);
@@ -59,7 +59,7 @@ impl EditorFileImpl for FileWithAnalysis {
     }
 
     fn apply_context_action(&self, range: TextRange, id: &str) -> Option<TextEdit> {
-        let def = ::fall_editor::actions::apply_default_context_action(self.file(), range, id);
+        let def = fall_editor::actions::apply_default_context_action(self.file(), range, id);
         if let Some(result) = def {
             return result;
         }

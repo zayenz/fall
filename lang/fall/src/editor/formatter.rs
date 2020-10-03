@@ -82,7 +82,7 @@ fn test_reformat(before: &str, after: &str) {
     let file = crate::parse(before.trim());
     let edit = reformat_file(&file, FALL_SPACING, WHITESPACE);
     let actual = edit.apply(file.text());
-    ::fall_tree::test_util::report_diff(after.trim(), &actual.as_text().to_cow());
+    fall_tree::test_util::report_diff(after.trim(), &actual.as_text().to_cow());
 }
 
 #[test]

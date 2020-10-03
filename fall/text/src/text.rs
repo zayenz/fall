@@ -81,7 +81,7 @@ impl<'f> Text<'f> {
         TextBuf::from(self.as_str())
     }
 
-    pub fn chars(&self) -> ::std::str::Chars {
+    pub fn chars(&self) -> std::str::Chars {
         self.as_str().chars()
     }
 
@@ -142,13 +142,13 @@ impl<'f, 's> PartialOrd<&'s str> for Text<'f> {
 }
 
 impl<'a, 'b> Ord for Text<'a> {
-    fn cmp(&self, other: &Text<'a>) -> ::std::cmp::Ordering {
+    fn cmp(&self, other: &Text<'a>) -> std::cmp::Ordering {
         self.as_str().cmp(other.as_str())
     }
 }
 
-impl<'f> ::std::hash::Hash for Text<'f> {
-    fn hash<H: ::std::hash::Hasher>(&self, state: &mut H) {
+impl<'f> std::hash::Hash for Text<'f> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.as_str().hash(state)
     }
 }

@@ -43,7 +43,7 @@ impl<V: Send + 'static> FileIndex<V> {
         };
         let imp = Arc::new(imp);
         let imp2 = imp.clone();
-        ::std::thread::spawn(move || watch(&imp2));
+        std::thread::spawn(move || watch(&imp2));
         FileIndex { imp }
     }
 
@@ -69,7 +69,7 @@ pub struct FileIndexImpl<V> {
 }
 
 fn watch<V>(index: &FileIndexImpl<V>) {
-    let initial_indexing_start = ::std::time::Instant::now();
+    let initial_indexing_start = std::time::Instant::now();
     for path in index.file_set.roots.iter() {
         index.change(path)
     }

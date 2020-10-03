@@ -1,7 +1,7 @@
 use fall_tree::{Text, TextRange, AstNode};
 use fall_tree::search::{children_of_type, child_of_type_exn, child_of_type};
 
-use ::{STRING, IDENT, SIMPLE_STRING, PUB,
+use {STRING, IDENT, SIMPLE_STRING, PUB,
        LexRule, SynRule, VerbatimDef,
        RefExpr, AstClassDef, Attributes, Attribute, TestDef,
        CallExpr};

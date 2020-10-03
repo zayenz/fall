@@ -240,7 +240,7 @@ impl<'g> Parser<'g> {
     }
 }
 
-impl<'g> ::std::ops::Index<Pos> for Parser<'g> {
+impl<'g> std::ops::Index<Pos> for Parser<'g> {
     type Output = Token;
 
     fn index(&self, index: Pos) -> &Self::Output {
@@ -248,7 +248,7 @@ impl<'g> ::std::ops::Index<Pos> for Parser<'g> {
     }
 }
 
-impl<'g> ::std::ops::Index<NodeTypeRef> for Parser<'g> {
+impl<'g> std::ops::Index<NodeTypeRef> for Parser<'g> {
     type Output = NodeType;
 
     fn index(&self, index: NodeTypeRef) -> &Self::Output {

@@ -23,7 +23,7 @@ use fall_tree::{AstNode, File};
 mod generate;
 mod util;
 
-pub type Result<T> = ::std::result::Result<T, Error>;
+pub type Result<T> = std::result::Result<T, Error>;
 
 pub enum Task {
     Generate(PathBuf),
@@ -115,7 +115,7 @@ impl TestRenderer {
 
             fn main() {
                 let mut input = String::new();
-                ::std::io::stdin().read_to_string(&mut input).unwrap();
+                std::io::stdin().read_to_string(&mut input).unwrap();
                 for test in input.split("\n***###***\n") {
                     let file = syntax::language().parse(test.to_owned());
                     println!("{}\n", fall_tree::dump_file(&file));
@@ -178,7 +178,7 @@ impl TestRenderer {
 }
 
 fn base_directory() -> Result<PathBuf> {
-    let result = ::std::env::temp_dir().join("fall-tests");
+    let result = std::env::temp_dir().join("fall-tests");
     fs::create_dir_all(&result)?;
     fs::create_dir_all(&result.join("src"))?;
     Ok(result)
@@ -189,7 +189,7 @@ fn fall_dir() -> PathBuf {
     PathBuf::from(dir).parent().unwrap().to_owned()
 }
 
-fn put_text_if_changed(path: &Path, text: &str) -> ::std::io::Result<()> {
+fn put_text_if_changed(path: &Path, text: &str) -> std::io::Result<()> {
     if path.exists() {
         let old_text = fs::read_to_string(path)?;
         if old_text == text {

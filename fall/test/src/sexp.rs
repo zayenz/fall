@@ -21,7 +21,7 @@ pub fn language() -> &'static rt::Language {
     fn create_parser_definition() -> rt::ParserDefinition {
         let parser_json = r##"[{"Pub":{"ty":5,"body":5,"replaceable":false}},{"Or":[7,8]},{"Pub":{"ty":6,"body":13,"replaceable":false}},{"Rep":1},{"And":[[3],null]},{"Or":[4]},{"Token":4},{"And":[[6],null]},{"And":[[2],null]},{"Token":2},{"Rep":1},{"Token":3},{"And":[[9,10,11],null]},{"Or":[12]}]"##;
 
-        ::fall_parse::ParserDefinition {
+        fall_parse::ParserDefinition {
             node_types: vec![rt::ERROR, WHITESPACE, LPAREN, RPAREN, ATOM, FILE, LIST],
             syntactical_rules: rt::parser_from_str(parser_json),
 

@@ -4,5 +4,5 @@ use self::super::super::foo;
 
 
 fn foo() {
-    let x = ::Vec::<Vec<i32>>::new;
+    let x = Vec::<Vec<i32>>::new;
 }

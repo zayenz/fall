@@ -71,7 +71,7 @@ impl<'f> DB<'f> {
     }
 }
 
-pub(crate) trait Query<'f>: ::std::fmt::Debug {
+pub(crate) trait Query<'f>: std::fmt::Debug {
     type Result;
 }
 

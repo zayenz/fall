@@ -138,7 +138,7 @@ FILE
 
 ----------------------------------------
 impl Node {}
-unsafe impl<'f> ::Debug for Node<'f> where Self: 'static { }
+unsafe impl<'f> Debug for Node<'f> where Self: 'static { }
 
 FILE
   IMPL_DEF

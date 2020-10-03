@@ -37,7 +37,7 @@ pub fn language() -> &'static rt::Language {
     fn create_parser_definition() -> rt::ParserDefinition {
         let parser_json = r##"[{"Pub":{"ty":12,"body":19,"replaceable":false}},{"Pub":{"ty":13,"body":22,"replaceable":false}},{"Or":[25]},{"Or":[28]},{"Pub":{"ty":14,"body":31,"replaceable":false}},{"Or":[32]},{"Pub":{"ty":15,"body":36,"replaceable":false}},{"Or":[38]},{"Or":[41,47]},{"Token":5},{"Token":2},{"And":[[9,10],null]},{"Token":6},{"Token":11},{"And":[[12,4,13,4],null]},{"Token":7},{"And":[[15,1],null]},{"Token":8},{"And":[[17,6],null]},{"Or":[11,14,16,18]},{"And":[[2],null]},{"And":[[3],null]},{"Or":[20,21]},{"Token":3},{"Token":4},{"And":[[23,24],null]},{"Token":3},{"Token":3},{"And":[[26,27],null]},{"Opt":5},{"And":[[29],null]},{"Or":[30]},{"And":[[],null]},{"Token":9},{"Token":10},{"And":[[33,7,34],1]},{"Or":[35]},{"Rep":8},{"And":[[37],null]},{"Token":9},{"Token":10},{"And":[[39,7,40],1]},{"Token":10},{"Not":42},"Any",{"And":[[43,44],null]},{"Or":[45]},{"And":[[46],null]}]"##;
 
-        ::fall_parse::ParserDefinition {
+        fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
                 WHITESPACE,

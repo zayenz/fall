@@ -31,7 +31,7 @@ impl<I: EditorFileImpl> Clone for EditorFile<I> {
     }
 }
 
-impl<I: EditorFileImpl> ::std::ops::Deref for EditorFile<I> {
+impl<I: EditorFileImpl> std::ops::Deref for EditorFile<I> {
     type Target = I;
 
     fn deref(&self) -> &I {

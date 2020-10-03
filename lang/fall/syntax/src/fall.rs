@@ -84,7 +84,7 @@ pub fn language() -> &'static rt::Language {
     }
     fn create_parser_definition() -> rt::ParserDefinition {
         let parser_json = r##"[{"Pub":{"ty":32,"body":37,"replaceable":false}},{"Or":[39,41,43,45,47,49,51]},{"Or":[52,53,54,55,56]},{"Pub":{"ty":33,"body":77,"replaceable":false}},{"Pub":{"ty":34,"body":83,"replaceable":false}},{"Pub":{"ty":35,"body":86,"replaceable":false}},{"Pratt":{"atoms":[12,7,9],"prefixes":[],"infixes":[{"ty":39,"op":87,"priority":999,"has_rhs":false},{"ty":40,"op":88,"priority":999,"has_rhs":false}]}},{"Pub":{"ty":36,"body":93,"replaceable":false}},{"Pub":{"ty":37,"body":96,"replaceable":false}},{"Pub":{"ty":38,"body":106,"replaceable":false}},{"Pub":{"ty":39,"body":109,"replaceable":false}},{"Pub":{"ty":40,"body":112,"replaceable":false}},{"Pub":{"ty":41,"body":118,"replaceable":false}},{"Pub":{"ty":42,"body":123,"replaceable":false}},{"Pub":{"ty":43,"body":128,"replaceable":false}},{"Pub":{"ty":44,"body":132,"replaceable":false}},{"Pub":{"ty":45,"body":139,"replaceable":false}},{"Pub":{"ty":46,"body":147,"replaceable":false}},{"Pub":{"ty":47,"body":152,"replaceable":false}},{"Pub":{"ty":48,"body":157,"replaceable":false}},{"Or":[167]},{"Or":[172]},{"Or":[176]},{"Or":[180]},{"Or":[184]},{"Or":[199]},{"Pub":{"ty":49,"body":203,"replaceable":false}},{"Pub":{"ty":50,"body":221,"replaceable":false}},{"Pub":{"ty":51,"body":242,"replaceable":false}},{"Pub":{"ty":52,"body":249,"replaceable":false}},{"Pub":{"ty":53,"body":255,"replaceable":false}},{"Pub":{"ty":54,"body":258,"replaceable":false}},{"Pub":{"ty":55,"body":262,"replaceable":false}},{"Or":[266,269,271,273]},{"WithSkip":[1,2]},{"Rep":34},{"And":[[35],null]},{"Or":[36]},{"ContextualToken":[6,"tokenizer"]},{"And":[[38],null]},{"ContextualToken":[10,"pub"]},{"And":[[40],null]},{"ContextualToken":[7,"rule"]},{"And":[[42],null]},{"Token":19},{"And":[[44],null]},{"ContextualToken":[8,"verbatim"]},{"And":[[46],null]},{"ContextualToken":[9,"ast"]},{"And":[[48],null]},{"ContextualToken":[11,"test"]},{"And":[[50],null]},{"And":[[13],null]},{"And":[[3],null]},{"And":[[26],null]},{"And":[[27],null]},{"And":[[15],null]},{"Opt":16},{"ContextualToken":[10,"pub"]},{"Opt":58},{"ContextualToken":[7,"rule"]},{"Token":31},{"Opt":4},{"Token":20},{"Token":21},{"And":[[63,22,64],null]},{"Token":20},{"Not":1},"Any",{"And":[[67,68],null]},{"Or":[69]},{"Rep":70},{"And":[[66,71],null]},{"Or":[65,72]},{"Layer":[73,9]},{"And":[[57,59,60,61,62,74],3]},{"Or":[75]},{"Cached":76},{"Token":26},{"Call":[20,[[0,5]]]},{"Layer":[23,79]},{"Token":27},{"And":[[78,80,81],null]},{"Or":[82]},{"Token":31},{"And":[[84],null]},{"Or":[85]},{"Token":15},{"Token":14},{"Token":31},{"And":[[89],null]},{"Token":29},{"And":[[91],null]},{"Or":[90,92]},{"Rep":6},{"And":[[94],null]},{"Or":[95]},{"Opt":8},{"Token":13},{"And":[[98,8],null]},{"Or":[99]},{"Rep":100},{"And":[[97,101],null]},{"Or":[102]},{"Call":[21,[[1,103]]]},{"And":[[104],null]},{"Or":[105]},{"Token":15},{"And":[[6,107],null]},{"Or":[108]},{"Token":14},{"And":[[6,110],null]},{"Or":[111]},{"Token":24},{"Token":31},{"Rep":6},{"Token":25},{"And":[[113,114,115,116],null]},{"Or":[117]},{"ContextualToken":[6,"tokenizer"]},{"Rep":14},{"Call":[21,[[1,120]]]},{"And":[[119,121],1]},{"Or":[122]},{"Opt":16},{"Token":31},{"Opt":19},{"And":[[124,125,19,126],2]},{"Or":[127]},{"ContextualToken":[11,"test"]},{"Token":30},{"And":[[129,130],1]},{"Or":[131]},{"Token":19},{"Token":22},{"Call":[20,[[0,17]]]},{"Layer":[24,135]},{"Token":23},{"And":[[133,134,136,137],null]},{"Or":[138]},{"Token":31},{"Token":26},{"Token":27},{"And":[[141,18,142],null]},{"Or":[143]},{"Opt":144},{"And":[[140,145],null]},{"Or":[146]},{"Token":28},{"And":[[148],null]},{"Token":31},{"And":[[150],null]},{"Or":[149,151]},{"Token":29},{"And":[[153],null]},{"Token":30},{"And":[[155],null]},{"Or":[154,156]},{"Var":0},"Eof",{"And":[[159],null]},{"Token":17},{"And":[[161],null]},{"Or":[160,162]},{"And":[[158,163],1]},{"Or":[164]},{"Rep":165},{"And":[[166],null]},{"Token":20},{"Var":1},{"Layer":[22,169]},{"Token":21},{"And":[[168,170,171],1]},{"Token":20},{"Token":21},{"Call":[25,[[2,173],[3,174]]]},{"And":[[175],null]},{"Token":26},{"Token":27},{"Call":[25,[[2,177],[3,178]]]},{"And":[[179],null]},{"Token":22},{"Token":23},{"Call":[25,[[2,181],[3,182]]]},{"And":[[183],null]},{"Var":2},{"Var":2},{"Var":3},{"Call":[25,[[2,186],[3,187]]]},{"Var":3},{"And":[[185,188,189],null]},{"Var":3},{"Not":191},"Any",{"And":[[192,193],null]},{"Or":[194]},{"And":[[195],null]},{"Or":[190,196]},{"Rep":197},{"And":[[198],null]},{"ContextualToken":[8,"verbatim"]},{"Token":30},{"And":[[200,201],1]},{"Or":[202]},{"ContextualToken":[9,"ast"]},{"Token":20},{"ContextualToken":[3,"node"]},{"And":[[206],null]},{"ContextualToken":[4,"class"]},{"And":[[208],null]},{"ContextualToken":[5,"trait"]},{"And":[[210],null]},{"Or":[207,209,211]},{"And":[[28],null]},{"And":[[29],null]},{"And":[[30],null]},{"Or":[213,214,215]},{"WithSkip":[212,216]},{"Rep":217},{"Token":21},{"And":[[204,205,218,219],1]},{"Or":[220]},{"ContextualToken":[3,"node"]},{"Token":31},{"Token":18},{"Token":31},{"Token":17},{"And":[[226],null]},{"Token":20},{"Not":228},{"Not":229},{"And":[[230],null]},{"Or":[227,231]},{"And":[[225,232],null]},{"Or":[233]},{"Rep":234},{"And":[[224,235],null]},{"Or":[236]},{"Opt":237},{"Rep":31},{"Call":[21,[[1,239]]]},{"And":[[222,223,238,240],1]},{"Or":[241]},{"ContextualToken":[4,"class"]},{"Token":31},{"Token":31},{"Rep":245},{"Call":[21,[[1,246]]]},{"And":[[243,244,247],1]},{"Or":[248]},{"ContextualToken":[5,"trait"]},{"Token":31},{"Rep":31},{"Call":[21,[[1,252]]]},{"And":[[250,251,253],1]},{"Or":[254]},{"Token":31},{"And":[[256,32],null]},{"Or":[257]},{"Token":31},{"Opt":33},{"And":[[259,260],null]},{"Or":[261]},{"Token":15},{"Token":16},{"Token":31},{"And":[[263,264,265],null]},{"Token":16},{"Token":31},{"And":[[267,268],null]},{"Token":14},{"And":[[270],null]},{"Token":15},{"And":[[272],null]}]"##;
-        ::fall_parse::ParserDefinition {
+        fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
                 WHITESPACE,
@@ -471,8 +471,8 @@ impl<'f> FallFile<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for FallFile<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for FallFile<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("FallFile@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -499,8 +499,8 @@ impl<'f> TokenizerDef<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for TokenizerDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for TokenizerDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("TokenizerDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -530,8 +530,8 @@ impl<'f> LexRule<'f> {
         rt::child_of_type_exn(self.node(), IDENT).text()
     }
 }
-impl<'f> ::std::fmt::Debug for LexRule<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for LexRule<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("LexRule@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -570,8 +570,8 @@ impl<'f> SynRule<'f> {
         rt::AstChildren::new(self.node().children()).next()
     }
 }
-impl<'f> ::std::fmt::Debug for SynRule<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for SynRule<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("SynRule@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -598,8 +598,8 @@ impl<'f> Parameters<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for Parameters<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Parameters<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Parameters@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -626,8 +626,8 @@ impl<'f> Parameter<'f> {
         rt::child_of_type_exn(self.node(), IDENT).text()
     }
 }
-impl<'f> ::std::fmt::Debug for Parameter<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Parameter<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Parameter@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -654,8 +654,8 @@ impl<'f> Attributes<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for Attributes<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Attributes<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Attributes@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -685,8 +685,8 @@ impl<'f> Attribute<'f> {
         rt::AstChildren::new(self.node().children()).next()
     }
 }
-impl<'f> ::std::fmt::Debug for Attribute<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Attribute<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Attribute@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -709,8 +709,8 @@ impl<'f> rt::AstNode<'f> for AttributeValue<'f> {
     }
 }
 impl<'f> AttributeValue<'f> {}
-impl<'f> ::std::fmt::Debug for AttributeValue<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AttributeValue<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AttributeValue@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -737,8 +737,8 @@ impl<'f> VerbatimDef<'f> {
         rt::child_of_type_exn(self.node(), HASH_STRING).text()
     }
 }
-impl<'f> ::std::fmt::Debug for VerbatimDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for VerbatimDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("VerbatimDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -771,8 +771,8 @@ impl<'f> AstDef<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for AstDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AstDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AstDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -805,8 +805,8 @@ impl<'f> AstNodeDef<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for AstNodeDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AstNodeDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AstNodeDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -839,8 +839,8 @@ impl<'f> AstTraitDef<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for AstTraitDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AstTraitDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AstTraitDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -867,8 +867,8 @@ impl<'f> AstClassDef<'f> {
         self.node().children().find(|n| n.ty() == IDENT).unwrap()
     }
 }
-impl<'f> ::std::fmt::Debug for AstClassDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AstClassDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AstClassDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -898,8 +898,8 @@ impl<'f> MethodDef<'f> {
         rt::AstChildren::new(self.node().children()).next().unwrap()
     }
 }
-impl<'f> ::std::fmt::Debug for MethodDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for MethodDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("MethodDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -935,8 +935,8 @@ impl<'f> AstSelector<'f> {
         self.node().children().find(|n| n.ty() == DOT)
     }
 }
-impl<'f> ::std::fmt::Debug for AstSelector<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for AstSelector<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("AstSelector@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -963,8 +963,8 @@ impl<'f> TestDef<'f> {
         rt::child_of_type(self.node(), HASH_STRING).map(|n| n.text())
     }
 }
-impl<'f> ::std::fmt::Debug for TestDef<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for TestDef<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("TestDef@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -987,8 +987,8 @@ impl<'f> rt::AstNode<'f> for RefExpr<'f> {
     }
 }
 impl<'f> RefExpr<'f> {}
-impl<'f> ::std::fmt::Debug for RefExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for RefExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("RefExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1018,8 +1018,8 @@ impl<'f> CallExpr<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for CallExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for CallExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("CallExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1046,8 +1046,8 @@ impl<'f> BlockExpr<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for BlockExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for BlockExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("BlockExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1074,8 +1074,8 @@ impl<'f> OptExpr<'f> {
         rt::AstChildren::new(self.node().children()).next().unwrap()
     }
 }
-impl<'f> ::std::fmt::Debug for OptExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for OptExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("OptExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1102,8 +1102,8 @@ impl<'f> RepExpr<'f> {
         rt::AstChildren::new(self.node().children()).next().unwrap()
     }
 }
-impl<'f> ::std::fmt::Debug for RepExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for RepExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("RepExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1130,8 +1130,8 @@ impl<'f> SeqExpr<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for SeqExpr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for SeqExpr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("SeqExpr@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -1179,8 +1179,8 @@ impl<'f> rt::AstNode<'f> for Expr<'f> {
         }
     }
 }
-impl<'f> ::std::fmt::Debug for Expr<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Expr<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str(match *self {
             Expr::RefExpr(..) => "RefExpr@",
             Expr::CallExpr(..) => "CallExpr@",

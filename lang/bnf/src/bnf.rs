@@ -22,7 +22,7 @@ pub fn language() -> &'static rt::Language {
     }
     fn create_parser_definition() -> rt::ParserDefinition {
         let parser_json = r##"[{"Pub":{"ty":6,"body":9,"replaceable":false}},{"Or":[12]},{"Pub":{"ty":7,"body":14,"replaceable":false}},{"Pub":{"ty":8,"body":20,"replaceable":false}},{"Pub":{"ty":9,"body":23,"replaceable":false}},{"Pub":{"ty":10,"body":30,"replaceable":false}},{"WithSkip":[1,2]},{"Rep":6},{"And":[[7],null]},{"Or":[8]},{"Token":5},{"Token":2},{"And":[[10,11],null]},{"And":[[1,3],1]},{"Or":[13]},{"Token":3},{"And":[[15,4],null]},{"Or":[16]},{"Rep":17},{"And":[[4,18],null]},{"Or":[19]},{"Rep":5},{"And":[[5,21],null]},{"Or":[22]},{"Token":5},{"Token":2},{"Not":25},{"And":[[24,26],null]},{"Token":4},{"And":[[28],null]},{"Or":[27,29]}]"##;
-        ::fall_parse::ParserDefinition {
+        fall_parse::ParserDefinition {
             node_types: vec![
                 rt::ERROR,
                 WHITESPACE,
@@ -163,8 +163,8 @@ impl<'f> Grammar<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for Grammar<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Grammar<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Grammar@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -194,8 +194,8 @@ impl<'f> Prod<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for Prod<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Prod<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Prod@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -222,8 +222,8 @@ impl<'f> Alt<'f> {
         rt::AstChildren::new(self.node().children())
     }
 }
-impl<'f> ::std::fmt::Debug for Alt<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Alt<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Alt@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -246,8 +246,8 @@ impl<'f> rt::AstNode<'f> for Terminal<'f> {
     }
 }
 impl<'f> Terminal<'f> {}
-impl<'f> ::std::fmt::Debug for Terminal<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Terminal<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Terminal@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -270,8 +270,8 @@ impl<'f> rt::AstNode<'f> for Nonterminal<'f> {
     }
 }
 impl<'f> Nonterminal<'f> {}
-impl<'f> ::std::fmt::Debug for Nonterminal<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Nonterminal<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str("Nonterminal@")?;
         self.node().range().fmt(f)?;
         Ok(())
@@ -299,8 +299,8 @@ impl<'f> rt::AstNode<'f> for Symbol<'f> {
         }
     }
 }
-impl<'f> ::std::fmt::Debug for Symbol<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Symbol<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_str(match *self {
             Symbol::Terminal(..) => "Terminal@",
             Symbol::Nonterminal(..) => "Nonterminal@",

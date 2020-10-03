@@ -55,8 +55,8 @@ impl File {
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Node<'f>(imp::NodeImpl<'f>);
 
-impl<'f> ::std::fmt::Debug for Node<'f> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+impl<'f> std::fmt::Debug for Node<'f> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.0.debug(f)
     }
 }

@@ -248,7 +248,7 @@ fn performance_test() {
         return;
     }
     let text = file::get_text(test_data().join("parser.rs_")).unwrap();
-    let thread = ::std::thread::Builder::new()
+    let thread = std::thread::Builder::new()
         .stack_size(8 * 1024 * 1024)
         .spawn(|| {
             let (total, file) = elapsed::measure_time(|| lang_rust().parse(text));

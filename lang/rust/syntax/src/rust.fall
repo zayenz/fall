@@ -240,7 +240,7 @@ pub rule impl_def {
 
 test r"
 impl Node {}
-unsafe impl<'f> ::Debug for Node<'f> where Self: 'static { }
+unsafe impl<'f> Debug for Node<'f> where Self: 'static { }
 "
 
 pub rule trait_def {

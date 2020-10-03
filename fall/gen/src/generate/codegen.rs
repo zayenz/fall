@@ -9,7 +9,7 @@ use fall_parse as dst;
 
 use crate::util::{camel, scream};
 
-pub type Result<T> = std::result::Result<T, ::failure::Error>;
+pub type Result<T> = std::result::Result<T, failure::Error>;
 
 pub(super) struct Codegen<'a, 'f: 'a> {
     analysis: &'a Analysis<'f>,

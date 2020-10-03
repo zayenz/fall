@@ -287,7 +287,7 @@ impl ParserDefinition {
 
 pub mod runtime {
     pub fn parser_from_str(json: &str) -> Vec<crate::Expr> {
-        ::serde_json::from_str(json).unwrap()
+        serde_json::from_str(json).unwrap()
     }
 
     pub use crate::{parse, reparse, LexRule, ParserDefinition, RegexLexer};

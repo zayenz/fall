@@ -66,8 +66,8 @@ pub fn compare_trees(expected: &str, actual: &str) -> Changeset {
 }
 
 pub fn check_directory(lang: &Language, directory: &Path) {
-    let rewrite = ::std::env::var("rewrite_test_data").is_ok();
-    for file in ::std::fs::read_dir(directory).unwrap() {
+    let rewrite = std::env::var("rewrite_test_data").is_ok();
+    for file in std::fs::read_dir(directory).unwrap() {
         let file = file.unwrap();
         let path = file.path();
         if path.extension().unwrap_or_default() != "rs" {
@@ -79,7 +79,7 @@ pub fn check_directory(lang: &Language, directory: &Path) {
 }
 
 pub fn check_inline_tests(lang: &Language, grammar: &Path, test_data: &Path) {
-    let rewrite = ::std::env::var("rewrite_test_data").is_ok();
+    let rewrite = std::env::var("rewrite_test_data").is_ok();
     let grammar =
         file::get_text(grammar).unwrap_or_else(|_| panic!("Can't read {}", grammar.display()));
 

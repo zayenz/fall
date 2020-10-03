@@ -35,16 +35,16 @@ pub struct NodeImpl<'f> {
     file: &'f super::File,
 }
 
-impl<'f> ::std::cmp::PartialEq for NodeImpl<'f> {
+impl<'f> std::cmp::PartialEq for NodeImpl<'f> {
     fn eq(&self, other: &NodeImpl<'f>) -> bool {
         self.key() == other.key()
     }
 }
 
-impl<'f> ::std::cmp::Eq for NodeImpl<'f> {}
+impl<'f> std::cmp::Eq for NodeImpl<'f> {}
 
-impl<'f> ::std::hash::Hash for NodeImpl<'f> {
-    fn hash<H: ::std::hash::Hasher>(&self, state: &mut H) {
+impl<'f> std::hash::Hash for NodeImpl<'f> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.key().hash(state)
     }
 }
@@ -82,7 +82,7 @@ impl<'f> NodeImpl<'f> {
         }
     }
 
-    pub fn debug(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+    pub fn debug(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
             "Node({})",
@@ -102,7 +102,7 @@ impl<'f> NodeImpl<'f> {
 #[derive(Clone)]
 pub struct NodeChildren<'f> {
     file: &'f super::File,
-    inner: ::std::slice::Iter<'f, NodeId>,
+    inner: std::slice::Iter<'f, NodeId>,
 }
 
 impl<'f> Iterator for NodeChildren<'f> {
