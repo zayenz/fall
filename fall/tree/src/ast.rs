@@ -35,6 +35,6 @@ impl<'f, A: AstNode<'f>> Iterator for AstChildren<'f, A> {
                 return Some(a);
             }
         }
-        return None;
+        None
     }
 }

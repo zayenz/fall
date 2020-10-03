@@ -151,11 +151,10 @@ impl<'f> CallExpr<'f> {
         if !(self.fn_name() == "is_in" || self.fn_name() == "enter" || self.fn_name() == "exit") {
             return None;
         }
-        return self
-            .args()
+        self.args()
             .next()
             .and_then(|arg| child_of_type(arg.node(), SIMPLE_STRING))
-            .map(|ctx| lit_body(ctx.text()));
+            .map(|ctx| lit_body(ctx.text()))
     }
 }
 

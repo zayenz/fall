@@ -85,7 +85,7 @@ pub fn find_leaf_at_offset(node: Node, offset: TextUnit) -> LeafAtOffset {
     let left = children.next().unwrap();
     let right = children.next();
     assert!(children.next().is_none());
-    return if let Some(right) = right {
+    if let Some(right) = right {
         match (
             find_leaf_at_offset(left, offset),
             find_leaf_at_offset(right, offset),
@@ -97,7 +97,7 @@ pub fn find_leaf_at_offset(node: Node, offset: TextUnit) -> LeafAtOffset {
         }
     } else {
         find_leaf_at_offset(left, offset)
-    };
+    }
 }
 
 #[derive(Clone, Copy, Debug)]

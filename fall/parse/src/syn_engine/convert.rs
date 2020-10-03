@@ -67,7 +67,7 @@ fn reshuffle_events(events: &[Event]) -> Vec<Event> {
                         break;
                     }
                 }
-                for &(idx, ty) in forward_parents.iter().into_iter().rev() {
+                for &(idx, ty) in forward_parents.iter().rev() {
                     result.push(Event::Start {
                         ty,
                         forward_parent: None,
@@ -113,10 +113,10 @@ impl<'a> Convertor<'a> {
         builder.finish_internal();
 
         let right_edge = n_tokens + right_ws;
-        return Conversion {
+        Conversion {
             right_edge,
             n_events,
-        };
+        }
     }
 
     fn collect_tokens_for_binder<'t>(
@@ -152,8 +152,8 @@ impl<'a> Convertor<'a> {
                     let leading_ws = self.collect_tokens_for_binder(tokens);
                     let left_wd =
                         leading_ws.len() - (self.whitespace_binder)(ty, &leading_ws, true);
-                    for i in 0..left_wd {
-                        let t = tokens[i].0;
+                    for token in tokens.iter().take(left_wd) {
+                        let t = token.0;
                         builder.leaf(t.ty, t.len);
                     }
                     tokens = &tokens[left_wd..];
@@ -176,8 +176,8 @@ impl<'a> Convertor<'a> {
                         .iter()
                         .take_while(|&&(t, _)| (self.is_whitespace)(t.ty))
                         .count();
-                    for i in 0..non_white {
-                        let t = tokens[i].0;
+                    for token in tokens.iter().take(non_white) {
+                        let t = token.0;
                         builder.leaf(t.ty, t.len);
                     }
                     tokens = &tokens[non_white..];

@@ -5,8 +5,10 @@ use crate::syn_engine::{Event, Grammar};
 use crate::{ExprRef, NodeTypeRef};
 use fall_tree::{tu, NodeType, Text, TextSuffix, TextUnit};
 
+pub(crate) type ParserCache<'g> = (HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &'g [Event]);
+
 pub(crate) struct Parser<'g> {
-    cache: Option<(HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &'g [Event])>,
+    cache: Option<ParserCache<'g>>,
     pub grammar: &'g Grammar<'g>,
     text: Text<'g>,
     tokens: &'g [Token],
@@ -38,7 +40,7 @@ pub(crate) struct Mark(u32);
 
 impl<'g> Parser<'g> {
     pub fn new(
-        cache: Option<(HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &'g [Event])>,
+        cache: Option<ParserCache<'g>>,
         grammar: &'g Grammar<'g>,
         is_ws: &dyn Fn(Token) -> bool,
         text: Text<'g>,
@@ -108,7 +110,7 @@ impl<'g> Parser<'g> {
             }
         }
 
-        return None;
+        None
     }
 
     pub fn start_cached(&mut self, expr: ExprRef) -> Mark {

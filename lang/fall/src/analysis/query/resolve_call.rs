@@ -97,6 +97,7 @@ impl<'f> db::OnceQExecutor<'f> for super::ResolveCall<'f> {
             Some(CallKind::PrevIs(Arc::new(args)))
         };
 
+        #[allow(clippy::type_complexity)]
         let build_in: Vec<(
             &str,
             &mut dyn FnMut(&mut DiagnosticSink) -> Option<CallKind<'f>>,

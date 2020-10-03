@@ -1,10 +1,9 @@
-use fall_editor::actions::ActionResult;
-use fall_tree::{File, TextRange};
+use fall_editor::actions::ActionRangeItem;
 
 mod extract_rule;
 mod swap_alternatives;
 
-pub const ACTIONS: &[(&str, fn(&File, TextRange, bool) -> Option<ActionResult>)] = &[
+pub const ACTIONS: &[ActionRangeItem] = &[
     ("Swap alternatives", |file, range, apply| {
         swap_alternatives::swap_alternatives(file, range.start(), apply)
     }),

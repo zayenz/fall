@@ -28,7 +28,7 @@ impl<'f> db::OnceQExecutor<'f> for super::AllContexts {
         );
 
         for (k, v) in result.iter() {
-            if let &Some(call) = v {
+            if let Some(call) = v {
                 d.warning(call.node(), format!("Context `{}` is used only once", k))
             };
         }

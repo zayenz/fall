@@ -10,9 +10,8 @@ pub extern crate fall_tree;
 pub extern crate serde_json;
 
 use std::any::Any;
-use std::collections::HashMap;
 
-use fall_tree::{tu, Language, Metrics, NodeType, Text, TextEdit, TextUnit, TreeBuilder, ERROR};
+use fall_tree::{tu, Language, Metrics, NodeType, Text, TextEdit, TreeBuilder, ERROR};
 
 mod lex_engine;
 
@@ -21,6 +20,7 @@ use crate::lex_engine::{Lexer, Token};
 mod syn_engine;
 
 use crate::syn_engine::Event;
+use crate::syn_engine::ParserCache;
 
 pub struct RegexLexer {
     tys: Vec<NodeType>,
@@ -207,6 +207,7 @@ pub fn parse(
     Some(Box::new(incremental_data))
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn reparse(
     lang: &Language,
     lexer_def: &RegexLexer,
@@ -238,7 +239,7 @@ pub fn reparse(
 impl ParserDefinition {
     fn parse(
         &self,
-        prev: Option<(HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &[Event])>,
+        prev: Option<ParserCache>,
         text: Text,
         tokens: &[Token],
         lang: &Language,

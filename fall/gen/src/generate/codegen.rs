@@ -60,11 +60,11 @@ impl<'a, 'f> Codegen<'a, 'f> {
         let lex_rules = self
             .file()
             .tokenizer_def()
-            .ok_or(format_err!("no tokens defined"))?
+            .ok_or_else(|| format_err!("no tokens defined"))?
             .lex_rules()
             .filter(|r| !r.is_contextual())
             .map(|r| {
-                let re = r.token_re().ok_or(format_err!("Bad token"))?;
+                let re = r.token_re().ok_or_else(|| format_err!("Bad token"))?;
                 Ok(CtxLexRule {
                     ty: r.node_type(),
                     re: format!("{:?}", re),
@@ -254,7 +254,7 @@ impl<'a, 'f> Codegen<'a, 'f> {
                 let ref_ = self
                     .analysis
                     .resolve_reference(ref_)
-                    .ok_or(format_err!("Unresolved references: {}", ref_.node().text()))?;
+                    .ok_or_else(|| format_err!("Unresolved references: {}", ref_.node().text()))?;
 
                 match ref_ {
                     RefKind::Token(rule) => {
@@ -263,7 +263,7 @@ impl<'a, 'f> Codegen<'a, 'f> {
                             dst::Expr::ContextualToken(
                                 ty_ref,
                                 rule.token_text()
-                                    .ok_or(format_err!("Missing contextual token text"))?
+                                    .ok_or_else(|| format_err!("Missing contextual token text"))?
                                     .to_string(),
                             )
                         } else {
@@ -279,7 +279,7 @@ impl<'a, 'f> Codegen<'a, 'f> {
                 let call = self
                     .analysis
                     .resolve_call(call)
-                    .ok_or(format_err!("Failed to compile {}", call.node().text()))?;
+                    .ok_or_else(|| format_err!("Failed to compile {}", call.node().text()))?;
 
                 match call {
                     CallKind::Eof => dst::Expr::Eof,
@@ -325,16 +325,14 @@ impl<'a, 'f> Codegen<'a, 'f> {
 
     fn gen_pratt(&mut self, ast: BlockExpr<'f>) -> Result<dst::PrattTable> {
         fn alt_to_rule<'f>(analysis: &Analysis<'f>, alt: Expr<'f>) -> Result<SynRule<'f>> {
-            match alt {
-                Expr::SeqExpr(expr) => match expr.parts().next() {
-                    Some(Expr::RefExpr(ref_)) => match analysis.resolve_reference(ref_) {
-                        Some(RefKind::RuleReference(rule)) => Ok(rule),
-                        _ => return Err(format_err!("Bad pratt spec")),
-                    },
-                    _ => return Err(format_err!("Bad pratt spec")),
-                },
-                _ => return Err(format_err!("Bad pratt spec")),
+            if let Expr::SeqExpr(expr) = alt {
+                if let Some(Expr::RefExpr(ref_)) = expr.parts().next() {
+                    if let Some(RefKind::RuleReference(rule)) = analysis.resolve_reference(ref_) {
+                        return Ok(rule);
+                    }
+                }
             }
+            Err(format_err!("Bad pratt spec"))
         }
 
         let mut result = dst::PrattTable {
@@ -347,12 +345,12 @@ impl<'a, 'f> Codegen<'a, 'f> {
 
             let ty = self
                 .syn_rule_ty(rule)
-                .ok_or(format_err!("non public pratt rule"))?;
+                .ok_or_else(|| format_err!("non public pratt rule"))?;
 
             let prat_kind = self
                 .analysis
                 .resolve_pratt_variant(rule)
-                .ok_or(format_err!("pratt rule without attributes"))?;
+                .ok_or_else(|| format_err!("pratt rule without attributes"))?;
 
             match prat_kind {
                 PratVariant::Atom(_) => result.atoms.push(self.syn_rule_ref(rule)),
@@ -389,7 +387,7 @@ impl<'a, 'f> Codegen<'a, 'f> {
         let description = self
             .analysis
             .resolve_method(method)
-            .ok_or(format_err!("Bad method `{}`", method.node().text()))?;
+            .ok_or_else(|| format_err!("Bad method `{}`", method.node().text()))?;
 
         let (ret_type, body) = match description {
             MethodKind::TextAccessor(lex_rule, arity) => {

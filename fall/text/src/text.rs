@@ -57,7 +57,10 @@ impl<'f> Text<'f> {
             !c.is_whitespace()
         }
 
-        let left = self.as_str().find(non_ws).unwrap_or(self.as_str().len());
+        let left = self
+            .as_str()
+            .find(non_ws)
+            .unwrap_or_else(|| self.as_str().len());
         let s = &self.as_str()[left..];
         let right = s
             .rfind(non_ws)
@@ -69,7 +72,8 @@ impl<'f> Text<'f> {
         ))
     }
 
-    pub fn to_string(&self) -> String {
+    #[allow(clippy::inherent_to_string_shadow_display, dead_code)]
+    fn to_string(&self) -> String {
         self.as_str().to_owned()
     }
 

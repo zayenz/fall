@@ -31,7 +31,7 @@ impl<'a> fst::Automaton for FstSubSeq<'a> {
         if byte == self.query.as_bytes()[state] {
             return state + 1;
         }
-        return state;
+        state
     }
 
     fn can_match(&self, _: &usize) -> bool {

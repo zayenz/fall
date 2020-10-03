@@ -2,17 +2,16 @@ use std::path::Path;
 
 use crate::{dump_file, dump_file_ws, tu, File, Language, TextRange, TextUnit};
 use difference::Changeset;
-use file;
 
 pub fn extract_range(input: &str, caret: &str) -> (String, TextRange) {
     let left_offset = input
         .find(caret)
-        .expect(&format!("No caret ({}) in\n{}\n", caret, input));
+        .unwrap_or_else(|| panic!("No caret ({}) in\n{}\n", caret, input));
     let mid_offset = left_offset + caret.len();
     let right_offset = mid_offset
         + input[mid_offset..]
             .find(caret)
-            .expect(&format!("Only single caret ({}) in \n{}\n", caret, input));
+            .unwrap_or_else(|| panic!("Only single caret ({}) in \n{}\n", caret, input));
     let input = input[..left_offset].to_string()
         + &input[mid_offset..right_offset]
         + &input[right_offset + caret.len()..];
@@ -26,7 +25,7 @@ pub fn extract_range(input: &str, caret: &str) -> (String, TextRange) {
 pub fn extract_offset(input: &str, caret: &str) -> (String, TextUnit) {
     let left_offset = input
         .find(caret)
-        .expect(&format!("No caret ({}) in\n{}\n", caret, input));
+        .unwrap_or_else(|| panic!("No caret ({}) in\n{}\n", caret, input));
     let right_offset = left_offset + caret.len();
     let input = input[..left_offset].to_string() + &input[right_offset..];
     (input, tu(left_offset as u32))
@@ -85,7 +84,7 @@ pub fn check_inline_tests(lang: &Language, grammar: &Path, test_data: &Path) {
 
     let tests = collect_tests(&grammar);
     let expected = render_tests(lang, &tests);
-    let actual = file::get_text(test_data).unwrap_or(String::new());
+    let actual = file::get_text(test_data).unwrap_or_default();
 
     if expected != actual {
         if rewrite {
@@ -108,7 +107,7 @@ fn collect_tests(mut grammar: &str) -> Vec<String> {
         let n_hashes = grammar.chars().take_while(|&c| c == '#').count();
         grammar = &grammar[n_hashes + 1..];
         if let Some(end) = grammar.find(&"\"################"[..1 + n_hashes]) {
-            let example = &grammar[..end].trim();
+            let &example = &grammar[..end].trim();
             result.push(example.to_string())
         }
     }
@@ -147,8 +146,8 @@ fn compute_diff(expected: &str, actual: &str) -> Option<Changeset> {
 }
 
 fn check_file(lang: &Language, source_path: &Path, tree: &Path, rewrite: bool) {
-    let source =
-        file::get_text(source_path).expect(&format!("Can't read {}", source_path.display()));
+    let source = file::get_text(source_path)
+        .unwrap_or_else(|_| panic!("Can't read {}", source_path.display()));
 
     let file = lang.parse(source);
     let actual_tree = dump_file(&file);
@@ -161,7 +160,7 @@ fn check_file(lang: &Language, source_path: &Path, tree: &Path, rewrite: bool) {
         }
         (false, None) => panic!("{} does not exist", tree.display()),
         (true, Some(expected_tree)) => {
-            if let Some(_) = compute_diff(&expected_tree, &actual_tree) {
+            if compute_diff(&expected_tree, &actual_tree).is_some() {
                 println!("Rewriting {}", tree.display());
                 file::put_text(tree, actual_tree).unwrap();
             }

@@ -1,10 +1,9 @@
 use crate::syntax::{EnumDef, NameOwner, StructDef, TypeParametersOwner, UseDecl};
-use fall_editor::actions::ActionResult;
+use fall_editor::actions::{ActionResult, ActionUnitItem};
 use fall_tree::search::ast;
 use fall_tree::{AstNode, File, FileEdit, TextUnit};
 
-pub const ACTIONS: &[(&str, fn(&File, TextUnit, bool) -> Option<ActionResult>)] =
-    &[("Add braces", add_use_braces), ("Add impl", add_impl)];
+pub const ACTIONS: &[ActionUnitItem] = &[("Add braces", add_use_braces), ("Add impl", add_impl)];
 
 fn add_use_braces(file: &File, offset: TextUnit, apply: bool) -> Option<ActionResult> {
     let use_decl: UseDecl = ast::node_at_offset(file.root(), offset)?;

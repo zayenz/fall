@@ -15,7 +15,7 @@ pub fn swap_alternatives(file: &File, offset: TextUnit, apply: bool) -> Option<A
     Some(ActionResult::Applied(edit.into_text_edit()))
 }
 
-fn find_swappable_nodes<'f>(file: &'f File, offset: TextUnit) -> Option<(Node<'f>, Node<'f>)> {
+fn find_swappable_nodes(file: &File, offset: TextUnit) -> Option<(Node, Node)> {
     let pipe = match find_leaf_at_offset(file.root(), offset) {
         LeafAtOffset::None => return None,
         LeafAtOffset::Single(n) => {

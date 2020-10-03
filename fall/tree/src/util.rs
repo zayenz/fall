@@ -43,9 +43,9 @@ fn dump(lang: &Language, root: Node, text: &str, include_whitespace: bool) -> St
 
         let ty_name = lang.node_type_info(n.ty()).name;
         if n.children().next().is_none() {
-            write!(buf, "{} {:?}\n", ty_name, &text[n.range()]).unwrap();
+            writeln!(buf, "{} {:?}", ty_name, &text[n.range()]).unwrap();
         } else {
-            write!(buf, "{}\n", ty_name).unwrap();
+            writeln!(buf, "{}", ty_name).unwrap();
             for child in n.children() {
                 go(lang, level + 1, child, text, buf, include_whitespace);
             }

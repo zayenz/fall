@@ -60,8 +60,8 @@ impl EditorFileImpl for FileWithAnalysis {
 
     fn apply_context_action(&self, range: TextRange, id: &str) -> Option<TextEdit> {
         let def = fall_editor::actions::apply_default_context_action(self.file(), range, id);
-        if let Some(result) = def {
-            return result;
+        if def.is_some() {
+            return def;
         }
         let &(_, action) = actions::ACTIONS.iter().find(|&&(aid, _)| aid == id)?;
         action(self.file(), range, true).map(ActionResult::into_edit)

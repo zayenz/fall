@@ -28,10 +28,10 @@ impl LineIndex {
         let line = self.newlines.upper_bound(&offset) - 1;
         let line_start_offset = self.newlines[line];
         let col = offset - line_start_offset;
-        return LineCol {
+        LineCol {
             line: line as u32,
             col: col.into(),
-        };
+        }
     }
 }
 

@@ -58,7 +58,7 @@ struct Query {
 
 impl Query {
     fn new(query: &str) -> Query {
-        let all_symbols = query.contains("#");
+        let all_symbols = query.contains('#');
         let query: String = query
             .chars()
             .filter(|&c| c != '#')

@@ -49,6 +49,7 @@ impl<'f> DB<'f> {
         self.file
     }
 
+    #[allow(clippy::let_and_return)]
     pub fn get<Q: QExecutor<'f>>(&self, q: Q) -> Q::Result {
         //        let id = format!("{:?}", q);
         //        let mut stack = self.query_stack.lock().unwrap();

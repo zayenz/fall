@@ -28,8 +28,7 @@ pub fn extend_selection(file: &File, range: TextRange) -> Option<TextRange> {
     };
     let node = find_covering_node(file.root(), range);
 
-    match ancestors(node).skip_while(|n| n.range() == range).next() {
-        None => None,
-        Some(parent) => Some(parent.range()),
-    }
+    ancestors(node)
+        .find(|n| n.range() != range)
+        .map(|parent| parent.range())
 }

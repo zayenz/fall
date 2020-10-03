@@ -58,7 +58,7 @@ impl<'f> FileEdit<'f> {
     }
 
     fn text_edit_for_node(&self, node: Node<'f>, edit_builder: &mut TextEditBuilder) {
-        if self.deleted.iter().find(|&&n| n == node).is_some() {
+        if self.deleted.iter().any(|&n| n == node) {
             edit_builder.delete(node.range());
             return;
         }

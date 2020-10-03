@@ -12,7 +12,7 @@ pub fn generate(analysis: &Analysis) -> Result<String> {
         .map_err(|e| format_err!("Failed to format template:\n{:?}", e))
 }
 
-const TEMPLATE: &'static str = r#####"
+const TEMPLATE: &str = r#####"
 use fall_parse::runtime as rt;
 pub use self::rt::ERROR;
 

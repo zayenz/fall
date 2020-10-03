@@ -23,6 +23,7 @@ mod parser;
 mod pratt;
 
 pub(crate) use self::expr::parse;
+pub(crate) use self::parser::ParserCache;
 
 mod convert;
 

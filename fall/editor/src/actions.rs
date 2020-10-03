@@ -11,17 +11,13 @@ pub fn default_context_actions(file: &File, range: TextRange, actions: &mut Vec<
     }
 }
 
-pub fn apply_default_context_action(
-    file: &File,
-    range: TextRange,
-    id: &str,
-) -> Option<Option<TextEdit>> {
+pub fn apply_default_context_action(file: &File, range: TextRange, id: &str) -> Option<TextEdit> {
     let action = DEFAULT_ACTIONS.iter().find(|&&(aid, _)| aid == id)?.1;
-    Some(action(file, range.start(), true).map(ActionResult::into_edit))
+    action(file, range.start(), true).map(ActionResult::into_edit)
 }
-
-pub const DEFAULT_ACTIONS: &[(&str, fn(&File, TextUnit, bool) -> Option<ActionResult>)] =
-    &[("Swap", swap)];
+pub type ActionUnitItem<'a> = (&'a str, fn(&File, TextUnit, bool) -> Option<ActionResult>);
+pub type ActionRangeItem<'a> = (&'a str, fn(&File, TextRange, bool) -> Option<ActionResult>);
+pub const DEFAULT_ACTIONS: &[ActionUnitItem] = &[("Swap", swap)];
 
 pub enum ActionResult {
     Available,
@@ -81,7 +77,7 @@ fn swap(file: &File, offset: TextUnit, apply: bool) -> Option<ActionResult> {
     Some(ActionResult::Applied(edit.into_text_edit()))
 }
 
-fn nonws_sibling<'f>(node: Node<'f>, direction: Direction) -> Option<Node<'f>> {
+fn nonws_sibling(node: Node, direction: Direction) -> Option<Node> {
     let lang = node.file().language();
     let mut node = sibling(node, direction)?;
     while lang.node_type_info(node.ty()).whitespace_like {
@@ -90,7 +86,7 @@ fn nonws_sibling<'f>(node: Node<'f>, direction: Direction) -> Option<Node<'f>> {
     Some(node)
 }
 
-fn find_comma<'f>(node: Node<'f>, offset: TextUnit) -> Option<Node<'f>> {
+fn find_comma(node: Node, offset: TextUnit) -> Option<Node> {
     fn is_comma(node: Node) -> bool {
         node.text() == ","
     }

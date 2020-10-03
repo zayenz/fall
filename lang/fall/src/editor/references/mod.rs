@@ -11,16 +11,16 @@ mod refdec;
 use self::refdec::{Declaration, Reference};
 
 pub fn resolve_reference(analysis: &Analysis, offset: TextUnit) -> Option<TextRange> {
-    return refdec::resolve_reference(analysis, offset, &|node| ref_provider(analysis, node));
+    refdec::resolve_reference(analysis, offset, &|node| ref_provider(analysis, node))
 }
 
 pub fn find_usages(analysis: &Analysis, offset: TextUnit) -> Vec<TextRange> {
-    return refdec::find_usages(
+    refdec::find_usages(
         analysis,
         offset,
         &|node| ref_provider(analysis, node),
         def_provider,
-    );
+    )
 }
 
 fn ref_provider<'f>(analysis: &Analysis<'f>, node: Node<'f>) -> Option<Reference<'f>> {
@@ -60,25 +60,22 @@ fn ref_provider<'f>(analysis: &Analysis<'f>, node: Node<'f>) -> Option<Reference
                 ))
             })
             .visit_nodes(&[IDENT], |ident, result| {
-                match ident.parent().and_then(CallExpr::wrap) {
-                    Some(call) => {
-                        if let Some(CallKind::RuleCall(..)) = analysis.resolve_call(call) {
-                            *result = Some(Reference::new(ident, |analysis, node| {
-                                let call = CallExpr::wrap(node.parent().unwrap()).unwrap();
-                                match analysis.resolve_call(call).unwrap() {
-                                    CallKind::RuleCall(rule, ..) => Some(rule.into()),
-                                    _ => unimplemented!(),
-                                }
-                            }))
-                        }
+                if let Some(call) = ident.parent().and_then(CallExpr::wrap) {
+                    if let Some(CallKind::RuleCall(..)) = analysis.resolve_call(call) {
+                        *result = Some(Reference::new(ident, |analysis, node| {
+                            let call = CallExpr::wrap(node.parent().unwrap()).unwrap();
+                            match analysis.resolve_call(call).unwrap() {
+                                CallKind::RuleCall(rule, ..) => Some(rule.into()),
+                                _ => unimplemented!(),
+                            }
+                        }))
                     }
-                    _ => {}
                 }
             }),
     )
 }
 
-fn def_provider<'f>(node: Node<'f>) -> Option<Declaration<'f>> {
+fn def_provider(node: Node) -> Option<Declaration> {
     process_node(
         node,
         visitor(None)

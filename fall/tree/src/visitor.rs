@@ -14,7 +14,7 @@ where
     V: Visit<'f, Context = C>,
 {
     traversal::bottom_up(node, |node| visitor.do_visit(node));
-    return visitor.ctx;
+    visitor.ctx
 }
 
 pub fn process_node<'f, V, C>(node: Node<'f>, mut visitor: VisitorBuilder<'f, C, V>) -> C

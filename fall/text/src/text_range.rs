@@ -54,44 +54,44 @@ impl TextRange {
         TextRange::from_to(from, from + len)
     }
 
-    pub fn start(&self) -> TextUnit {
+    pub fn start(self) -> TextUnit {
         self.start
     }
 
-    pub fn end(&self) -> TextUnit {
+    pub fn end(self) -> TextUnit {
         self.end
     }
 
-    pub fn len(&self) -> TextUnit {
+    pub fn len(self) -> TextUnit {
         self.end - self.start
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub fn is_empty(self) -> bool {
         self.start() == self.end()
     }
 
-    pub fn is_subrange_of(&self, other: TextRange) -> bool {
+    pub fn is_subrange_of(self, other: TextRange) -> bool {
         other.start() <= self.start() && self.end() <= other.end()
     }
 
-    pub fn intersects(&self, other: TextRange) -> bool {
+    pub fn intersects(self, other: TextRange) -> bool {
         !self.disjoint(other)
     }
 
-    pub fn disjoint(&self, other: TextRange) -> bool {
+    pub fn disjoint(self, other: TextRange) -> bool {
         self.end() <= other.start() || other.end() <= self.start()
     }
 
-    pub fn contains_offset_nonstrict(&self, offset: TextUnit) -> bool {
+    pub fn contains_offset_nonstrict(self, offset: TextUnit) -> bool {
         self.start() <= offset && offset <= self.end()
     }
 
-    pub fn glue(&self, right: TextRange) -> TextRange {
+    pub fn glue(self, right: TextRange) -> TextRange {
         assert_eq!(self.end(), right.start());
         TextRange::from_to(self.start(), right.end())
     }
 
-    pub fn shift_right(&self, offset: TextUnit) -> TextRange {
+    pub fn shift_right(self, offset: TextUnit) -> TextRange {
         TextRange::from_len(self.start() + offset, self.len())
     }
 }

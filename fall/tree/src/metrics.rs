@@ -2,6 +2,7 @@ use std::fmt;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+#[derive(Default)]
 pub struct Metrics {
     metrics: Mutex<Vec<Metric>>,
 }
@@ -9,7 +10,7 @@ pub struct Metrics {
 impl fmt::Display for Metrics {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for m in self.metrics.lock().unwrap().iter() {
-            write!(f, "{}\n", m)?;
+            writeln!(f, "{}", m)?;
         }
         Ok(())
     }

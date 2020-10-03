@@ -1,8 +1,7 @@
-use fall_tree::{Language, Text, TextUnit};
-use std::collections::HashMap;
+use fall_tree::{Language, Text};
 
 use crate::lex_engine::Token;
-use crate::syn_engine::parser::{Parser, Pos};
+use crate::syn_engine::parser::{Parser, ParserCache, Pos};
 use crate::syn_engine::Event;
 use crate::{Arg, Context, Expr, ExprRef, NodeTypeRef};
 
@@ -10,7 +9,7 @@ use super::pratt::parse_pratt;
 use super::Grammar;
 
 pub(crate) fn parse(
-    prev: Option<(HashMap<(TextUnit, ExprRef), (u32, u32, u32)>, &[Event])>,
+    prev: Option<ParserCache>,
     grammar: Grammar,
     lang: &Language,
     text: Text,
@@ -105,8 +104,8 @@ fn parse_expr_inner(p: &mut Parser, expr: ExprRef, tokens: Pos) -> Option<Pos> {
     }
 }
 
-fn parse_pub<'g>(
-    p: &mut Parser<'g>,
+fn parse_pub(
+    p: &mut Parser,
     tokens: Pos,
     ty_idx: NodeTypeRef,
     body: ExprRef,
@@ -126,8 +125,8 @@ fn parse_pub<'g>(
     Some(ts)
 }
 
-fn parse_pub_replace<'g>(
-    p: &mut Parser<'g>,
+fn parse_pub_replace(
+    p: &mut Parser,
     tokens: Pos,
     ty_idx: NodeTypeRef,
     body: ExprRef,
@@ -137,11 +136,7 @@ fn parse_pub_replace<'g>(
     Some(ts)
 }
 
-pub(crate) fn parse_or<'t, 'g>(
-    p: &mut Parser<'g>,
-    options: &'g [ExprRef],
-    tokens: Pos,
-) -> Option<Pos> {
+pub(crate) fn parse_or<'g>(p: &mut Parser<'g>, options: &'g [ExprRef], tokens: Pos) -> Option<Pos> {
     options
         .iter()
         .filter_map(|&opt| parse_expr(p, opt, tokens))
@@ -165,7 +160,7 @@ fn parse_and<'g>(
             break;
         }
     }
-    if consumed < commit.unwrap_or(parts.len()) {
+    if consumed < commit.unwrap_or_else(|| parts.len()) {
         return None;
     }
     if consumed < parts.len() {
@@ -175,7 +170,7 @@ fn parse_and<'g>(
     Some(tokens)
 }
 
-fn parse_token<'g>(p: &mut Parser<'g>, tokens: Pos, ty_idx: NodeTypeRef) -> Option<Pos> {
+fn parse_token(p: &mut Parser, tokens: Pos, ty_idx: NodeTypeRef) -> Option<Pos> {
     let (ty, ts) = p.bump(tokens)?;
     if p[ty_idx] != ty {
         return None;
@@ -192,18 +187,18 @@ fn parse_contextual_token<'g>(
     p.bump_by_text(tokens, text, ty_idx)
 }
 
-fn parse_opt<'g>(p: &mut Parser<'g>, tokens: Pos, body: ExprRef) -> Option<Pos> {
+fn parse_opt(p: &mut Parser, tokens: Pos, body: ExprRef) -> Option<Pos> {
     Some(parse_expr(p, body, tokens).unwrap_or(tokens))
 }
 
-fn parse_not<'g>(p: &mut Parser<'g>, tokens: Pos, e: ExprRef) -> Option<Pos> {
+fn parse_not(p: &mut Parser, tokens: Pos, e: ExprRef) -> Option<Pos> {
     match parse_expr_pred(p, e, tokens) {
         None => Some(tokens),
         Some(_) => None,
     }
 }
 
-fn parse_eof<'g>(_: &mut Parser<'g>, tokens: Pos) -> Option<Pos> {
+fn parse_eof(_: &mut Parser, tokens: Pos) -> Option<Pos> {
     if tokens.is_empty() {
         Some(tokens)
     } else {
@@ -211,7 +206,7 @@ fn parse_eof<'g>(_: &mut Parser<'g>, tokens: Pos) -> Option<Pos> {
     }
 }
 
-fn parse_layer<'g>(p: &mut Parser<'g>, tokens: Pos, l: ExprRef, e: ExprRef) -> Option<Pos> {
+fn parse_layer(p: &mut Parser, tokens: Pos, l: ExprRef, e: ExprRef) -> Option<Pos> {
     let rest = parse_expr_pred(p, l, tokens)?;
     let layer = p.cut_suffix(tokens, rest);
     let mut leftovers = parse_expr(p, e, layer).unwrap_or(layer);
@@ -227,7 +222,7 @@ fn parse_layer<'g>(p: &mut Parser<'g>, tokens: Pos, l: ExprRef, e: ExprRef) -> O
     Some(rest)
 }
 
-fn parse_rep<'g>(p: &mut Parser<'g>, tokens: Pos, body: ExprRef) -> Option<Pos> {
+fn parse_rep(p: &mut Parser, tokens: Pos, body: ExprRef) -> Option<Pos> {
     let mut tokens = tokens;
     while let Some(ts) = parse_expr(p, body, tokens) {
         tokens = ts;
@@ -235,25 +230,17 @@ fn parse_rep<'g>(p: &mut Parser<'g>, tokens: Pos, body: ExprRef) -> Option<Pos> 
     Some(tokens)
 }
 
-fn parse_with_skip<'g>(
-    p: &mut Parser<'g>,
-    tokens: Pos,
-    first: ExprRef,
-    body: ExprRef,
-) -> Option<Pos> {
+fn parse_with_skip(p: &mut Parser, tokens: Pos, first: ExprRef, body: ExprRef) -> Option<Pos> {
     let mut skipped = false;
     let mut tokens = tokens;
     loop {
         if skipped {
             p.finish();
         }
-        match parse_expr_pred(p, first, tokens) {
-            Some(_) => {
-                if let Some(ts) = parse_expr(p, body, tokens) {
-                    return Some(ts);
-                }
+        if parse_expr_pred(p, first, tokens).is_some() {
+            if let Some(ts) = parse_expr(p, body, tokens) {
+                return Some(ts);
             }
-            None => {}
         }
         if skipped {
             p.reopen()
@@ -268,7 +255,7 @@ fn parse_with_skip<'g>(
     }
 }
 
-fn parse_enter<'g>(p: &mut Parser<'g>, tokens: Pos, ctx: Context, e: ExprRef) -> Option<Pos> {
+fn parse_enter(p: &mut Parser, tokens: Pos, ctx: Context, e: ExprRef) -> Option<Pos> {
     let idx = ctx.0 as usize;
     let old = p.contexts[idx];
     p.contexts[idx] = true;
@@ -277,7 +264,7 @@ fn parse_enter<'g>(p: &mut Parser<'g>, tokens: Pos, ctx: Context, e: ExprRef) ->
     result
 }
 
-fn parse_exit<'g>(p: &mut Parser<'g>, tokens: Pos, ctx: Context, e: ExprRef) -> Option<Pos> {
+fn parse_exit(p: &mut Parser, tokens: Pos, ctx: Context, e: ExprRef) -> Option<Pos> {
     let idx = ctx.0 as usize;
     let old = p.contexts[idx];
     p.contexts[idx] = false;
@@ -286,7 +273,7 @@ fn parse_exit<'g>(p: &mut Parser<'g>, tokens: Pos, ctx: Context, e: ExprRef) -> 
     result
 }
 
-fn parse_is_in<'g>(p: &mut Parser<'g>, tokens: Pos, ctx: Context) -> Option<Pos> {
+fn parse_is_in(p: &mut Parser, tokens: Pos, ctx: Context) -> Option<Pos> {
     if p.contexts[ctx.0 as usize] {
         Some(tokens)
     } else {
@@ -314,7 +301,7 @@ fn parse_call<'g>(
     result
 }
 
-fn parse_var<'g>(p: &mut Parser<'g>, tokens: Pos, i: Arg) -> Option<Pos> {
+fn parse_var(p: &mut Parser, tokens: Pos, i: Arg) -> Option<Pos> {
     let expr = p.args[i.0 as usize].unwrap();
     parse_expr(p, expr, tokens)
 }
@@ -331,7 +318,7 @@ fn parse_prev_is<'g>(p: &mut Parser<'g>, tokens: Pos, ts: &[NodeTypeRef]) -> Opt
     None
 }
 
-fn parse_inject<'g>(p: &mut Parser<'g>, pos: Pos, prefix: ExprRef, body: ExprRef) -> Option<Pos> {
+fn parse_inject(p: &mut Parser, pos: Pos, prefix: ExprRef, body: ExprRef) -> Option<Pos> {
     let prefix_mark = p.mark();
     let after_prefix = parse_expr(p, prefix, pos)?;
     let body_mark = p.mark();
@@ -342,7 +329,7 @@ fn parse_inject<'g>(p: &mut Parser<'g>, pos: Pos, prefix: ExprRef, body: ExprRef
     Some(result)
 }
 
-fn parse_cached<'g>(p: &mut Parser<'g>, expr: ExprRef, pos: Pos) -> Option<Pos> {
+fn parse_cached(p: &mut Parser, expr: ExprRef, pos: Pos) -> Option<Pos> {
     let mark = p.start_cached(expr);
     let result = p
         .get_from_cache(expr, pos)
